@@ -15,6 +15,11 @@ Userspace I²C HAL for the buses enabled in
 VINTF already lists `android.hardware.sensors@1.0` as passthrough;
 `android.hardware.sensors@1.0-impl` wraps this module in-process.
 
+HAL 1.11 subtracts still-detected gyro bias and a magnetometer
+calibration (least-squares sphere hard-iron, then a symmetric 3×3
+soft-iron ellipsoid). Cal file is `/data/misc/talkman-sensors/cal.txt`
+(`v4`). Mag accuracy is field quality only, not motion.
+
 Do not enable `sensors.qcom` or the leftover `sensorhal/` tree.
 Those are bullhead ADSP / nanohub leftovers and do not match this
 hardware.
