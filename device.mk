@@ -200,9 +200,9 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     libtinyxml
 
-# GNSS HAL
+# GNSS HAL — talkman impl ignores CAF NMEA length (nmeaCb SIGABRT)
 PRODUCT_PACKAGES += \
-    android.hardware.gnss@1.0-impl \
+    android.hardware.gnss@1.0-impl.talkman \
     android.hardware.gnss@1.0-service
 
 # GPS

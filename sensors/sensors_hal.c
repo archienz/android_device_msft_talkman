@@ -11,6 +11,19 @@
  * VINTF lists android.hardware.sensors@1.0 as passthrough, so
  * SensorService loads android.hardware.sensors@1.0-impl in-process
  * and that impl opens this module as sensors.talkman.
+ *
+ * Mag/gyro leftover from the first bring-up: chip axes were published
+ * raw. Speaker hard-iron is ~300 uT, so AOSP fusion rejects mag
+ * (|B| > 100 uT) and yaw walks at the gyro rest bias (~1 deg/s).
+ * This HAL subtracts a still-detected gyro bias and a magnetometer
+ * calibration that matches production stacks (PX4 / AKM-style):
+ * least-squares sphere hard-iron, then a symmetric 3x3 soft-iron
+ * ellipsoid. Mainline octagon DT has no mount-matrix; a full search
+ * of the 48 axis maps used in Qualcomm/InvenSense board files does
+ * not improve IGRF dip, so the chip frame is published as Android
+ * device frame (identity), same as Linux IIO with no matrix.
+ * Mag accuracy follows AOSP SensorEvent: field quality only, not
+ * whether the phone is moving.
  */
 
 #define LOG_TAG "TalkmanSensors"
@@ -75,7 +88,7 @@
 #define HALL_FRONT_PATH "/sys/class/gpio/gpio42/value"
 #define HALL_BACK_PATH "/sys/class/gpio/gpio75/value"
 
-#define QMAX 64
+#define QMAX 256
 
 #define AK_WIA1 0x00
 #define AK_ST1 0x10
@@ -86,7 +99,29 @@
 #define AK_WIA2_VAL 0x04
 #define AK_CNTL2_POWER_DOWN 0x00
 #define AK_CNTL2_CONT_20HZ 0x04
+#define AK_CNTL2_CONT_50HZ 0x06
+#define AK_CNTL2_FUSE_ROM 0x1F
+#define AK_ASAX 0x60
 #define AK_SCALE_UT 0.15f
+#define CAL_PATH "/data/misc/talkman-sensors/cal.txt"
+#define CAL_PATH_ALT "/data/system/talkman-sensors-cal.txt"
+#define MAG_SPAN_MIN 35.0f
+#define MAG_SPAN_WIDE 45.0f
+#define MAG_RADIUS_MIN 20.0f
+#define MAG_RADIUS_MAX 80.0f
+#define MAG_EARTH_LOW 25.0f
+#define MAG_EARTH_HIGH 65.0f
+#define MAG_FIT_N 256
+#define MAG_FIT_MIN 100
+#define MAG_FIT_RMS_MAX 12.0f
+#define MAG_DIP_MIN 0.40f
+#define MAG_DIP_MAX 0.98f
+#define MAG_STILL_COMMIT 20
+#define GYRO_STILL_MAX 0.16f
+#define GYRO_BIAS_MAX 0.25f
+#define GYRO_STILL_SAMPLES 200
+#define GYRO_REST_DEADBAND 0.025f
+#define GYRO_MOTION_COOLDOWN 150
 
 #define ZPA_WHOAMI 0x0f
 #define ZPA_CTRL0 0x20
@@ -252,7 +287,7 @@ static const struct sensor_t k_accel = {
     .maxRange = 39.2266f,
     .resolution = 0.0012f,
     .power = 0.5f,
-    .minDelay = 5000,
+    .minDelay = 20000,
     .fifoReservedEventCount = 0,
     .fifoMaxEventCount = 0,
     .stringType = SENSOR_STRING_TYPE_ACCELEROMETER,
@@ -270,7 +305,7 @@ static const struct sensor_t k_gyro = {
     .maxRange = 34.9066f,
     .resolution = 0.001f,
     .power = 0.5f,
-    .minDelay = 5000,
+    .minDelay = 20000,
     .fifoReservedEventCount = 0,
     .fifoMaxEventCount = 0,
     .stringType = SENSOR_STRING_TYPE_GYROSCOPE,
@@ -297,6 +332,35 @@ static int g_zpa_saw_busy;
 static int64_t g_zpa_start_ns;
 static int g_imu_kind;
 static int g_imu_probed;
+static float g_ak_scale[3] = { 1.0f, 1.0f, 1.0f };
+static float g_mag_off[3];
+static float g_mag_S[9] = {
+    1.0f, 0.0f, 0.0f,
+    0.0f, 1.0f, 0.0f,
+    0.0f, 0.0f, 1.0f
+};
+static int g_mag_calibrated;
+static float g_fit_m[MAG_FIT_N][3];
+static int g_fit_n;
+static int g_fit_i;
+static float g_mag_fit_r;
+static float g_mag_fit_rms = 99.0f;
+static int g_last_mag_status = -1;
+static int g_mag_still_n;
+static int g_gyro_cool;
+static float g_last_mag[3];
+static int g_have_last_mag;
+static float g_gyro_bias[3];
+static int g_gyro_calibrated;
+static float g_last_accel[3];
+static int g_have_accel;
+static float g_last_gyro_raw[3];
+static int g_have_gyro;
+static float g_still_sum[3];
+static int g_still_n;
+static int g_cal_loaded;
+static int g_cal_dirty;
+static int64_t g_last_save_ns;
 static struct sensor_t g_list[N_SENSORS];
 static int g_list_n;
 
@@ -325,6 +389,563 @@ static int64_t now_ns(void)
 static int64_t mono_ns(void)
 {
     return clock_ns(CLOCK_MONOTONIC);
+}
+
+static float vlen3(float x, float y, float z)
+{
+    return sqrtf(x * x + y * y + z * z);
+}
+
+static float mag_dip_abs(float mx, float my, float mz)
+{
+    float an, mn, d;
+    if (!g_have_accel)
+        return -1.0f;
+    an = vlen3(g_last_accel[0], g_last_accel[1], g_last_accel[2]);
+    mn = vlen3(mx, my, mz);
+    if (an < 8.5f || an > 11.0f || mn < 1.0f)
+        return -1.0f;
+    d = mx * g_last_accel[0] + my * g_last_accel[1] + mz * g_last_accel[2];
+    return fabsf(d / (mn * an));
+}
+
+static int mag_status_from_field(float mx, float my, float mz)
+{
+    float n = vlen3(mx, my, mz);
+    int st;
+    /* AOSP SensorEvent.accuracy for TYPE_MAGNETIC_FIELD is field
+     * quality, not a motion flag. Compass UIs treat MEDIUM as red.
+     */
+    if (!g_mag_calibrated)
+        st = SENSOR_STATUS_ACCURACY_LOW;
+    else if (n >= MAG_EARTH_LOW && n <= MAG_EARTH_HIGH)
+        st = SENSOR_STATUS_ACCURACY_HIGH;
+    else if (n >= MAG_RADIUS_MIN && n <= MAG_RADIUS_MAX)
+        st = SENSOR_STATUS_ACCURACY_MEDIUM;
+    else
+        st = SENSOR_STATUS_ACCURACY_LOW;
+    if (st != g_last_mag_status) {
+        ALOGI("mag status %d |B|=%.1f dip=%.2f cal=%d r=%.1f rms=%.1f",
+              st, n, mag_dip_abs(mx, my, mz), g_mag_calibrated,
+              g_mag_fit_r, g_mag_fit_rms);
+        g_last_mag_status = st;
+    }
+    return st;
+}
+
+static void cal_save(void)
+{
+    /* Caller holds g_lock. Do not fopen here: SensorService poll
+     * thread would block I2C and can SIGBUS if the mapping is busy.
+     */
+    g_cal_dirty = 1;
+}
+
+static void cal_flush(void)
+{
+    FILE *fp;
+    float mag_off[3], mag_S[9], gyro_bias[3];
+    int mag_c, gyro_c;
+    int64_t now;
+
+    pthread_mutex_lock(&g_lock);
+    now = now_ns();
+    if (!g_cal_dirty || (g_last_save_ns && now - g_last_save_ns < 2000000000LL)) {
+        pthread_mutex_unlock(&g_lock);
+        return;
+    }
+    g_cal_dirty = 0;
+    g_last_save_ns = now;
+    mag_off[0] = g_mag_off[0];
+    mag_off[1] = g_mag_off[1];
+    mag_off[2] = g_mag_off[2];
+    memcpy(mag_S, g_mag_S, sizeof(mag_S));
+    mag_c = g_mag_calibrated;
+    gyro_bias[0] = g_gyro_bias[0];
+    gyro_bias[1] = g_gyro_bias[1];
+    gyro_bias[2] = g_gyro_bias[2];
+    gyro_c = g_gyro_calibrated;
+    pthread_mutex_unlock(&g_lock);
+
+    fp = fopen(CAL_PATH, "w");
+    if (!fp)
+        fp = fopen(CAL_PATH_ALT, "w");
+    if (!fp)
+        return;
+    fprintf(fp, "v4\n");
+    fprintf(fp, "mag %.4f %.4f %.4f %d\n",
+            mag_off[0], mag_off[1], mag_off[2], mag_c);
+    fprintf(fp, "magS %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f\n",
+            mag_S[0], mag_S[1], mag_S[2], mag_S[3], mag_S[4], mag_S[5],
+            mag_S[6], mag_S[7], mag_S[8]);
+    fprintf(fp, "gyro %.6f %.6f %.6f %d\n",
+            gyro_bias[0], gyro_bias[1], gyro_bias[2], gyro_c);
+    fclose(fp);
+}
+
+static void mag_S_identity(void)
+{
+    memset(g_mag_S, 0, sizeof(g_mag_S));
+    g_mag_S[0] = g_mag_S[4] = g_mag_S[8] = 1.0f;
+}
+
+static void mag_S_diag(float sx, float sy, float sz)
+{
+    mag_S_identity();
+    g_mag_S[0] = sx;
+    g_mag_S[4] = sy;
+    g_mag_S[8] = sz;
+}
+
+static void cal_load(void)
+{
+    FILE *fp;
+    char line[192];
+    float ox, oy, oz, bx, by, bz, sx, sy, sz;
+    float S[9];
+    int mq, gq;
+    int ver = 0;
+    if (g_cal_loaded)
+        return;
+    g_cal_loaded = 1;
+    mag_S_identity();
+    fp = fopen(CAL_PATH, "r");
+    if (!fp)
+        fp = fopen(CAL_PATH_ALT, "r");
+    if (!fp)
+        return;
+    if (!fgets(line, sizeof(line), fp)) {
+        fclose(fp);
+        return;
+    }
+    /* v1 AABB discard mag. v2 sphere. v3 diagonal scale. v4 3x3 soft-iron. */
+    if (strncmp(line, "v2", 2) == 0)
+        ver = 2;
+    else if (strncmp(line, "v3", 2) == 0)
+        ver = 3;
+    else if (strncmp(line, "v4", 2) == 0)
+        ver = 4;
+    while (fgets(line, sizeof(line), fp)) {
+        if (ver >= 2 && sscanf(line, "mag %f %f %f %d", &ox, &oy, &oz, &mq) == 4) {
+            if (vlen3(ox, oy, oz) < 2000.0f) {
+                g_mag_off[0] = ox;
+                g_mag_off[1] = oy;
+                g_mag_off[2] = oz;
+                g_mag_calibrated = mq ? 1 : 0;
+            }
+        } else if (ver == 3 &&
+                   sscanf(line, "magscale %f %f %f", &sx, &sy, &sz) == 3) {
+            if (sx > 0.5f && sx < 2.0f &&
+                sy > 0.5f && sy < 2.0f &&
+                sz > 0.5f && sz < 2.0f)
+                mag_S_diag(sx, sy, sz);
+        } else if (ver >= 4 &&
+                   sscanf(line, "magS %f %f %f %f %f %f %f %f %f",
+                          &S[0], &S[1], &S[2], &S[3], &S[4], &S[5],
+                          &S[6], &S[7], &S[8]) == 9) {
+            if (fabsf(S[0]) > 0.3f && fabsf(S[0]) < 3.0f &&
+                fabsf(S[4]) > 0.3f && fabsf(S[4]) < 3.0f &&
+                fabsf(S[8]) > 0.3f && fabsf(S[8]) < 3.0f)
+                memcpy(g_mag_S, S, sizeof(g_mag_S));
+        } else if (sscanf(line, "gyro %f %f %f %d", &bx, &by, &bz, &gq) == 4) {
+            if (vlen3(bx, by, bz) < GYRO_BIAS_MAX) {
+                g_gyro_bias[0] = bx;
+                g_gyro_bias[1] = by;
+                g_gyro_bias[2] = bz;
+                g_gyro_calibrated = gq ? 1 : 0;
+            }
+        }
+    }
+    fclose(fp);
+    if (g_mag_calibrated)
+        g_mag_fit_rms = 10.0f;
+    ALOGI("cal load mag=%d off=%.1f %.1f %.1f S=%.2f %.2f %.2f / %.2f %.2f %.2f / %.2f %.2f %.2f gyro=%d v=%d",
+          g_mag_calibrated, g_mag_off[0], g_mag_off[1], g_mag_off[2],
+          g_mag_S[0], g_mag_S[1], g_mag_S[2], g_mag_S[3], g_mag_S[4], g_mag_S[5],
+          g_mag_S[6], g_mag_S[7], g_mag_S[8], g_gyro_calibrated, ver);
+}
+
+static int solve4(double A[4][4], double b[4], double x[4])
+{
+    int i, j, k, p;
+    double t, maxv;
+    for (i = 0; i < 4; i++) {
+        p = i;
+        maxv = fabs(A[i][i]);
+        for (k = i + 1; k < 4; k++) {
+            t = fabs(A[k][i]);
+            if (t > maxv) {
+                maxv = t;
+                p = k;
+            }
+        }
+        if (maxv < 1e-9)
+            return -1;
+        if (p != i) {
+            for (j = 0; j < 4; j++) {
+                t = A[i][j];
+                A[i][j] = A[p][j];
+                A[p][j] = t;
+            }
+            t = b[i];
+            b[i] = b[p];
+            b[p] = t;
+        }
+        t = A[i][i];
+        for (j = i; j < 4; j++)
+            A[i][j] /= t;
+        b[i] /= t;
+        for (k = 0; k < 4; k++) {
+            if (k == i)
+                continue;
+            t = A[k][i];
+            for (j = i; j < 4; j++)
+                A[k][j] -= t * A[i][j];
+            b[k] -= t * b[i];
+        }
+    }
+    for (i = 0; i < 4; i++)
+        x[i] = b[i];
+    return 0;
+}
+
+static int mag_sphere_fit(float *cx, float *cy, float *cz, float *R, float *rms_out)
+{
+    double A[4][4];
+    double b[4], x[4], row[4];
+    double mx, my, mz, y, r2, rms, d, rr;
+    int i, j, k, n;
+    n = g_fit_n;
+    if (n < MAG_FIT_MIN)
+        return -1;
+    memset(A, 0, sizeof(A));
+    memset(b, 0, sizeof(b));
+    for (i = 0; i < n; i++) {
+        mx = g_fit_m[i][0];
+        my = g_fit_m[i][1];
+        mz = g_fit_m[i][2];
+        row[0] = 2.0 * mx;
+        row[1] = 2.0 * my;
+        row[2] = 2.0 * mz;
+        row[3] = -1.0;
+        y = mx * mx + my * my + mz * mz;
+        for (j = 0; j < 4; j++) {
+            for (k = 0; k < 4; k++)
+                A[j][k] += row[j] * row[k];
+            b[j] += row[j] * y;
+        }
+    }
+    if (solve4(A, b, x) != 0)
+        return -1;
+    r2 = x[0] * x[0] + x[1] * x[1] + x[2] * x[2] - x[3];
+    if (r2 < (double)(MAG_RADIUS_MIN * MAG_RADIUS_MIN) ||
+        r2 > (double)(MAG_RADIUS_MAX * MAG_RADIUS_MAX))
+        return -1;
+    rr = sqrt(r2);
+    rms = 0.0;
+    for (i = 0; i < n; i++) {
+        mx = g_fit_m[i][0] - x[0];
+        my = g_fit_m[i][1] - x[1];
+        mz = g_fit_m[i][2] - x[2];
+        d = sqrt(mx * mx + my * my + mz * mz) - rr;
+        rms += d * d;
+    }
+    rms = sqrt(rms / (double)n);
+    if (rms > (double)MAG_FIT_RMS_MAX)
+        return -1;
+    *cx = (float)x[0];
+    *cy = (float)x[1];
+    *cz = (float)x[2];
+    *R = (float)rr;
+    *rms_out = (float)rms;
+    return 0;
+}
+
+static int mag_buffer_span(float *sx, float *sy, float *sz)
+{
+    float mn[3], mx[3];
+    int i, j;
+    if (g_fit_n < MAG_FIT_MIN)
+        return -1;
+    mn[0] = mx[0] = g_fit_m[0][0];
+    mn[1] = mx[1] = g_fit_m[0][1];
+    mn[2] = mx[2] = g_fit_m[0][2];
+    for (i = 1; i < g_fit_n; i++) {
+        for (j = 0; j < 3; j++) {
+            if (g_fit_m[i][j] < mn[j])
+                mn[j] = g_fit_m[i][j];
+            if (g_fit_m[i][j] > mx[j])
+                mx[j] = g_fit_m[i][j];
+        }
+    }
+    *sx = mx[0] - mn[0];
+    *sy = mx[1] - mn[1];
+    *sz = mx[2] - mn[2];
+    return 0;
+}
+
+static int solve_n(int n, double *A, double *b, double *x)
+{
+    int i, j, k, p;
+    double t, maxv;
+    for (i = 0; i < n; i++) {
+        p = i;
+        maxv = fabs(A[i * n + i]);
+        for (k = i + 1; k < n; k++) {
+            t = fabs(A[k * n + i]);
+            if (t > maxv) {
+                maxv = t;
+                p = k;
+            }
+        }
+        if (maxv < 1e-12)
+            return -1;
+        if (p != i) {
+            for (j = 0; j < n; j++) {
+                t = A[i * n + j];
+                A[i * n + j] = A[p * n + j];
+                A[p * n + j] = t;
+            }
+            t = b[i];
+            b[i] = b[p];
+            b[p] = t;
+        }
+        t = A[i * n + i];
+        for (j = i; j < n; j++)
+            A[i * n + j] /= t;
+        b[i] /= t;
+        for (k = 0; k < n; k++) {
+            if (k == i)
+                continue;
+            t = A[k * n + i];
+            for (j = i; j < n; j++)
+                A[k * n + j] -= t * A[i * n + j];
+            b[k] -= t * b[i];
+        }
+    }
+    for (i = 0; i < n; i++)
+        x[i] = b[i];
+    return 0;
+}
+
+static int chol3(const double A[3][3], double L[3][3])
+{
+    double d;
+    if (A[0][0] <= 1e-12)
+        return -1;
+    L[0][0] = sqrt(A[0][0]);
+    L[0][1] = L[0][2] = 0.0;
+    L[1][0] = A[1][0] / L[0][0];
+    L[2][0] = A[2][0] / L[0][0];
+    d = A[1][1] - L[1][0] * L[1][0];
+    if (d <= 1e-12)
+        return -1;
+    L[1][1] = sqrt(d);
+    L[1][2] = 0.0;
+    L[2][1] = (A[2][1] - L[2][0] * L[1][0]) / L[1][1];
+    d = A[2][2] - L[2][0] * L[2][0] - L[2][1] * L[2][1];
+    if (d <= 1e-12)
+        return -1;
+    L[2][2] = sqrt(d);
+    return 0;
+}
+
+static void mag_apply_S(float dx, float dy, float dz, const float *S,
+                        float *ox, float *oy, float *oz)
+{
+    *ox = S[0] * dx + S[1] * dy + S[2] * dz;
+    *oy = S[3] * dx + S[4] * dy + S[5] * dz;
+    *oz = S[6] * dx + S[7] * dy + S[8] * dz;
+}
+
+static float mag_S_rms(float cx, float cy, float cz, const float *S, float R)
+{
+    double rms = 0.0, d;
+    float ox, oy, oz;
+    int i;
+    if (g_fit_n <= 0 || R < 1.0f)
+        return 99.0f;
+    for (i = 0; i < g_fit_n; i++) {
+        mag_apply_S(g_fit_m[i][0] - cx, g_fit_m[i][1] - cy, g_fit_m[i][2] - cz,
+                    S, &ox, &oy, &oz);
+        d = sqrt((double)ox * ox + (double)oy * oy + (double)oz * oz) - (double)R;
+        rms += d * d;
+    }
+    return (float)sqrt(rms / (double)g_fit_n);
+}
+
+/* PX4-style symmetric soft-iron: (m-c)^T A (m-c) = R^2, S = L^T from
+ * Cholesky A = L L^T. Maps the speaker ellipsoid onto a sphere.
+ */
+static int mag_ellipsoid_scale(float cx, float cy, float cz, float R, float S[9])
+{
+    double AtA[36], Atb[6], p[6], row[6];
+    double A[3][3], L[3][3], vx, vy, vz, y;
+    int i, j, k;
+    if (g_fit_n < MAG_FIT_MIN || R < MAG_RADIUS_MIN)
+        return -1;
+    memset(AtA, 0, sizeof(AtA));
+    memset(Atb, 0, sizeof(Atb));
+    y = (double)R * (double)R;
+    for (i = 0; i < g_fit_n; i++) {
+        vx = g_fit_m[i][0] - cx;
+        vy = g_fit_m[i][1] - cy;
+        vz = g_fit_m[i][2] - cz;
+        row[0] = vx * vx;
+        row[1] = vy * vy;
+        row[2] = vz * vz;
+        row[3] = 2.0 * vx * vy;
+        row[4] = 2.0 * vx * vz;
+        row[5] = 2.0 * vy * vz;
+        for (j = 0; j < 6; j++) {
+            for (k = 0; k < 6; k++)
+                AtA[j * 6 + k] += row[j] * row[k];
+            Atb[j] += row[j] * y;
+        }
+    }
+    if (solve_n(6, AtA, Atb, p) != 0)
+        return -1;
+    A[0][0] = p[0];
+    A[1][1] = p[1];
+    A[2][2] = p[2];
+    A[0][1] = A[1][0] = p[3];
+    A[0][2] = A[2][0] = p[4];
+    A[1][2] = A[2][1] = p[5];
+    if (chol3(A, L) != 0)
+        return -1;
+    /* S = L^T so |S (m-c)| = R */
+    S[0] = (float)L[0][0];
+    S[1] = (float)L[1][0];
+    S[2] = (float)L[2][0];
+    S[3] = (float)L[0][1];
+    S[4] = (float)L[1][1];
+    S[5] = (float)L[2][1];
+    S[6] = (float)L[0][2];
+    S[7] = (float)L[1][2];
+    S[8] = (float)L[2][2];
+    if (fabsf(S[0]) < 0.4f || fabsf(S[0]) > 2.5f ||
+        fabsf(S[4]) < 0.4f || fabsf(S[4]) > 2.5f ||
+        fabsf(S[8]) < 0.4f || fabsf(S[8]) > 2.5f)
+        return -1;
+    return 0;
+}
+
+static void mag_try_commit(void)
+{
+    float cx, cy, cz, radius, rms, spx, spy, spz, used_rms;
+    float S[9];
+    int ok, wide;
+    if (mag_buffer_span(&spx, &spy, &spz) != 0)
+        return;
+    ok = (spx > MAG_SPAN_MIN) + (spy > MAG_SPAN_MIN) + (spz > MAG_SPAN_MIN);
+    wide = (spx > MAG_SPAN_WIDE) + (spy > MAG_SPAN_WIDE) + (spz > MAG_SPAN_WIDE);
+    if (g_mag_calibrated) {
+        if (ok != 3)
+            return;
+    } else if (!(ok == 3 || wide >= 2)) {
+        return;
+    }
+    if (mag_sphere_fit(&cx, &cy, &cz, &radius, &rms) != 0)
+        return;
+    memset(S, 0, sizeof(S));
+    S[0] = S[4] = S[8] = 1.0f;
+    if (mag_ellipsoid_scale(cx, cy, cz, radius, S) != 0) {
+        S[0] = S[4] = S[8] = 1.0f;
+        S[1] = S[2] = S[3] = S[5] = S[6] = S[7] = 0.0f;
+    }
+    used_rms = mag_S_rms(cx, cy, cz, S, radius);
+    if (used_rms > MAG_FIT_RMS_MAX)
+        return;
+    if (g_mag_calibrated && used_rms > g_mag_fit_rms - 0.3f) {
+        ALOGI("mag keep cal rms=%.1f new=%.1f span=%.1f %.1f %.1f",
+              g_mag_fit_rms, used_rms, spx, spy, spz);
+        return;
+    }
+    g_mag_off[0] = cx;
+    g_mag_off[1] = cy;
+    g_mag_off[2] = cz;
+    memcpy(g_mag_S, S, sizeof(g_mag_S));
+    g_mag_fit_r = radius;
+    g_mag_fit_rms = used_rms;
+    g_mag_calibrated = 1;
+    ALOGI("mag commit off=%.1f %.1f %.1f S=%.3f %.3f %.3f / %.3f %.3f %.3f / %.3f %.3f %.3f r=%.1f rms=%.1f n=%d",
+          cx, cy, cz,
+          S[0], S[1], S[2], S[3], S[4], S[5], S[6], S[7], S[8],
+          radius, used_rms, g_fit_n);
+    g_last_save_ns = 0;
+    cal_save();
+}
+
+static void mag_update_cal(float x, float y, float z, int moving)
+{
+    static int logged_n;
+    if (moving) {
+        g_fit_m[g_fit_i][0] = x;
+        g_fit_m[g_fit_i][1] = y;
+        g_fit_m[g_fit_i][2] = z;
+        g_fit_i = (g_fit_i + 1) % MAG_FIT_N;
+        if (g_fit_n < MAG_FIT_N)
+            g_fit_n++;
+        g_mag_still_n = 0;
+        if (g_fit_n != logged_n && (g_fit_n % 50) == 0) {
+            ALOGI("mag cal samples=%d", g_fit_n);
+            logged_n = g_fit_n;
+        }
+        return;
+    }
+    if (g_fit_n < MAG_FIT_MIN)
+        return;
+    g_mag_still_n++;
+    if (g_mag_still_n == MAG_STILL_COMMIT)
+        mag_try_commit();
+}
+
+static void gyro_update_bias(float gx, float gy, float gz)
+{
+    float an, gn, nb[3];
+    int i;
+    if (!g_have_accel)
+        return;
+    an = vlen3(g_last_accel[0], g_last_accel[1], g_last_accel[2]);
+    gn = vlen3(gx, gy, gz);
+    if (an < 8.5f || an > 11.0f || gn > 0.50f) {
+        g_still_n = 0;
+        g_still_sum[0] = g_still_sum[1] = g_still_sum[2] = 0;
+        g_gyro_cool = GYRO_MOTION_COOLDOWN;
+        return;
+    }
+    if (g_gyro_cool > 0) {
+        g_gyro_cool--;
+        g_still_n = 0;
+        g_still_sum[0] = g_still_sum[1] = g_still_sum[2] = 0;
+        return;
+    }
+    if (gn > GYRO_STILL_MAX)
+        return;
+    g_still_sum[0] += gx;
+    g_still_sum[1] += gy;
+    g_still_sum[2] += gz;
+    g_still_n++;
+    if (g_still_n < GYRO_STILL_SAMPLES)
+        return;
+    for (i = 0; i < 3; i++)
+        nb[i] = g_still_sum[i] / (float)g_still_n;
+    g_still_n = 0;
+    g_still_sum[0] = g_still_sum[1] = g_still_sum[2] = 0;
+    if (vlen3(nb[0], nb[1], nb[2]) > GYRO_BIAS_MAX)
+        return;
+    if (g_gyro_calibrated) {
+        for (i = 0; i < 3; i++)
+            g_gyro_bias[i] = 0.90f * g_gyro_bias[i] + 0.10f * nb[i];
+    } else {
+        for (i = 0; i < 3; i++)
+            g_gyro_bias[i] = nb[i];
+        ALOGI("gyro rest bias %.4f %.4f %.4f rad/s",
+              g_gyro_bias[0], g_gyro_bias[1], g_gyro_bias[2]);
+        g_last_save_ns = 0;
+    }
+    g_gyro_calibrated = 1;
+    cal_save();
 }
 
 static int handle_index(int handle)
@@ -425,6 +1046,7 @@ static void fill_common(sensors_event_t *ev, int handle, int type)
 static int ak_init(void)
 {
     uint8_t id[2] = { 0, 0 };
+    uint8_t asa[3] = { 128, 128, 128 };
     if (i2c_read_regs(g_i2c4, AK_ADDR, AK_WIA1, id, 2) != 0)
         return -1;
     if (id[0] != AK_WIA1_VAL || id[1] != AK_WIA2_VAL) {
@@ -434,7 +1056,21 @@ static int ak_init(void)
     i2c_write_reg(g_i2c4, AK_ADDR, AK_CNTL3, 0x01);
     usleep(1000);
     i2c_write_reg(g_i2c4, AK_ADDR, AK_CNTL2, AK_CNTL2_POWER_DOWN);
-    ALOGI("AK09912 WIA ok");
+    usleep(100);
+    i2c_write_reg(g_i2c4, AK_ADDR, AK_CNTL2, AK_CNTL2_FUSE_ROM);
+    usleep(100);
+    if (i2c_read_regs(g_i2c4, AK_ADDR, AK_ASAX, asa, 3) == 0) {
+        g_ak_scale[0] = (asa[0] + 128.0f) / 256.0f;
+        g_ak_scale[1] = (asa[1] + 128.0f) / 256.0f;
+        g_ak_scale[2] = (asa[2] + 128.0f) / 256.0f;
+        ALOGI("AK09912 WIA ok ASA %u %u %u scale=%.3f %.3f %.3f",
+              asa[0], asa[1], asa[2],
+              g_ak_scale[0], g_ak_scale[1], g_ak_scale[2]);
+    } else {
+        ALOGI("AK09912 WIA ok (ASA unread, scale 1)");
+    }
+    i2c_write_reg(g_i2c4, AK_ADDR, AK_CNTL2, AK_CNTL2_POWER_DOWN);
+    cal_load();
     return 0;
 }
 
@@ -443,6 +1079,8 @@ static int ak_read(sensors_event_t *ev)
     uint8_t st1 = 0;
     uint8_t raw[8];
     int16_t x, y, z;
+    float mx, my, mz, dmag, gn;
+    int moving;
     if (i2c_read_regs(g_i2c4, AK_ADDR, AK_ST1, &st1, 1) != 0)
         return -1;
     if ((st1 & 0x01) == 0)
@@ -454,11 +1092,28 @@ static int ak_read(sensors_event_t *ev)
     x = (int16_t)(raw[0] | (raw[1] << 8));
     y = (int16_t)(raw[2] | (raw[3] << 8));
     z = (int16_t)(raw[4] | (raw[5] << 8));
+    mx = x * AK_SCALE_UT * g_ak_scale[0];
+    my = y * AK_SCALE_UT * g_ak_scale[1];
+    mz = z * AK_SCALE_UT * g_ak_scale[2];
+    dmag = 0.0f;
+    if (g_have_last_mag)
+        dmag = vlen3(mx - g_last_mag[0], my - g_last_mag[1], mz - g_last_mag[2]);
+    g_last_mag[0] = mx;
+    g_last_mag[1] = my;
+    g_last_mag[2] = mz;
+    g_have_last_mag = 1;
+    gn = g_have_gyro ? vlen3(g_last_gyro_raw[0], g_last_gyro_raw[1],
+                             g_last_gyro_raw[2]) : 0.0f;
+    moving = (dmag > 8.0f) || (gn > 0.40f);
+    mag_update_cal(mx, my, mz, moving);
+    if (g_mag_calibrated)
+        mag_apply_S(mx - g_mag_off[0], my - g_mag_off[1], mz - g_mag_off[2],
+                    g_mag_S, &mx, &my, &mz);
     fill_common(ev, HANDLE_MAG, SENSOR_TYPE_MAGNETIC_FIELD);
-    ev->magnetic.x = x * AK_SCALE_UT;
-    ev->magnetic.y = y * AK_SCALE_UT;
-    ev->magnetic.z = z * AK_SCALE_UT;
-    ev->magnetic.status = SENSOR_STATUS_ACCURACY_MEDIUM;
+    ev->magnetic.x = mx;
+    ev->magnetic.y = my;
+    ev->magnetic.z = mz;
+    ev->magnetic.status = mag_status_from_field(mx, my, mz);
     return 1;
 }
 
@@ -762,7 +1417,7 @@ static int imu_icm_wake(void)
         return 0;
     if (i2c_write_reg(g_i2c4, IMU_ADDR, ICM_REG_PWR_MGMT_1, 0x01) != 0)
         return 0;
-    usleep(100000);
+    usleep(5000);
     i2c_write_reg(g_i2c4, IMU_ADDR, ICM_REG_PWR_MGMT_2, 0x00);
     i2c_write_reg(g_i2c4, IMU_ADDR, ICM_REG_LP_CONFIG, 0x00);
     if (!imu_icm_bank(ICM_BANK2))
@@ -929,6 +1584,10 @@ static int imu_read_accel(sensors_event_t *ev)
     ev->acceleration.y = ay;
     ev->acceleration.z = az;
     ev->acceleration.status = SENSOR_STATUS_ACCURACY_MEDIUM;
+    g_last_accel[0] = ax;
+    g_last_accel[1] = ay;
+    g_last_accel[2] = az;
+    g_have_accel = 1;
     return 1;
 }
 
@@ -970,11 +1629,27 @@ static int imu_read_gyro(sensors_event_t *ev)
     } else {
         return 0;
     }
+    g_last_gyro_raw[0] = gx;
+    g_last_gyro_raw[1] = gy;
+    g_last_gyro_raw[2] = gz;
+    g_have_gyro = 1;
+    gyro_update_bias(gx, gy, gz);
+    gx -= g_gyro_bias[0];
+    gy -= g_gyro_bias[1];
+    gz -= g_gyro_bias[2];
+    if (g_have_accel) {
+        float an = vlen3(g_last_accel[0], g_last_accel[1], g_last_accel[2]);
+        if (an >= 8.5f && an <= 11.0f &&
+            vlen3(gx, gy, gz) < GYRO_REST_DEADBAND) {
+            gx = gy = gz = 0;
+        }
+    }
     fill_common(ev, HANDLE_GYRO, SENSOR_TYPE_GYROSCOPE);
     ev->gyro.x = gx;
     ev->gyro.y = gy;
     ev->gyro.z = gz;
-    ev->gyro.status = SENSOR_STATUS_ACCURACY_MEDIUM;
+    ev->gyro.status = g_gyro_calibrated ?
+        SENSOR_STATUS_ACCURACY_HIGH : SENSOR_STATUS_ACCURACY_MEDIUM;
     return 1;
 }
 
@@ -1089,8 +1764,10 @@ static int activate(struct sensors_poll_device_t *dev, int handle, int enabled)
         if (g_period_ns[handle] <= 0)
             g_period_ns[handle] = 50000000;
         g_next_ns[handle] = now_ns();
-        if (handle == HANDLE_MAG)
-            i2c_write_reg(g_i2c4, AK_ADDR, AK_CNTL2, AK_CNTL2_CONT_20HZ);
+        if (handle == HANDLE_MAG) {
+            i2c_write_reg(g_i2c4, AK_ADDR, AK_CNTL2, AK_CNTL2_CONT_50HZ);
+            g_period_ns[handle] = 20000000;
+        }
         if (handle == HANDLE_PROX || handle == HANDLE_LIGHT) {
             apds_write(APDS_ENABLE,
                        APDS_ENABLE_PON | APDS_ENABLE_AEN | APDS_ENABLE_PEN);
@@ -1136,6 +1813,11 @@ static int set_delay(struct sensors_poll_device_t *dev, int handle,
     if ((handle == HANDLE_PRESS || handle == HANDLE_TEMP) &&
         period_ns < 200000000)
         period_ns = 200000000;
+    if (handle == HANDLE_MAG)
+        period_ns = 20000000;
+    if ((handle == HANDLE_ACCEL || handle == HANDLE_GYRO) &&
+        period_ns < 20000000)
+        period_ns = 20000000;
     if (period_ns < 5000000)
         period_ns = 5000000;
     if (period_ns > 1000000000LL)
@@ -1185,6 +1867,7 @@ static int poll_events(struct sensors_poll_device_t *dev,
         g_qcount--;
     }
     pthread_mutex_unlock(&g_lock);
+    cal_flush();
     return copied;
 }
 
@@ -1258,6 +1941,7 @@ static int open_sensors(const struct hw_module_t *module, const char *id,
     err = open_buses();
     if (err != 0)
         return err;
+    cal_load();
     ak_init();
     zpa_init();
     apds_init();
