@@ -47,7 +47,7 @@ The clamp size is not 40.
 The file init.talkman.rc does not contain LGE SKU wifi.
 The file init.talkman.rc does not contain IMS QMI.
 The GnssNavigationMessage commit is b0d3883.
-The GnssNavigationMessage commit is under HEAD 145f904.
+The GnssNavigationMessage commit is under HEAD eb97ddb.
 The QCamera2 recode is on lineage-18.1-talkman.
 The QCamera2 recode commit is 73947d2.
 The QCamera2 recode sets probe, torch, and msm8992.
@@ -55,15 +55,17 @@ The SMIApp provider is disabled.
 The SMIApp commit is 80dde95.
 The QCamera2 change sets JPEG, ION, and vendor-module.
 The QCamera2 JPEG commit is d572733.
-The leftover QCamera2 ION mmap leak fix closes share fds on ION_MAP_FAILED.
-The leftover QCamera2 ION mmap leak fix frees only the mmap-fail batch.
-The leftover QCamera2 ION mmap leak commit is 1eb58d3.
 The file device.mk does not include camera.device@1.0-impl.
 The device.mk commit is 49965d7.
 The file flash-autofocus.xml stays.
 The ION mmap file descriptors are closed.
 The ION mmap commit is 1eb58d3.
-The HEAD commit is 145f904.
+The file init.talkman.rc does not contain qcamerasvr.
+The file init.talkman.rc does not contain mm-qcamera-daemon.
+The file proprietary-blobs.txt does not contain qcamerasvr.
+The file proprietary-blobs.txt does not contain mm-qcamera-daemon.
+The init camera daemon commit is eb97ddb.
+The HEAD commit is eb97ddb.
 
 ## What we are doing
 

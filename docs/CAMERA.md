@@ -88,7 +88,7 @@ Device-tree SMIApp stubs stay disabled.
 This repository is `android_device_msft_talkman` only.
 Do not push `android_kernel_mmo_msm8994`.
 
-## Leftover QCamera2
+## QCamera2
 
 `camera/QCamera2` (plus `camera/mm-image-codec` and the `camera/Android.mk` wiring) is a bullhead path.
 Plan: retire.
