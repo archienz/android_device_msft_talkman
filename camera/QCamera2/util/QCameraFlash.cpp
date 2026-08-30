@@ -136,7 +136,7 @@ int32_t QCameraFlash::initFlash(const int camera_id)
 {
     int32_t retVal = 0;
     bool hasFlash = false;
-    char flashNode[QCAMERA_MAX_FILEPATH_LENGTH];
+    char flashNode[QCAMERA_MAX_FILEPATH_LENGTH] = {0};
     char flashPath[QCAMERA_MAX_FILEPATH_LENGTH] = "/dev/";
 
     if (camera_id < 0 || camera_id >= MM_CAMERA_MAX_NUM_SENSORS) {
@@ -281,6 +281,7 @@ int32_t QCameraFlash::deinitFlash(const int camera_id)
         setFlashMode(camera_id, false);
 
         struct msm_flash_cfg_data_t cfg;
+        memset(&cfg, 0, sizeof(cfg));
         cfg.cfg_type = CFG_FLASH_RELEASE;
         retVal = ioctl(m_flashFds[camera_id],
                 VIDIOC_MSM_FLASH_CFG,

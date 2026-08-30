@@ -132,7 +132,7 @@ static int get_comp_from_list(char *comp_name)
 {
   int index = -1, i = 0;
 
-  if (NULL == comp_name)
+  if (NULL == comp_name || NULL == g_omxcore)
     return -1;
 
   for (i = 0; i < g_omxcore->comp_cnt; i++) {
@@ -264,8 +264,13 @@ OMX_API OMX_ERRORTYPE OMX_APIENTRY OMX_GetHandle(
 error:
 
   if (OMX_TRUE == close_handle) {
-    dlclose(p_core_comp->lib_handle);
+    if (p_core_comp->lib_handle) {
+      dlclose(p_core_comp->lib_handle);
+    }
     p_core_comp->lib_handle = NULL;
+    p_core_comp->create_comp_func = NULL;
+    p_core_comp->get_instance = NULL;
+    p_core_comp->open = FALSE;
   }
   pthread_mutex_unlock(&g_omxcore_lock);
   ALOGE("%s:%d] Error %d", __func__, __LINE__, rc);
@@ -284,6 +289,9 @@ static int get_idx_from_handle(OMX_IN OMX_HANDLETYPE *ahComp, int *aCompIdx,
   int *aInstIdx)
 {
   int i = 0, j = 0;
+  if (NULL == g_omxcore || NULL == aCompIdx || NULL == aInstIdx) {
+    return FALSE;
+  }
   for (i = 0; i < g_omxcore->comp_cnt; i++) {
     for (j = 0; j < OMX_COMP_MAX_INSTANCES; j++) {
       if ((OMX_COMPONENTTYPE *)g_omxcore->component[i].handle[j] ==

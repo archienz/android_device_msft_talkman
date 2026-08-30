@@ -1448,6 +1448,11 @@ int QCamera2HardwareInterface::getCapabilities(uint32_t cameraId,
     struct  camera_info *p_info;
     pthread_mutex_lock(&g_camlock);
     p_info = get_cam_info(cameraId);
+    if (!p_info || !info) {
+        pthread_mutex_unlock(&g_camlock);
+        ALOGE("%s: invalid cameraId %u or info %p", __func__, cameraId, info);
+        return BAD_VALUE;
+    }
     p_info->device_version = CAMERA_DEVICE_API_VERSION_1_0;
     p_info->static_camera_characteristics = NULL;
     memcpy(info, p_info, sizeof (struct camera_info));

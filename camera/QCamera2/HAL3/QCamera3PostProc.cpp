@@ -2586,6 +2586,10 @@ int32_t QCamera3Exif::addEntry(exif_tag_id_t tagid,
                               void *data)
 {
     int32_t rc = NO_ERROR;
+    if (data == NULL || count == 0) {
+        ALOGE("%s: Invalid EXIF arguments", __func__);
+        return BAD_VALUE;
+    }
     if(m_nNumEntries >= MAX_HAL3_EXIF_TABLE_ENTRIES) {
         ALOGE("%s: Number of entries exceeded limit", __func__);
         return NO_MEMORY;
@@ -2732,8 +2736,9 @@ int32_t QCamera3Exif::addEntry(exif_tag_id_t tagid,
             break;
     }
 
-    // Increase number of entries
-    m_nNumEntries++;
+    if (rc == NO_ERROR) {
+        m_nNumEntries++;
+    }
     return rc;
 }
 

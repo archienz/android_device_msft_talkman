@@ -4552,15 +4552,20 @@ QCamera3HardwareInterface::translateFromHalMetadata(
         //calculate the noise profile based on sensitivity
         double noise_profile_S = computeNoiseModelEntryS(*sensorSensitivity);
         double noise_profile_O = computeNoiseModelEntryO(*sensorSensitivity);
-        double noise_profile[2 * gCamCapability[mCameraId]->num_color_channels];
-        for (int i = 0; i < 2 * gCamCapability[mCameraId]->num_color_channels; i += 2) {
+        uint8_t channels = gCamCapability[mCameraId]->num_color_channels;
+        if (channels == 0 || channels > 4) {
+            channels = 4;
+        }
+        double noise_profile[8];
+        memset(noise_profile, 0, sizeof(noise_profile));
+        for (int i = 0; i < 2 * channels; i += 2) {
             noise_profile[i]   = noise_profile_S;
             noise_profile[i+1] = noise_profile_O;
         }
         CDBG("%s: noise model entry (S, O) is (%f, %f)", __func__,
                 noise_profile_S, noise_profile_O);
         camMetadata.update(ANDROID_SENSOR_NOISE_PROFILE, noise_profile,
-                (size_t) (2 * gCamCapability[mCameraId]->num_color_channels));
+                (size_t) (2 * channels));
     }
 
     IF_META_AVAILABLE(uint32_t, shadingMode, CAM_INTF_META_SHADING_MODE, metadata) {
@@ -7274,6 +7279,11 @@ int QCamera3HardwareInterface::getCamInfo(uint32_t cameraId,
     ATRACE_CALL();
     int rc = 0;
 
+    if (!info || cameraId >= MM_CAMERA_MAX_NUM_SENSORS) {
+        ALOGE("%s: invalid args cameraId=%u info=%p", __func__, cameraId, info);
+        return BAD_VALUE;
+    }
+
     pthread_mutex_lock(&gCamLock);
     if (NULL == gCamCapability[cameraId]) {
         rc = initCapabilities(cameraId);
@@ -9500,16 +9510,33 @@ void QCamera3HardwareInterface::getFlashInfo(const int cameraId,
         bool& hasFlash,
         char (&flashNode)[QCAMERA_MAX_FILEPATH_LENGTH])
 {
+    flashNode[0] = '\0';
+    hasFlash = false;
+
+    if (cameraId < 0 || cameraId >= MM_CAMERA_MAX_NUM_SENSORS) {
+        ALOGE("%s: Invalid camera id: %d", __func__, cameraId);
+        return;
+    }
+
+    if (NULL == gCamCapability[cameraId]) {
+        struct camera_info info;
+        memset(&info, 0, sizeof(info));
+        if (getCamInfo((uint32_t)cameraId, &info) < 0) {
+            ALOGE("%s: Unable to query capabilities for camera id: %d",
+                    __func__, cameraId);
+            return;
+        }
+    }
+
     cam_capability_t* camCapability = gCamCapability[cameraId];
     if (NULL == camCapability) {
-        hasFlash = false;
-        flashNode[0] = '\0';
-    } else {
-        hasFlash = camCapability->flash_available;
-        strlcpy(flashNode,
-                (char*)camCapability->flash_dev_name,
-                QCAMERA_MAX_FILEPATH_LENGTH);
+        return;
     }
+
+    hasFlash = camCapability->flash_available;
+    strlcpy(flashNode,
+            (char*)camCapability->flash_dev_name,
+            QCAMERA_MAX_FILEPATH_LENGTH);
 }
 
 /*===========================================================================

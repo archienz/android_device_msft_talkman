@@ -1400,7 +1400,6 @@ void get_sensor_info()
             CDBG_ERROR("Error: ioctl media_dev failed: %s\n", strerror(errno));
             close(dev_fd);
             dev_fd = -1;
-            num_cameras = 0;
             break;
         }
 
@@ -1427,6 +1426,11 @@ void get_sensor_info()
             }
             if(entity.type == MEDIA_ENT_T_V4L2_SUBDEV &&
                 entity.group_id == MSM_CAMERA_SUBDEV_SENSOR) {
+                if (num_cameras >= MM_CAMERA_MAX_NUM_SENSORS) {
+                    CDBG_ERROR("%s: max sensors reached, ignoring extra nodes",
+                            __func__);
+                    break;
+                }
                 temp = entity.flags >> 8;
                 mount_angle = (temp & 0xFF) * 90;
                 facing = (temp >> 8);
@@ -1465,6 +1469,12 @@ void sort_camera_info(int num_cam)
     int idx = 0, i;
     struct camera_info temp_info[MM_CAMERA_MAX_NUM_SENSORS];
     char temp_dev_name[MM_CAMERA_MAX_NUM_SENSORS][MM_CAMERA_DEV_NAME_LEN];
+
+    if (num_cam <= 0 || num_cam > MM_CAMERA_MAX_NUM_SENSORS) {
+        ALOGE("%s: invalid camera count %d", __func__, num_cam);
+        return;
+    }
+
     memset(temp_info, 0, sizeof(temp_info));
     memset(temp_dev_name, 0, sizeof(temp_dev_name));
 
@@ -1512,7 +1522,7 @@ uint8_t get_num_of_cameras()
     struct media_device_info mdev_info;
     int num_media_devices = 0;
     int8_t num_cameras = 0;
-    char subdev_name[32];
+    char subdev_name[32] = {0};
     int32_t sd_fd = -1;
     struct sensor_init_cfg_data cfg;
     char prop[PROPERTY_VALUE_MAX];
@@ -1554,6 +1564,7 @@ uint8_t get_num_of_cameras()
             break;
         }
         num_media_devices++;
+        memset(&mdev_info, 0, sizeof(mdev_info));
         rc = ioctl(dev_fd, MEDIA_IOC_DEVICE_INFO, &mdev_info);
         if (rc < 0) {
             CDBG_ERROR("Error: ioctl media_dev failed: %s\n", strerror(errno));
@@ -1584,7 +1595,7 @@ uint8_t get_num_of_cameras()
                 entity.name, entity.type, entity.group_id);
             if (entity.type == MEDIA_ENT_T_V4L2_SUBDEV &&
                 entity.group_id == MSM_CAMERA_SUBDEV_SENSOR_INIT) {
-                snprintf(subdev_name, sizeof(dev_name), "/dev/%s", entity.name);
+                snprintf(subdev_name, sizeof(subdev_name), "/dev/%s", entity.name);
                 break;
             }
         }
@@ -1593,10 +1604,16 @@ uint8_t get_num_of_cameras()
     }
 
     /* Open sensor_init subdev */
+    if (subdev_name[0] == '\0') {
+        CDBG_ERROR("No sensor_init subdev found");
+        pthread_mutex_unlock(&g_intf_lock);
+        return 0;
+    }
     sd_fd = open(subdev_name, O_RDWR);
     if (sd_fd < 0) {
         CDBG_ERROR("Open sensor_init subdev failed");
-        return FALSE;
+        pthread_mutex_unlock(&g_intf_lock);
+        return 0;
     }
 
     cfg.cfgtype = CFG_SINIT_PROBE_WAIT_DONE;
@@ -1626,7 +1643,6 @@ uint8_t get_num_of_cameras()
             CDBG_ERROR("Error: ioctl media_dev failed: %s\n", strerror(errno));
             close(dev_fd);
             dev_fd = -1;
-            num_cameras = 0;
             break;
         }
 
@@ -1634,6 +1650,13 @@ uint8_t get_num_of_cameras()
             close(dev_fd);
             dev_fd = -1;
             continue;
+        }
+
+        if (num_cameras >= MM_CAMERA_MAX_NUM_SENSORS) {
+            CDBG_ERROR("%s: max number of cameras reached", __func__);
+            close(dev_fd);
+            dev_fd = -1;
+            break;
         }
 
         while (1) {
@@ -1648,15 +1671,14 @@ uint8_t get_num_of_cameras()
             }
             if(entity.type == MEDIA_ENT_T_DEVNODE_V4L && entity.group_id == QCAMERA_VNODE_GROUP_ID) {
                 strlcpy(g_cam_ctrl.video_dev_name[num_cameras],
-                     entity.name, sizeof(entity.name));
+                     entity.name, sizeof(g_cam_ctrl.video_dev_name[num_cameras]));
+                CDBG("%s: dev_info[id=%d,name='%s']\n",
+                    __func__, (int)num_cameras, g_cam_ctrl.video_dev_name[num_cameras]);
+                num_cameras++;
                 break;
             }
         }
 
-        CDBG("%s: dev_info[id=%d,name='%s']\n",
-            __func__, (int)num_cameras, g_cam_ctrl.video_dev_name[num_cameras]);
-
-        num_cameras++;
         close(dev_fd);
         dev_fd = -1;
     }
@@ -1712,6 +1734,10 @@ static int32_t mm_camera_intf_process_advanced_capture(uint32_t camera_handle,
 
 struct camera_info *get_cam_info(uint32_t camera_id)
 {
+    if (camera_id >= MM_CAMERA_MAX_NUM_SENSORS) {
+        CDBG_ERROR("%s: invalid camera_id %u", __func__, camera_id);
+        return NULL;
+    }
     return &g_cam_ctrl.info[camera_id];
 }
 

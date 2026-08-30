@@ -139,6 +139,13 @@ int QCamera2Factory::get_number_of_cameras()
  *==========================================================================*/
 int QCamera2Factory::get_camera_info(int camera_id, struct camera_info *info)
 {
+    if (!gQCamera2Factory) {
+        get_number_of_cameras();
+        if (!gQCamera2Factory) {
+            ALOGE("%s: Camera factory is not initialized", __func__);
+            return NO_INIT;
+        }
+    }
     return gQCamera2Factory->getCameraInfo(camera_id, info);
 }
 
@@ -155,6 +162,13 @@ int QCamera2Factory::get_camera_info(int camera_id, struct camera_info *info)
  *==========================================================================*/
 int QCamera2Factory::set_callbacks(const camera_module_callbacks_t *callbacks)
 {
+    if (!gQCamera2Factory) {
+        get_number_of_cameras();
+        if (!gQCamera2Factory) {
+            ALOGE("%s: Camera factory is not initialized", __func__);
+            return NO_INIT;
+        }
+    }
     return gQCamera2Factory->setCallbacks(callbacks);
 }
 
@@ -183,6 +197,13 @@ int QCamera2Factory::open_legacy(const struct hw_module_t* module,
         ALOGE("Invalid camera id");
         return BAD_VALUE;
     }
+    if (!gQCamera2Factory) {
+        get_number_of_cameras();
+        if (!gQCamera2Factory) {
+            ALOGE("%s: Camera factory is not initialized", __func__);
+            return NO_INIT;
+        }
+    }
     return gQCamera2Factory->openLegacy(atoi(id), halVersion, device);
 }
 
@@ -200,6 +221,17 @@ int QCamera2Factory::open_legacy(const struct hw_module_t* module,
  *==========================================================================*/
 int QCamera2Factory::set_torch_mode(const char* camera_id, bool on)
 {
+    if (!camera_id) {
+        ALOGE("%s: Invalid camera id", __func__);
+        return BAD_VALUE;
+    }
+    if (!gQCamera2Factory) {
+        get_number_of_cameras();
+        if (!gQCamera2Factory) {
+            ALOGE("%s: Camera factory is not initialized", __func__);
+            return NO_INIT;
+        }
+    }
     return gQCamera2Factory->setTorchMode(camera_id, on);
 }
 
@@ -370,6 +402,13 @@ int QCamera2Factory::camera_device_open(
         ALOGE("Invalid camera id");
         return BAD_VALUE;
     }
+    if (!gQCamera2Factory) {
+        get_number_of_cameras();
+        if (!gQCamera2Factory) {
+            ALOGE("%s: Camera factory is not initialized", __func__);
+            return NO_INIT;
+        }
+    }
     return gQCamera2Factory->cameraDeviceOpen(atoi(id), hw_device);
 }
 
@@ -445,6 +484,10 @@ int QCamera2Factory::setTorchMode(const char* camera_id, bool on)
     char* endPointer = NULL;
     errno = 0;
     QCameraFlash& flash = QCameraFlash::getInstance();
+
+    if (!camera_id) {
+        return -EINVAL;
+    }
 
     cameraIdLong = strtol(camera_id, &endPointer, 10);
 

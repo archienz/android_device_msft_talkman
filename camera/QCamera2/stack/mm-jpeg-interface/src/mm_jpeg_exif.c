@@ -63,9 +63,17 @@ int32_t addExifEntry(QOMX_EXIF_INFO *p_exif_info, exif_tag_id_t tagid,
   exif_tag_type_t type, uint32_t count, void *data)
 {
     int32_t rc = 0;
-    uint32_t numOfEntries = (uint32_t)p_exif_info->numOfEntries;
-    QEXIF_INFO_DATA *p_info_data = p_exif_info->exif_data;
-    if(numOfEntries >= MAX_EXIF_TABLE_ENTRIES) {
+    uint32_t numOfEntries;
+    QEXIF_INFO_DATA *p_info_data;
+
+    if (p_exif_info == NULL || data == NULL || count == 0) {
+        ALOGE("%s: Invalid EXIF arguments", __func__);
+        return -1;
+    }
+
+    numOfEntries = (uint32_t)p_exif_info->numOfEntries;
+    p_info_data = p_exif_info->exif_data;
+    if(p_info_data == NULL || numOfEntries >= MAX_EXIF_TABLE_ENTRIES) {
         ALOGE("%s: Number of entries exceeded limit", __func__);
         return -1;
     }
@@ -191,8 +199,9 @@ int32_t addExifEntry(QOMX_EXIF_INFO *p_exif_info, exif_tag_id_t tagid,
     break;
     }
 
-    // Increase number of entries
-    p_exif_info->numOfEntries++;
+    if (rc == 0) {
+        p_exif_info->numOfEntries++;
+    }
     return rc;
 }
 

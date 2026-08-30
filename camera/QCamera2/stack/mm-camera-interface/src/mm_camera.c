@@ -373,15 +373,16 @@ on_error:
     if (NULL == my_obj) {
         CDBG_ERROR("%s: Invalid camera object\n", __func__);
         rc = -1;
-    } else {
-        if (my_obj->ctrl_fd >= 0) {
-            close(my_obj->ctrl_fd);
-            my_obj->ctrl_fd = -1;
-        }
-        if (my_obj->ds_fd >= 0) {
-            mm_camera_socket_close(my_obj->ds_fd);
-            my_obj->ds_fd = -1;
-        }
+        return rc;
+    }
+
+    if (my_obj->ctrl_fd >= 0) {
+        close(my_obj->ctrl_fd);
+        my_obj->ctrl_fd = -1;
+    }
+    if (my_obj->ds_fd >= 0) {
+        mm_camera_socket_close(my_obj->ds_fd);
+        my_obj->ds_fd = -1;
     }
 
     /* unlock cam_lock, we need release global intf_lock in camera_open(),

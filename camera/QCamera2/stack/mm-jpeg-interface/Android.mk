@@ -32,17 +32,11 @@ ifneq (,$(filter  msm8610,$(TARGET_BOARD_PLATFORM)))
     LOCAL_CFLAGS+= -DLOAD_ADSP_RPC_LIB
 endif
 
-DUAL_JPEG_TARGET_LIST := msm8974
-DUAL_JPEG_TARGET_LIST += msm8994
+# talkman MSM8992 has a single JPEG engine. Do not enable 8994 dual-session.
+LOCAL_CFLAGS+= -DMM_JPEG_CONCURRENT_SESSIONS_COUNT=1
 
-ifneq (,$(filter  $(DUAL_JPEG_TARGET_LIST),$(TARGET_BOARD_PLATFORM)))
-    LOCAL_CFLAGS+= -DMM_JPEG_CONCURRENT_SESSIONS_COUNT=2
-else
-    LOCAL_CFLAGS+= -DMM_JPEG_CONCURRENT_SESSIONS_COUNT=1
-endif
-
-JPEG_PIPELINE_TARGET_LIST := msm8994
-JPEG_PIPELINE_TARGET_LIST += msm8992
+# MSM8992 uses the JPEG pipeline encoder.
+JPEG_PIPELINE_TARGET_LIST := msm8992
 
 ifneq (,$(filter  $(JPEG_PIPELINE_TARGET_LIST),$(TARGET_BOARD_PLATFORM)))
     LOCAL_CFLAGS+= -DMM_JPEG_USE_PIPELINE
@@ -59,7 +53,7 @@ LOCAL_SRC_FILES := \
 
 LOCAL_MODULE           := libmmjpeg_interface
 LOCAL_PRELINK_MODULE   := false
-LOCAL_SHARED_LIBRARIES := libdl libcutils liblog libqomx_core liblog
+LOCAL_SHARED_LIBRARIES := libdl libcutils liblog libqomx_core
 LOCAL_MODULE_TAGS := optional
 LOCAL_VENDOR_MODULE := true
 
