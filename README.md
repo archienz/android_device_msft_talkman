@@ -31,8 +31,8 @@ ASD-STE100 updates this README when the facts change.
 
 ## What we have done
 
-The changes from pull requests 1, 2, 3, and 4 are on lineage-18.1-talkman.
-The HEAD commit is 938f5c8.
+The changes from pull requests 1, 2, 3, 4, and 5 are on lineage-18.1-talkman.
+The HEAD commit is 369b619.
 These changes are not draft-only.
 
 ### Pull request 1
@@ -68,6 +68,15 @@ Remove bullhead and angler from TARGET_OTA_ASSERT_DEVICE.
 https://github.com/archienz/android_device_msft_talkman/pull/4
 
 Set AUDIO_FEATURE_ENABLED_SPKR_PROTECTION to false.
+
+### Pull request 5
+
+https://github.com/archienz/android_device_msft_talkman/pull/5
+
+Pull request 5 is closed.
+These changes are on lineage-18.1-talkman.
+The file is gnss/1.0/default/GnssDebug.cpp.
+Set std::max to std::min.
 
 ## Not done
 

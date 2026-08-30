@@ -89,6 +89,15 @@ Pull request 4 is not stacked on pull request 1.
 
 Set AUDIO_FEATURE_ENABLED_SPKR_PROTECTION to false.
 
+## GNSS debug pull request
+
+The leftover pull request 5 is closed.
+The URL is https://github.com/archienz/android_device_msft_talkman/pull/5
+These changes are on lineage-18.1-talkman.
+The HEAD commit is 369b619.
+The file is gnss/1.0/default/GnssDebug.cpp.
+Set std::max to std::min.
+
 ## In progress and unproven
 
 tinymix on the device after brunch of pull request 1 is unproven.
