@@ -49,6 +49,7 @@ genfscon sysfs /devices/pci0000:00/0000:00:00.0/0000:01:00.0/net/wlan0   u:objec
 genfscon sysfs /devices/virtual/graphics/fb0                             u:object_r:sysfs_graphics:s0
 genfscon sysfs /devices/virtual/graphics/fb1                             u:object_r:sysfs_graphics:s0
 genfscon sysfs /devices/soc.0/qpnp-smbcharger-17/power_supply/battery    u:object_r:sysfs_battery:s0
+genfscon sysfs /class/leds                                               u:object_r:sysfs_leds:s0
 genfscon sysfs /devices/soc.0/leds-qpnp-25/leds                          u:object_r:sysfs_leds:s0
 genfscon sysfs /devices/soc.0/fd900000.qcom,mdss_mdp/qcom,mdss_fb_primary.182/leds/lcd-backlight     u:object_r:sysfs_leds:s0
 genfscon sysfs /devices/soc.0/qcom,camera-flash.82/leds                                              u:object_r:sysfs_leds:s0
