@@ -14,7 +14,7 @@ The Android tree is Android4Lumia950.
 The Android version is LineageOS 18.1.
 The device branch is lineage-18.1-talkman.
 
-The local clone is at C:\\Users\\nizb0\\src\\android_device_msft_talkman.
+The local clone is at C:\Users\nizb0\src\android_device_msft_talkman.
 The origin remote is the archienz fork.
 The upstream remote is Android4Lumia950.
 
