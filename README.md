@@ -27,6 +27,9 @@ The speaker path uses QUAT_MI2S_RX.
 The speaker amplifier is TAS2552.
 Set TAS2552 Volume to 18.
 The torch HAL writes 0 or 255 to led::flash_torch.
+Set genfscon for sysfs /class/leds to sysfs_leds.
+The blanket write for hal_light to sysfs is gone.
+The sepolicy commit is fd50fbb.
 The PRODUCT_PACKAGES list includes rild.
 Set qseecom to 0660.
 Set diag to 0770.
@@ -39,6 +42,7 @@ The GNSS debug function uses std::min.
 We bring up the lights and torch functions on talkman.
 We bring up the camera function. You must have a DPP dump.
 We bring up SELinux. SELinux is still permissive.
+SELINUX_IGNORE_NEVERALLOWS stays.
 
 ## Not done
 

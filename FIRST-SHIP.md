@@ -39,6 +39,9 @@ Set AUDIO_FEATURE_ENABLED_SPKR_PROTECTION to false.
 LIGHT_ID_FLASHLIGHT writes to /sys/class/leds/led::flash_torch/brightness.
 Write 0 to set the torch to OFF.
 Write 255 to set the torch to ON.
+Set genfscon for sysfs /class/leds to sysfs_leds.
+The blanket write for hal_light to sysfs is gone.
+The sepolicy commit is fd50fbb.
 HIDL 2.0 has no Flashlight interface.
 The Quick Settings torch is off until the camera function is complete.
 
@@ -67,6 +70,7 @@ The kernel governor change from PERFORMANCE to interactive is prepared.
 STACKPROTECTOR_STRONG is prepared.
 There is no archienz kernel fork at this time.
 SELinux is still permissive. SELinux is not enforcing.
+SELINUX_IGNORE_NEVERALLOWS stays.
 We bring up the lights and torch functions.
 We bring up the camera function. You must have a DPP dump.
 We bring up SELinux.
