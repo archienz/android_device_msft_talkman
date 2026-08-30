@@ -55,7 +55,10 @@ The SMIApp provider is disabled.
 The SMIApp commit is 80dde95.
 The QCamera2 change sets JPEG, ION, and vendor-module.
 The QCamera2 JPEG commit is d572733.
-The HEAD commit is d572733.
+The leftover QCamera2 ION mmap leak fix closes share fds on ION_MAP_FAILED.
+The leftover QCamera2 ION mmap leak fix frees only the mmap-fail batch.
+The leftover QCamera2 ION mmap leak commit is 1eb58d3.
+The HEAD commit is 1eb58d3.
 
 ## What we are doing
 
