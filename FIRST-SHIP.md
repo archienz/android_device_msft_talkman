@@ -69,7 +69,7 @@ The clamp size is not 40.
 The file init.talkman.rc does not contain LGE SKU wifi.
 The file init.talkman.rc does not contain IMS QMI.
 The GnssNavigationMessage commit is b0d3883.
-The GnssNavigationMessage commit is under HEAD 539d08cad582d2bc9510c3e980c84c31f863847e.
+The GnssNavigationMessage commit is under HEAD c8ac257.
 The QCamera2 recode is on lineage-18.1-talkman.
 The QCamera2 recode commit is 73947d2.
 The QCamera2 recode sets probe, torch, and msm8992.
@@ -87,8 +87,11 @@ The file init.talkman.rc does not contain mm-qcamera-daemon.
 The file proprietary-blobs.txt does not contain qcamerasvr.
 The file proprietary-blobs.txt does not contain mm-qcamera-daemon.
 The init camera daemon commit is eb97ddb.
-The HEAD commit is 539d08c.
-The full SHA is 539d08cad582d2bc9510c3e980c84c31f863847e.
+The HEAD commit is c8ac257.
+CVE pass 5 landed at c8ac257.
+The file init.talkman.rc sets chmod 0700 on /sys/kernel/debug.
+ATFWD is disabled unless persist.radio.atfwd.start=true.
+The radio notes file is radio/README.md at 539d08c.
 The file radio/README.md exists.
 It holds MODEM_FS1, MODEM_FS2, MODEM_FSC, MODEM_FSG, and DPP restore notes.
 modem.img stays TALKMAN_LTE_ROW.
