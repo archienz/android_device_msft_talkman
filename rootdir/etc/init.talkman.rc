@@ -338,12 +338,6 @@ service qti /vendor/bin/qti
     user radio
     group radio net_raw diag usb net_admin
 
-service sensors /vendor/bin/sensors.qcom
-    class core
-    user root
-    group root
-    disabled
-
 service netmgrd /vendor/bin/netmgrd
     class main
     group radio system wakelock
@@ -364,18 +358,6 @@ on property:init.svc.per_mgr=running
 
 on property:sys.shutdown.requested=*
     stop per_proxy
-
-on property:ro.boot.hardware.sku=LGH790
-    setprop ro.boot.wificountrycode US
-
-on property:ro.boot.hardware.sku=LGH791
-    setprop ro.boot.wificountrycode 00
-
-on property:ro.boot.hardware.sku=LGH791F
-    setprop ro.boot.wificountrycode 00
-
-on property:ro.boot.hardware.sku=LGH798
-    setprop ro.boot.wificountrycode 00
 
 service thermal-engine /vendor/bin/thermal-engine
     class main
@@ -438,22 +420,6 @@ service cnd /vendor/bin/cnd
     socket cnd stream 660 root inet
     group root wakelock
 
-service imsqmidaemon /vendor/bin/imsqmidaemon
-    class main
-    user system
-    socket ims_qmid stream 0660 system radio
-    group radio net_raw log diag
-
-service imsdatadaemon /vendor/bin/imsdatadaemon
-    class main
-    user system
-    socket ims_datad stream 0660 system radio
-    group system wifi radio inet net_raw log diag net_admin
-    disabled
-
-on property:sys.ims.QMI_DAEMON_STATUS=1
-    start imsdatadaemon
-
 service talkman-sh /vendor/bin/init.talkman.sh
     class late_start
     user radio
@@ -485,13 +451,3 @@ on property:init.svc.servicemanager=restarting
     
 on property:vold.decrypt=trigger_restart_framework
     restart camera-provider-2-4
-
-# start sensor daemon as core class [START]
-service lge-sensor-sh /vendor/bin/init.msm8992.sensor.sh
-    class core
-    user root
-    group root wakelock
-    oneshot
-    seclabel u:r:sensors:s0
-    writepid /dev/cpuset/system-background/tasks
-# start sensor daemon as core class [END]
