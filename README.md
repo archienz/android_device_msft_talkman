@@ -1,15 +1,16 @@
 # talkman
 
-## Purpose
-
-This repository is the archienz device tree for the Lumia 950.
+This repository is the device tree for the Lumia 950.
 The device codename is talkman.
-The Android version is LineageOS 18.1.
-The device branch is lineage-18.1-talkman.
 This repository is not for the Lumia 950 XL.
 The Lumia 950 XL codename is cityman.
 Do not use cityman procedures for talkman.
-Work stays on the archienz fork.
+
+## Purpose
+
+This repository is the archienz working tree for LineageOS 18.1 on talkman.
+The branch is lineage-18.1-talkman.
+All device-tree work stays on this fork.
 Do not push to Android4Lumia950.
 
 The full first-ship data is in [FIRST-SHIP.md](FIRST-SHIP.md).
@@ -18,51 +19,57 @@ WARNING: Do not use a cityman tag.
 
 WARNING: Do not install Image.gz-dtb if Image.gz-dtb has one DTB and that DTB is a cityman DTB.
 
-## Work
+## What we are doing
 
-The first-ship work adds the speaker path, the torch HAL, and rild.
-The CVE work sets qseecom, diag, and TARGET_OTA_ASSERT_DEVICE.
-When the kernel is forked, set the governor to interactive.
-When the kernel is forked, set STACKPROTECTOR_STRONG.
-Camera is a later function. You must have a DPP dump.
+We bring up missing hardware on talkman.
+We fix bugs in the device tree that is already in this repository.
+We add security patches that apply to this tree.
+We prepare kernel governor and STACKPROTECTOR_STRONG changes for when the kernel is on archienz.
+Camera work waits for a DPP dump.
 
-## Completed work
+ASD-STE100 updates this README when the facts change.
+
+## What we have done
 
 ### Pull request 1
 
-The URL is https://github.com/archienz/android_device_msft_talkman/pull/1
-The branch name is cursor/first-ship-mixer-lights-rild-4b97.
+https://github.com/archienz/android_device_msft_talkman/pull/1
+
 The speaker path uses QUAT_MI2S_RX.
 The speaker amplifier is TAS2552.
 Set TAS2552 Volume to 18.
 The torch HAL writes 0 or 255 to led::flash_torch.
 Add rild to PRODUCT_PACKAGES.
+The headphone path uses SLIMBUS_5_RX.
+Set persist.speaker.prot.enable to false.
+The speaker path does not use SD3.
 
 ### Pull request 2
 
-The URL is https://github.com/archienz/android_device_msft_talkman/pull/2
-The branch name is docs/first-ship.
-Pull request 2 adds FIRST-SHIP.md and README.md.
+https://github.com/archienz/android_device_msft_talkman/pull/2
+
+Pull request 2 adds FIRST-SHIP.md and README.md on branch docs/first-ship.
 
 ### Pull request 3
 
-The URL is https://github.com/archienz/android_device_msft_talkman/pull/3
-The branch name is cursor/tighten-qseecom-diag-ota-57b7.
+https://github.com/archienz/android_device_msft_talkman/pull/3
+
 Set qseecom to 0660.
-Set diag to 0770.
+Set diag logs to 0770.
 Set TARGET_OTA_ASSERT_DEVICE to talkman only.
+Remove bullhead and angler from TARGET_OTA_ASSERT_DEVICE.
 
 ### Pull request 4
 
-The URL is https://github.com/archienz/android_device_msft_talkman/pull/4
-The branch name is cursor/disable-spkr-protection-4683.
+https://github.com/archienz/android_device_msft_talkman/pull/4
+
 Set AUDIO_FEATURE_ENABLED_SPKR_PROTECTION to false.
 
 ## Not done
 
-Camera is not done.
-The voice front-end for quat is not done.
-tinymix on the device is not proven.
-The boot log SMEM 0xfb is unproven.
-The boot log hw_platform 26 is unproven.
-Kernel, vendor, and lk2nd forks are not on archienz.
+Camera is not implemented. You must have SMIApp and a DPP dump.
+The voice front-end for quat is not implemented.
+tinymix on the device after brunch of pull request 1 is unproven.
+The device boot log must show SMEM 0xfb and hw_platform 26. These values are unproven.
+Kernel, vendor, and lk2nd are not on the archienz fork.
+The Quick Settings torch is off until the camera function is complete.
