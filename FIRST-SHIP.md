@@ -5,6 +5,7 @@ The device codename is talkman.
 This document is not for the Lumia 950 XL.
 The Lumia 950 XL codename is cityman.
 Do not use cityman procedures for talkman.
+The dashboard summary is in [README.md](README.md).
 
 ## Device and trees
 
@@ -62,6 +63,26 @@ Do not start rild in init.talkman.rc.
 - Camera. Use SMIApp and a DPP dump in a later change.
 - Voice front-end for quat. A later change will add this function.
 - Additional flash code in the kernel. The Harmony kernel already has TAS, quat DAI, and torch DTS.
+
+## CVE pull request
+
+The CVE pull request is pull request 3 on the archienz fork.
+The URL is https://github.com/archienz/android_device_msft_talkman/pull/3
+The branch name is cursor/tighten-qseecom-diag-ota-57b7.
+The CVE pull request is not stacked on pull request 1.
+
+Set qseecom to 0660.
+Set diag to 0770.
+Set TARGET_OTA_ASSERT_DEVICE to talkman only.
+Remove bullhead from TARGET_OTA_ASSERT_DEVICE.
+Remove angler from TARGET_OTA_ASSERT_DEVICE.
+
+## In progress and unproven
+
+tinymix on the device after brunch of pull request 1 is unproven.
+The kernel governor change from PERFORMANCE to interactive is prepared.
+STACKPROTECTOR_STRONG is prepared.
+There is no archienz kernel fork at this time.
 
 ## Flash
 
