@@ -90,7 +90,7 @@ Do not push `android_kernel_mmo_msm8994`.
 
 ## Leftover QCamera2
 
-`camera/QCamera2` (plus `camera/QCameraParameters.h`, `camera/QCamera_Intf.h`, `camera/mm-image-codec`, and the leftover `camera/Android.mk` wiring) is a bullhead leftover.
+`camera/QCamera2` (plus `camera/mm-image-codec` and the `camera/Android.mk` wiring) is a bullhead path.
 Plan: retire.
 Do not delete it in this change.
 Do not rewrite it in this change.
