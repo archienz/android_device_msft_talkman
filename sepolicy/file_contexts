@@ -135,6 +135,8 @@
 /sys/devices/virtual/smdpkt/smdcntl([0-9])+/open_timeout            u:object_r:sysfs_smdcntl_open_timeout:s0
 
 /sys/class/hwmon/hwmon2/device(/.*)?                                u:object_r:sysfs_hwmon:s0
+# talkman gpio-leds torch/RGB/lcd-backlight are /sys/class/leds (not cityman xenon)
+/sys/class/leds(/.*)?                                               u:object_r:sysfs_leds:s0
 /sys/devices/soc.0/qpnp-fg-18/power_supply/bms/battery_type         u:object_r:sysfs_batteryinfo:s0
 /sys/devices/platform/battery_current_limit                         u:object_r:sysfs_thermal:s0
 
