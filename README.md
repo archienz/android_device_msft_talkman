@@ -46,9 +46,14 @@ The clamp size is sizeof(message->data).
 The clamp size is not 40.
 The file init.talkman.rc does not contain LGE SKU wifi.
 The file init.talkman.rc does not contain IMS QMI.
-The HEAD commit is c3a5653.
 The GnssNavigationMessage commit is b0d3883.
-The GnssNavigationMessage commit is under HEAD c3a5653.
+The GnssNavigationMessage commit is under HEAD 80dde95.
+The QCamera2 recode is on lineage-18.1-talkman.
+The QCamera2 recode commit is 73947d2.
+The QCamera2 recode sets probe, torch, and msm8992.
+The SMIApp provider is disabled.
+The SMIApp commit is 80dde95.
+The HEAD commit is 80dde95.
 
 ## What we are doing
 
@@ -60,6 +65,7 @@ SELINUX_IGNORE_NEVERALLOWS stays.
 ## Not done
 
 Camera is not implemented. You must have SMIApp and a DPP dump.
+The camera function does not work.
 The Quick Settings torch is off until the camera function is complete.
 The voice front-end for quat is not implemented.
 tinymix on the device is unproven.

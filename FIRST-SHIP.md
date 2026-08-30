@@ -65,13 +65,19 @@ The clamp size is sizeof(message->data).
 The clamp size is not 40.
 The file init.talkman.rc does not contain LGE SKU wifi.
 The file init.talkman.rc does not contain IMS QMI.
-The HEAD commit is c3a5653.
 The GnssNavigationMessage commit is b0d3883.
-The GnssNavigationMessage commit is under HEAD c3a5653.
+The GnssNavigationMessage commit is under HEAD 80dde95.
+The QCamera2 recode is on lineage-18.1-talkman.
+The QCamera2 recode commit is 73947d2.
+The QCamera2 recode sets probe, torch, and msm8992.
+The SMIApp provider is disabled.
+The SMIApp commit is 80dde95.
+The HEAD commit is 80dde95.
 
 ## Functions that are not complete
 
 Camera is not implemented. You must have SMIApp and a DPP dump.
+The camera function does not work.
 The voice front-end for quat is not implemented.
 Additional flash code in the kernel is not in this tree. The Harmony kernel already has TAS, quat DAI, and torch DTS.
 
@@ -85,6 +91,7 @@ SELinux is still permissive. SELinux is not enforcing.
 SELINUX_IGNORE_NEVERALLOWS stays.
 We bring up the lights and torch functions.
 We bring up the camera function. You must have a DPP dump.
+The camera function does not work.
 We bring up SELinux.
 
 ## Flash
