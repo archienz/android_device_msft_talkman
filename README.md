@@ -31,6 +31,10 @@ ASD-STE100 updates this README when the facts change.
 
 ## What we have done
 
+The changes from pull requests 1, 2, 3, and 4 are on lineage-18.1-talkman.
+The HEAD commit is 938f5c8.
+These changes are not draft-only.
+
 ### Pull request 1
 
 https://github.com/archienz/android_device_msft_talkman/pull/1
@@ -48,14 +52,14 @@ The speaker path does not use SD3.
 
 https://github.com/archienz/android_device_msft_talkman/pull/2
 
-Pull request 2 adds FIRST-SHIP.md and README.md on branch docs/first-ship.
+Pull request 2 added FIRST-SHIP.md and README.md. These files are on lineage-18.1-talkman.
 
 ### Pull request 3
 
 https://github.com/archienz/android_device_msft_talkman/pull/3
 
 Set qseecom to 0660.
-Set diag logs to 0770.
+Set diag to 0770.
 Set TARGET_OTA_ASSERT_DEVICE to talkman only.
 Remove bullhead and angler from TARGET_OTA_ASSERT_DEVICE.
 

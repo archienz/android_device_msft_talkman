@@ -29,7 +29,8 @@ There is no pull request 403.
 The first-ship code is in pull request 1 on the archienz fork.
 The URL is https://github.com/archienz/android_device_msft_talkman/pull/1
 The branch name is cursor/first-ship-mixer-lights-rild-4b97.
-The pull request is a draft.
+These changes are on lineage-18.1-talkman.
+The HEAD commit is 938f5c8.
 The pull request contains five files.
 The five files set the speaker path, the torch HAL, and rild.
 
@@ -82,7 +83,8 @@ Remove angler from TARGET_OTA_ASSERT_DEVICE.
 The speaker protection pull request is pull request 4 on the archienz fork.
 The URL is https://github.com/archienz/android_device_msft_talkman/pull/4
 The branch name is cursor/disable-spkr-protection-4683.
-The pull request is a draft.
+These changes are on lineage-18.1-talkman.
+The HEAD commit is 938f5c8.
 Pull request 4 is not stacked on pull request 1.
 
 Set AUDIO_FEATURE_ENABLED_SPKR_PROTECTION to false.
