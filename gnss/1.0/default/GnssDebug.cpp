@@ -45,7 +45,7 @@ Return<void> GnssDebug::getDebugData(getDebugData_cb _hidl_cb)  {
     if (mGnssDebugIface) {
         char buffer[kMaxDebugStrLen + 1];
         size_t length = mGnssDebugIface->get_internal_state(buffer, kMaxDebugStrLen);
-        length = std::max(length, kMaxDebugStrLen);
+        length = std::min(length, kMaxDebugStrLen);
         buffer[length] = '\0';
         ALOGD("Gnss Debug Data: %s", buffer);
     }
