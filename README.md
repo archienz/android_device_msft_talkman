@@ -9,12 +9,15 @@ Do not use cityman procedures for talkman.
 ## Purpose
 
 This repository is the archienz working tree for LineageOS 18.1 on talkman.
-The branch is lineage-18.1-talkman.
+The current branch is lineage-18.1-talkman.
+Do not use a cursor branch.
 All device-tree work stays on this fork.
 Do not push to Android4Lumia950.
 
 The full first-ship data is in [FIRST-SHIP.md](FIRST-SHIP.md).
 Copy roomservice.xml to .repo/local_manifests/roomservice.xml so brunch uses the archienz device tree.
+The roomservice device project is archienz/android_device_msft_talkman.
+The revision is lineage-18.1-talkman.
 
 WARNING: Do not use a cityman tag.
 
@@ -47,7 +50,7 @@ The clamp size is not 40.
 The file init.talkman.rc does not contain LGE SKU wifi.
 The file init.talkman.rc does not contain IMS QMI.
 The GnssNavigationMessage commit is b0d3883.
-The GnssNavigationMessage commit is under HEAD eb97ddb.
+The GnssNavigationMessage commit is under HEAD 539d08cad582d2bc9510c3e980c84c31f863847e.
 The QCamera2 recode is on lineage-18.1-talkman.
 The QCamera2 recode commit is 73947d2.
 The QCamera2 recode sets probe, torch, and msm8992.
@@ -65,11 +68,14 @@ The file init.talkman.rc does not contain mm-qcamera-daemon.
 The file proprietary-blobs.txt does not contain qcamerasvr.
 The file proprietary-blobs.txt does not contain mm-qcamera-daemon.
 The init camera daemon commit is eb97ddb.
-The HEAD commit is eb97ddb.
+The HEAD commit is 539d08cad582d2bc9510c3e980c84c31f863847e.
+Radio NV restore notes are in radio/README.md.
+MODEM_FS1/2/C/G and DPP restore.
+modem.img stays TALKMAN_LTE_ROW.
+This is not a device-tree change.
 
 ## What we are doing
 
-We bring up the lights and torch functions on talkman.
 We bring up the camera function. You must have a DPP dump.
 We bring up SELinux. SELinux is still permissive.
 SELINUX_IGNORE_NEVERALLOWS stays.

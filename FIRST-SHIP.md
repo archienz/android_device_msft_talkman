@@ -13,7 +13,10 @@ The device is the Lumia 950 (talkman).
 The SoC is MSM8992.
 The Android tree is Android4Lumia950.
 The Android version is LineageOS 18.1.
-The device branch is lineage-18.1-talkman.
+The current branch is lineage-18.1-talkman.
+Do not use a cursor branch.
+The roomservice device project is archienz/android_device_msft_talkman.
+The revision is lineage-18.1-talkman.
 
 The local clone is at C:\Users\nizb0\src\android_device_msft_talkman.
 The origin remote is the archienz fork.
@@ -66,7 +69,7 @@ The clamp size is not 40.
 The file init.talkman.rc does not contain LGE SKU wifi.
 The file init.talkman.rc does not contain IMS QMI.
 The GnssNavigationMessage commit is b0d3883.
-The GnssNavigationMessage commit is under HEAD eb97ddb.
+The GnssNavigationMessage commit is under HEAD 539d08cad582d2bc9510c3e980c84c31f863847e.
 The QCamera2 recode is on lineage-18.1-talkman.
 The QCamera2 recode commit is 73947d2.
 The QCamera2 recode sets probe, torch, and msm8992.
@@ -84,7 +87,7 @@ The file init.talkman.rc does not contain mm-qcamera-daemon.
 The file proprietary-blobs.txt does not contain qcamerasvr.
 The file proprietary-blobs.txt does not contain mm-qcamera-daemon.
 The init camera daemon commit is eb97ddb.
-The HEAD commit is eb97ddb.
+The HEAD commit is 539d08cad582d2bc9510c3e980c84c31f863847e.
 
 ## Functions that are not complete
 
@@ -101,7 +104,6 @@ STACKPROTECTOR_STRONG is prepared.
 There is no archienz kernel fork at this time.
 SELinux is still permissive. SELinux is not enforcing.
 SELINUX_IGNORE_NEVERALLOWS stays.
-We bring up the lights and torch functions.
 We bring up the camera function. You must have a DPP dump.
 The camera function does not work.
 We bring up SELinux.
