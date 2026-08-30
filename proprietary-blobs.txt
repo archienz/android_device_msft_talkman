@@ -22,8 +22,6 @@
 /system/bin/diag_klog
 /system/bin/diag_mdlog
 /system/bin/diag_qshrink4_daemon
-/system/bin/imsdatadaemon
-/system/bin/imsqmidaemon
 /system/bin/ims_rtp_daemon
 /system/bin/irsc_util
 /system/bin/location-mq
