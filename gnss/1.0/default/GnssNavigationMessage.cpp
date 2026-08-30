@@ -16,6 +16,8 @@
 
 #define LOG_TAG "GnssHAL_GnssNavigationMessageInterface"
 
+#include <algorithm>
+
 #include <log/log.h>
 
 #include "GnssNavigationMessage.h"
@@ -57,7 +59,12 @@ void GnssNavigationMessage::gnssNavigationMessageCb(LegacyGnssNavigationMessage*
     navigationMsg.status = message->status;
     navigationMsg.messageId = message->message_id;
     navigationMsg.submessageId = message->submessage_id;
-    navigationMsg.data.setToExternal(message->data, message->data_length);
+    // CAF data_length is untrusted. hidl_vec::setToExternal wraps
+    // message->data for the HIDL parcel. Same class as nmeaCb: CAF
+    // length can exceed the payload. gps.h documents 40 bytes for L1 C/A.
+    constexpr size_t kMaxNavMsgLen = 40;
+    size_t length = std::min(message->data_length, kMaxNavMsgLen);
+    navigationMsg.data.setToExternal(message->data, length);
 
     auto ret = sGnssNavigationMsgCbIface->gnssNavigationMessageCb(navigationMsg);
     if (!ret.isOk()) {
