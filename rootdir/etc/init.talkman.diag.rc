@@ -2,10 +2,7 @@
 
 on post-fs-data
     # Modem logging collection
-    mkdir /data/diag_logs 0777 system system
-
-on boot
-    chmod 666 /dev/diag
+    mkdir /data/diag_logs 0770 system system
 
 service cnss_diag /vendor/bin/cnss_diag --q
     class late_start

@@ -19,7 +19,7 @@ DEVICE_PATH := device/msft/talkman
 BUILD_BROKEN_DUP_RULES := true
 BUILD_BROKEN_USES_BUILD_COPY_HEADERS := true
 
-TARGET_OTA_ASSERT_DEVICE := talkman,bullhead,angler
+TARGET_OTA_ASSERT_DEVICE := talkman
 
 # Architecture
 TARGET_ARCH := arm64
