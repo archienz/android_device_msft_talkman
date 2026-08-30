@@ -50,7 +50,7 @@ The clamp size is not 40.
 The file init.talkman.rc does not contain LGE SKU wifi.
 The file init.talkman.rc does not contain IMS QMI.
 The GnssNavigationMessage commit is b0d3883.
-The GnssNavigationMessage commit is under HEAD c8ac257.
+The GnssNavigationMessage commit is under HEAD e445663.
 The QCamera2 recode is on lineage-18.1-talkman.
 The QCamera2 recode commit is 73947d2.
 The QCamera2 recode sets probe, torch, and msm8992.
@@ -68,16 +68,28 @@ The file init.talkman.rc does not contain mm-qcamera-daemon.
 The file proprietary-blobs.txt does not contain qcamerasvr.
 The file proprietary-blobs.txt does not contain mm-qcamera-daemon.
 The init camera daemon commit is eb97ddb.
-The HEAD commit is c8ac257.
+The last-code range is ffb5b27..e445663.
+The last code is e445663d973ee230d779f2de6c4ddcd60c2e83d7.
+The HEAD commit is e445663.
 CVE pass 5 landed at c8ac257.
 The file init.talkman.rc sets chmod 0700 on /sys/kernel/debug.
 ATFWD is disabled unless persist.radio.atfwd.start=true.
-The radio notes file is radio/README.md at 539d08c.
+The torch HAL is complete.
+The sysfs_leds labels are complete.
+The radio notes file is radio/README.md.
+The radio notes file stays at 539d08c.
 The file radio/README.md exists.
 It holds MODEM_FS1, MODEM_FS2, MODEM_FSC, MODEM_FSG, and DPP restore notes.
 modem.img stays TALKMAN_LTE_ROW.
 This is not a device-tree change.
 Do not add service rild, radio.img, IMS, or Dual SIM.
+The file proprietary-blobs.txt dropped /system/bin/imsdatadaemon and /system/bin/imsqmidaemon only.
+The file proprietary-blobs.txt still has ims_rtp_daemon.
+The file proprietary-blobs.txt still has embms jars.
+The file proprietary-blobs.txt still has rcs jars.
+The file proprietary-blobs.txt still has QCRIL.
+The file proprietary-blobs.txt still has qmuxd.
+The file proprietary-blobs.txt still has rild.
 
 ## What we are doing
 
