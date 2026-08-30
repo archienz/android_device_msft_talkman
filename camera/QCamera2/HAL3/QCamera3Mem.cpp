@@ -324,6 +324,7 @@ int QCamera3HeapMemory::allocOneBuffer(QCamera3MemInfo &memInfo,
     }
 
     memset(&ion_info_fd, 0, sizeof(ion_info_fd));
+    ion_info_fd.fd = -1;
     ion_info_fd.handle = allocData.handle;
     rc = ioctl(main_ion_fd, ION_IOC_SHARE, &ion_info_fd);
     if (rc < 0) {
@@ -338,6 +339,10 @@ int QCamera3HeapMemory::allocOneBuffer(QCamera3MemInfo &memInfo,
     return OK;
 
 ION_MAP_FAILED:
+    if (ion_info_fd.fd >= 0) {
+        close(ion_info_fd.fd);
+        ion_info_fd.fd = -1;
+    }
     memset(&handle_data, 0, sizeof(handle_data));
     handle_data.handle = ion_info_fd.handle;
     ioctl(main_ion_fd, ION_IOC_FREE, &handle_data);

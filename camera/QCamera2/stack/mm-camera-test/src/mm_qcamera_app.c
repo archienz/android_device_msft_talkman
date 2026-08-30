@@ -116,6 +116,7 @@ int mm_app_allocate_ion_memory(mm_camera_app_buf_t *buf, unsigned int ion_type)
     struct ion_allocation_data alloc;
     struct ion_fd_data ion_info_fd;
     int main_ion_fd = -1;
+    int share_fd_valid = 0;
     void *data = NULL;
 
     main_ion_fd = open("/dev/ion", O_RDONLY);
@@ -138,12 +139,14 @@ int mm_app_allocate_ion_memory(mm_camera_app_buf_t *buf, unsigned int ion_type)
     }
 
     memset(&ion_info_fd, 0, sizeof(ion_info_fd));
+    ion_info_fd.fd = -1;
     ion_info_fd.handle = alloc.handle;
     rc = ioctl(main_ion_fd, ION_IOC_SHARE, &ion_info_fd);
     if (rc < 0) {
         CDBG_ERROR("ION map failed %s\n", strerror(errno));
         goto ION_MAP_FAILED;
     }
+    share_fd_valid = 1;
 
     data = mmap(NULL,
                 alloc.len,
@@ -164,6 +167,10 @@ int mm_app_allocate_ion_memory(mm_camera_app_buf_t *buf, unsigned int ion_type)
     return MM_CAMERA_OK;
 
 ION_MAP_FAILED:
+    if (share_fd_valid && ion_info_fd.fd >= 0) {
+        close(ion_info_fd.fd);
+        ion_info_fd.fd = -1;
+    }
     memset(&handle_data, 0, sizeof(handle_data));
     handle_data.handle = ion_info_fd.handle;
     ioctl(main_ion_fd, ION_IOC_FREE, &handle_data);
