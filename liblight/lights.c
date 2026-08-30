@@ -45,6 +45,7 @@ char const *const RED_TIMEOUT_FILE   = "/sys/class/leds/red/on_off_ms";
 char const *const GREEN_TIMEOUT_FILE = "/sys/class/leds/green/on_off_ms";
 char const *const BLUE_TIMEOUT_FILE  = "/sys/class/leds/blue/on_off_ms";
 char const *const RGB_LOCKED_FILE    = "/sys/class/leds/red/rgb_start";
+char const *const FLASH_FILE         = "/sys/class/leds/led::flash_torch/brightness";
 
 struct led_config {
     unsigned int colorRGB;
@@ -268,6 +269,19 @@ static int set_light_attention(struct light_device_t* dev __unused,
     return 0;
 }
 
+static int set_light_flashlight(struct light_device_t* dev __unused,
+        struct light_state_t const* state)
+{
+    int err = 0;
+    int brightness = (state->color & 0x00ffffff) ? 255 : 0;
+
+    pthread_mutex_lock(&g_lock);
+    err = write_int(FLASH_FILE, brightness);
+    pthread_mutex_unlock(&g_lock);
+
+    return err;
+}
+
 
 /** Close the lights device */
 static int close_lights(struct light_device_t *dev)
@@ -299,6 +313,8 @@ static int open_lights(const struct hw_module_t* module, char const* name,
         set_light = set_light_attention;
     else if (!strcmp(LIGHT_ID_BATTERY, name))
         set_light = set_light_battery;
+    else if (!strcmp(LIGHT_ID_FLASHLIGHT, name))
+        set_light = set_light_flashlight;
     else
         return -EINVAL;
 
