@@ -62,7 +62,7 @@ void GnssNavigationMessage::gnssNavigationMessageCb(LegacyGnssNavigationMessage*
     // CAF data_length is untrusted. hidl_vec::setToExternal wraps
     // message->data for the HIDL parcel. Same class as nmeaCb: CAF
     // length can exceed the payload. gps.h documents 40 bytes for L1 C/A.
-    constexpr size_t kMaxNavMsgLen = 40;
+    constexpr size_t kMaxNavMsgLen = sizeof(message->data);
     size_t length = std::min(message->data_length, kMaxNavMsgLen);
     navigationMsg.data.setToExternal(message->data, length);
 
