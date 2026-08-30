@@ -20,21 +20,10 @@ The origin remote is the archienz fork.
 The upstream remote is Android4Lumia950.
 
 Do not send first-ship changes to Android4Lumia950 at this time.
-GitHub returns HTTP 403 if you open a pull request on Android4Lumia950/android_device_msft_talkman.
+GitHub returns HTTP 403 if you write to Android4Lumia950/android_device_msft_talkman.
 HTTP 403 means there is no write access.
-There is no pull request 403.
 
-## First-ship pull request
-
-The first-ship code is in pull request 1 on the archienz fork.
-The URL is https://github.com/archienz/android_device_msft_talkman/pull/1
-The branch name is cursor/first-ship-mixer-lights-rild-4b97.
-These changes are on lineage-18.1-talkman.
-The HEAD commit is 938f5c8.
-The pull request contains five files.
-The five files set the speaker path, the torch HAL, and rild.
-
-## Speaker
+## Functions on lineage-18.1-talkman
 
 The speaker path uses QUAT_MI2S_RX.
 The speaker amplifier is TAS2552.
@@ -45,8 +34,7 @@ The name of the sound card is msm8994-tomtom-snd-card.
 The headphone path uses SLIMBUS_5_RX.
 Set persist.speaker.prot.enable to false.
 The speaker path does not use SD3.
-
-## Torch HAL
+Set AUDIO_FEATURE_ENABLED_SPKR_PROTECTION to false.
 
 LIGHT_ID_FLASHLIGHT writes to /sys/class/leds/led::flash_torch/brightness.
 Write 0 to set the torch to OFF.
@@ -54,69 +42,34 @@ Write 255 to set the torch to ON.
 HIDL 2.0 has no Flashlight interface.
 The Quick Settings torch is off until the camera function is complete.
 
-## RIL
-
-Add rild to PRODUCT_PACKAGES.
+The PRODUCT_PACKAGES list includes rild.
 Do not start rild in init.talkman.rc.
-
-## Functions that are not in pull request 1
-
-- Camera. Use SMIApp and a DPP dump in a later change.
-- Voice front-end for quat. A later change will add this function.
-- Additional flash code in the kernel. The Harmony kernel already has TAS, quat DAI, and torch DTS.
-
-## CVE pull request
-
-The CVE pull request is pull request 3 on the archienz fork.
-The URL is https://github.com/archienz/android_device_msft_talkman/pull/3
-The branch name is cursor/tighten-qseecom-diag-ota-57b7.
-The CVE pull request is not stacked on pull request 1.
 
 Set qseecom to 0660.
 Set diag to 0770.
 Set TARGET_OTA_ASSERT_DEVICE to talkman only.
-Remove bullhead from TARGET_OTA_ASSERT_DEVICE.
-Remove angler from TARGET_OTA_ASSERT_DEVICE.
+Do not include bullhead in TARGET_OTA_ASSERT_DEVICE.
+Do not include angler in TARGET_OTA_ASSERT_DEVICE.
 
-## Speaker protection pull request
-
-The speaker protection pull request is pull request 4 on the archienz fork.
-The URL is https://github.com/archienz/android_device_msft_talkman/pull/4
-The branch name is cursor/disable-spkr-protection-4683.
-These changes are on lineage-18.1-talkman.
-The HEAD commit is 938f5c8.
-Pull request 4 is not stacked on pull request 1.
-
-Set AUDIO_FEATURE_ENABLED_SPKR_PROTECTION to false.
-
-## GNSS debug pull request
-
-The leftover pull request 5 is closed.
-The URL is https://github.com/archienz/android_device_msft_talkman/pull/5
-These changes are on lineage-18.1-talkman.
-The HEAD commit is 369b619.
+The GNSS debug function uses std::min.
 The file is gnss/1.0/default/GnssDebug.cpp.
-Set std::max to std::min.
-Pull request 5 is closed.
-Pull request 5 is not merged.
-Pull request 5 is a leftover draft.
-The GNSS clamp is on lineage-18.1-talkman.
-Commit d283a273 is before 369b619.
-Commit d283a273 marks pull requests 1, 2, 3, and 4.
 
-## Leftover open drafts
+## Functions that are not complete
 
-Pull request 1 is an open draft. Pull request 1 is mixer, lights, and rild.
-Pull request 2 is an open draft. Pull request 2 is docs/first-ship.
-Pull request 3 is an open draft. Pull request 3 is qseecom, diag, and OTA.
-Pull request 4 is an open draft. Pull request 4 is SPKR_PROTECTION.
+Camera is not implemented. You must have SMIApp and a DPP dump.
+The voice front-end for quat is not implemented.
+Additional flash code in the kernel is not in this tree. The Harmony kernel already has TAS, quat DAI, and torch DTS.
 
 ## In progress and unproven
 
-tinymix on the device after brunch of pull request 1 is unproven.
+tinymix on the device is unproven.
 The kernel governor change from PERFORMANCE to interactive is prepared.
 STACKPROTECTOR_STRONG is prepared.
 There is no archienz kernel fork at this time.
+SELinux is still permissive. SELinux is not enforcing.
+We bring up the lights and torch functions.
+We bring up the camera function. You must have a DPP dump.
+We bring up SELinux.
 
 ## Flash
 

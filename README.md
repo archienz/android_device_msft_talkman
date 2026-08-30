@@ -19,82 +19,33 @@ WARNING: Do not use a cityman tag.
 
 WARNING: Do not install Image.gz-dtb if Image.gz-dtb has one DTB and that DTB is a cityman DTB.
 
-## What we are doing
-
-We bring up missing hardware on talkman.
-We fix bugs in the device tree that is already in this repository.
-We add security patches that apply to this tree.
-We prepare kernel governor and STACKPROTECTOR_STRONG changes for when the kernel is on archienz.
-Camera work waits for a DPP dump.
-
-ASD-STE100 updates this README when the facts change.
-
 ## What we have done
 
-The changes from pull requests 1, 2, 3, 4, and 5 are on lineage-18.1-talkman.
-The HEAD commit is 369b619.
-These changes are not draft-only.
-
-### Pull request 1
-
-https://github.com/archienz/android_device_msft_talkman/pull/1
+These functions are on lineage-18.1-talkman.
 
 The speaker path uses QUAT_MI2S_RX.
 The speaker amplifier is TAS2552.
 Set TAS2552 Volume to 18.
 The torch HAL writes 0 or 255 to led::flash_torch.
-Add rild to PRODUCT_PACKAGES.
-The headphone path uses SLIMBUS_5_RX.
-Set persist.speaker.prot.enable to false.
-The speaker path does not use SD3.
-
-### Pull request 2
-
-https://github.com/archienz/android_device_msft_talkman/pull/2
-
-Pull request 2 added FIRST-SHIP.md and README.md. These files are on lineage-18.1-talkman.
-
-### Pull request 3
-
-https://github.com/archienz/android_device_msft_talkman/pull/3
-
+The PRODUCT_PACKAGES list includes rild.
 Set qseecom to 0660.
 Set diag to 0770.
 Set TARGET_OTA_ASSERT_DEVICE to talkman only.
-Remove bullhead and angler from TARGET_OTA_ASSERT_DEVICE.
-
-### Pull request 4
-
-https://github.com/archienz/android_device_msft_talkman/pull/4
-
 Set AUDIO_FEATURE_ENABLED_SPKR_PROTECTION to false.
+The GNSS debug function uses std::min.
 
-## Leftover open drafts
+## What we are doing
 
-Pull request 1 is an open draft. Pull request 1 is mixer, lights, and rild.
-Pull request 2 is an open draft. Pull request 2 is docs/first-ship.
-Pull request 3 is an open draft. Pull request 3 is qseecom, diag, and OTA.
-Pull request 4 is an open draft. Pull request 4 is SPKR_PROTECTION.
-
-### Pull request 5
-
-https://github.com/archienz/android_device_msft_talkman/pull/5
-
-Pull request 5 is closed.
-Pull request 5 is not merged.
-Pull request 5 is a leftover draft.
-The GNSS clamp is on lineage-18.1-talkman.
-The HEAD commit is 369b619.
-The file is gnss/1.0/default/GnssDebug.cpp.
-Set std::max to std::min.
-Commit d283a273 is before 369b619.
-Commit d283a273 marks pull requests 1, 2, 3, and 4.
+We bring up the lights and torch functions on talkman.
+We bring up the camera function. You must have a DPP dump.
+We bring up SELinux. SELinux is still permissive.
 
 ## Not done
 
 Camera is not implemented. You must have SMIApp and a DPP dump.
+The Quick Settings torch is off until the camera function is complete.
 The voice front-end for quat is not implemented.
-tinymix on the device after brunch of pull request 1 is unproven.
+tinymix on the device is unproven.
 The device boot log must show SMEM 0xfb and hw_platform 26. These values are unproven.
 Kernel, vendor, and lk2nd are not on the archienz fork.
-The Quick Settings torch is off until the camera function is complete.
+SELinux is not enforcing.
