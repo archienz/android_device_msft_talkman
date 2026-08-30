@@ -69,14 +69,26 @@ https://github.com/archienz/android_device_msft_talkman/pull/4
 
 Set AUDIO_FEATURE_ENABLED_SPKR_PROTECTION to false.
 
+## Leftover open drafts
+
+Pull request 1 is an open draft. Pull request 1 is mixer, lights, and rild.
+Pull request 2 is an open draft. Pull request 2 is docs/first-ship.
+Pull request 3 is an open draft. Pull request 3 is qseecom, diag, and OTA.
+Pull request 4 is an open draft. Pull request 4 is SPKR_PROTECTION.
+
 ### Pull request 5
 
 https://github.com/archienz/android_device_msft_talkman/pull/5
 
 Pull request 5 is closed.
-These changes are on lineage-18.1-talkman.
+Pull request 5 is not merged.
+Pull request 5 is a leftover draft.
+The GNSS clamp is on lineage-18.1-talkman.
+The HEAD commit is 369b619.
 The file is gnss/1.0/default/GnssDebug.cpp.
 Set std::max to std::min.
+Commit d283a273 is before 369b619.
+Commit d283a273 marks pull requests 1, 2, 3, and 4.
 
 ## Not done
 
