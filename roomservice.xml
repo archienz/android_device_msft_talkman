@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- talkman not cityman -->
+<manifest>
+  <project name="archienz/android_device_msft_talkman" path="device/msft/talkman" remote="github" revision="lineage-18.1-talkman" />
+  <project name="Android4Lumia950/android_kernel_mmo_msm8994" path="kernel/mmo/msm8994" remote="github" revision="lineage-18.1-talkman" />
+  <project name="Android4Lumia950/android_vendor_msft_talkman" path="vendor/msft/talkman" remote="github" revision="lineage-18.1-talkman" />
+  <project name="lakgarg/packages_apps_GoogleCamera" path="packages/apps/GoogleCamera" remote="github" revision="master" />
+  <project name="LineageOS/android_hardware_sony_timekeep" path="hardware/sony/timekeep" remote="github" revision="lineage-18.1" />
+</manifest>

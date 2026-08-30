@@ -14,6 +14,7 @@ All device-tree work stays on this fork.
 Do not push to Android4Lumia950.
 
 The full first-ship data is in [FIRST-SHIP.md](FIRST-SHIP.md).
+Copy roomservice.xml to .repo/local_manifests/roomservice.xml so brunch uses the archienz device tree.
 
 WARNING: Do not use a cityman tag.
 
