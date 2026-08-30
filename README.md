@@ -47,7 +47,7 @@ The clamp size is not 40.
 The file init.talkman.rc does not contain LGE SKU wifi.
 The file init.talkman.rc does not contain IMS QMI.
 The GnssNavigationMessage commit is b0d3883.
-The GnssNavigationMessage commit is under HEAD d572733.
+The GnssNavigationMessage commit is under HEAD 49965d7.
 The QCamera2 recode is on lineage-18.1-talkman.
 The QCamera2 recode commit is 73947d2.
 The QCamera2 recode sets probe, torch, and msm8992.
@@ -55,7 +55,10 @@ The SMIApp provider is disabled.
 The SMIApp commit is 80dde95.
 The QCamera2 change sets JPEG, ION, and vendor-module.
 The QCamera2 JPEG commit is d572733.
-The HEAD commit is d572733.
+The file device.mk does not include camera.device@1.0-impl.
+The device.mk commit is 49965d7.
+The file flash-autofocus.xml stays.
+The HEAD commit is 49965d7.
 
 ## What we are doing
 
