@@ -49,10 +49,6 @@ Return<void> DumpstateDevice::dumpstateBoard(const hidl_handle& handle) {
     DumpFileToFd(fd, "RPM Stats", "/d/rpm_stats");
     DumpFileToFd(fd, "Power Management Stats", "/d/rpm_master_stats");
     RunCommandToFd(fd, "SUBSYSTEM TOMBSTONES", {"ls", "-l", "/data/tombstones/ramdump"} , CommandOptions::AS_ROOT);
-    DumpFileToFd(fd, "BAM DMUX Log", "/d/ipc_logging/bam_dmux/log");
-    DumpFileToFd(fd, "SMD Log", "/d/ipc_logging/smd/log");
-    DumpFileToFd(fd, "SMD PKT Log", "/d/ipc_logging/smd_pkt/log");
-    DumpFileToFd(fd, "IPC Router Log", "/d/ipc_logging/ipc_router/log");
     RunCommandToFd(fd, "ION HEAPS", {"/system/bin/sh", "-c", "for d in $(ls -d /d/ion/*); do for f in $(ls $d); do echo --- $d/$f; cat $d/$f; done; done"});
     DumpFileToFd(fd, "dmabuf info", "/d/dma_buf/bufinfo");
     DumpFileToFd(fd, "Battery Type", "/sys/class/power_supply/bms/battery_type");
