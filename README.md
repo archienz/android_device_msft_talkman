@@ -55,6 +55,15 @@ Set TARGET_OTA_ASSERT_DEVICE to talkman only.
 Remove bullhead from TARGET_OTA_ASSERT_DEVICE.
 Remove angler from TARGET_OTA_ASSERT_DEVICE.
 
+### Pull request 4
+
+The pull request is a draft.
+The branch name is cursor/disable-spkr-protection-4683.
+The URL is https://github.com/archienz/android_device_msft_talkman/pull/4
+Pull request 4 is not stacked on pull request 1.
+
+Set AUDIO_FEATURE_ENABLED_SPKR_PROTECTION to false.
+
 ## In progress and unproven
 
 The device boot log must show SMEM 0xfb. This value is unproven.

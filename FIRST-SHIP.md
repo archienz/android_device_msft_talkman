@@ -77,6 +77,16 @@ Set TARGET_OTA_ASSERT_DEVICE to talkman only.
 Remove bullhead from TARGET_OTA_ASSERT_DEVICE.
 Remove angler from TARGET_OTA_ASSERT_DEVICE.
 
+## Speaker protection pull request
+
+The speaker protection pull request is pull request 4 on the archienz fork.
+The URL is https://github.com/archienz/android_device_msft_talkman/pull/4
+The branch name is cursor/disable-spkr-protection-4683.
+The pull request is a draft.
+Pull request 4 is not stacked on pull request 1.
+
+Set AUDIO_FEATURE_ENABLED_SPKR_PROTECTION to false.
+
 ## In progress and unproven
 
 tinymix on the device after brunch of pull request 1 is unproven.
