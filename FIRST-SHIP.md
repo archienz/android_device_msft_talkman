@@ -61,7 +61,13 @@ The file is gnss/1.0/default/GnssDebug.cpp.
 Dumpstate does not use DumpFileToFd for ipc_logging.
 librmnetctl does not free the same object two times.
 The GnssNavigationMessage length uses std::min.
-The HEAD commit is 98a1529.
+The clamp size is sizeof(message->data).
+The clamp size is not 40.
+The file init.talkman.rc does not contain LGE SKU wifi.
+The file init.talkman.rc does not contain IMS QMI.
+The HEAD commit is c3a5653.
+The GnssNavigationMessage commit is b0d3883.
+The GnssNavigationMessage commit is under HEAD c3a5653.
 
 ## Functions that are not complete
 
