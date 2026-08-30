@@ -1,0 +1,16 @@
+<!--
+  DISABLED reference VINTF fragment. Do not install. Do not add to manifest.xml.
+  Leftover QCamera2 remains the live camera.provider (passthrough, legacy/0).
+  This stub uses instance smiapp/0 so it cannot replace legacy/0 if started by hand.
+-->
+<manifest version="1.0" type="device">
+    <hal format="hidl">
+        <name>android.hardware.camera.provider</name>
+        <transport>hwbinder</transport>
+        <version>2.4</version>
+        <interface>
+            <name>ICameraProvider</name>
+            <instance>smiapp/0</instance>
+        </interface>
+    </hal>
+</manifest>

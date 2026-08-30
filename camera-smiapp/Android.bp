@@ -1,0 +1,25 @@
+// talkman SMIApp camera.provider@2.4 stub.
+// Compiles without Icaros firmware. Not the live device camera.provider.
+// Do not add vintf_fragments here. Leftover QCamera2 stays legacy/0 in manifest.xml.
+// Do not override android.hardware.camera.provider@2.4-impl or camera.msm8992.
+
+cc_binary {
+    name: "android.hardware.camera.provider@2.4-service.talkman-smiapp",
+    defaults: ["hidl_defaults"],
+    proprietary: true,
+    relative_install_path: "hw",
+    srcs: [
+        "SmiappCameraProvider.cpp",
+        "service.cpp",
+    ],
+    shared_libs: [
+        "android.hardware.camera.common@1.0",
+        "android.hardware.camera.device@1.0",
+        "android.hardware.camera.device@3.2",
+        "android.hardware.camera.provider@2.4",
+        "libhidlbase",
+        "liblog",
+        "libutils",
+    ],
+    init_rc: ["android.hardware.camera.provider@2.4-service.talkman-smiapp.rc"],
+}

@@ -1,0 +1,9 @@
+# DISABLED. Not the live talkman camera.provider.
+# Leftover QCamera2 remains android.hardware.camera.provider@2.4-impl / legacy/0.
+# Do not remove 'disabled'. Do not implement a QS torch HIDL here.
+
+service vendor.camera-provider-2-4-talkman-smiapp /vendor/bin/hw/android.hardware.camera.provider@2.4-service.talkman-smiapp
+    class hal
+    user cameraserver
+    group camera
+    disabled
