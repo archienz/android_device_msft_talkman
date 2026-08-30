@@ -40,8 +40,10 @@ LIGHT_ID_FLASHLIGHT writes to /sys/class/leds/led::flash_torch/brightness.
 Write 0 to set the torch to OFF.
 Write 255 to set the torch to ON.
 Set genfscon for sysfs /class/leds to sysfs_leds.
+Set file_contexts for /sys/class/leds(/.*)? to sysfs_leds.
 The blanket write for hal_light to sysfs is gone.
-The sepolicy commit is fd50fbb.
+The genfscon commit is fd50fbb.
+The file_contexts commit is 4abb92c.
 HIDL 2.0 has no Flashlight interface.
 The Quick Settings torch is off until the camera function is complete.
 
@@ -56,6 +58,10 @@ Do not include angler in TARGET_OTA_ASSERT_DEVICE.
 
 The GNSS debug function uses std::min.
 The file is gnss/1.0/default/GnssDebug.cpp.
+Dumpstate does not use DumpFileToFd for ipc_logging.
+librmnetctl does not free the same object two times.
+The GnssNavigationMessage length uses std::min.
+The HEAD commit is 98a1529.
 
 ## Functions that are not complete
 

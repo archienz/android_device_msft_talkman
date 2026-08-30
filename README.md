@@ -29,14 +29,20 @@ The speaker amplifier is TAS2552.
 Set TAS2552 Volume to 18.
 The torch HAL writes 0 or 255 to led::flash_torch.
 Set genfscon for sysfs /class/leds to sysfs_leds.
+Set file_contexts for /sys/class/leds(/.*)? to sysfs_leds.
 The blanket write for hal_light to sysfs is gone.
-The sepolicy commit is fd50fbb.
+The genfscon commit is fd50fbb.
+The file_contexts commit is 4abb92c.
 The PRODUCT_PACKAGES list includes rild.
 Set qseecom to 0660.
 Set diag to 0770.
 Set TARGET_OTA_ASSERT_DEVICE to talkman only.
 Set AUDIO_FEATURE_ENABLED_SPKR_PROTECTION to false.
 The GNSS debug function uses std::min.
+Dumpstate does not use DumpFileToFd for ipc_logging.
+librmnetctl does not free the same object two times.
+The GnssNavigationMessage length uses std::min.
+The HEAD commit is 98a1529.
 
 ## What we are doing
 
