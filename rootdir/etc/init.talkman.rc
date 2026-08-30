@@ -24,7 +24,7 @@ on early-init
     mount debugfs debugfs /sys/kernel/debug
 
     # Allow to access debugfs for system:system
-    chmod 0755 /sys/kernel/debug
+    chmod 0700 /sys/kernel/debug
     chown system system /sys/kernel/debug/kgsl/proc
 
 on charger
@@ -392,13 +392,14 @@ service charger /charger
     critical
     seclabel u:r:charger:s0
 
-on property:persist.radio.atfwd.start=false
-    stop atfwd
+on property:persist.radio.atfwd.start=true
+    start atfwd
 
 service atfwd /vendor/bin/ATFWD-daemon
     class late_start
     user system
     group system radio
+    disabled
 
 #on property:ro.debuggable=1
 #    start ss_ramdump
