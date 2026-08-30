@@ -19,7 +19,9 @@ The origin remote is the archienz fork.
 The upstream remote is Android4Lumia950.
 
 Do not send first-ship changes to Android4Lumia950 at this time.
-Pull request 403 on Android4Lumia950 is not available.
+GitHub returns HTTP 403 if you open a pull request on Android4Lumia950/android_device_msft_talkman.
+HTTP 403 means there is no write access.
+There is no pull request 403.
 
 ## First-ship pull request
 
@@ -60,8 +62,6 @@ Do not start rild in init.talkman.rc.
 - Camera. Use SMIApp and a DPP dump in a later change.
 - Voice front-end for quat. A later change will add this function.
 - Additional flash code in the kernel. The Harmony kernel already has TAS, quat DAI, and torch DTS.
-
-The Quick Settings torch is off until the camera function is complete.
 
 ## Flash
 
