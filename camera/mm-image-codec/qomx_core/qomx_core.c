@@ -191,6 +191,12 @@ OMX_API OMX_ERRORTYPE OMX_APIENTRY OMX_GetHandle(
 
   pthread_mutex_lock(&g_omxcore_lock);
 
+  if (NULL == g_omxcore) {
+    ALOGE("%s:%d] OMX core is not initialized", __func__, __LINE__);
+    pthread_mutex_unlock(&g_omxcore_lock);
+    return OMX_ErrorInvalidState;
+  }
+
   comp_idx = get_comp_from_list(componentName);
   if (comp_idx < 0) {
     ALOGE("%s:%d] Cannot find the component", __func__, __LINE__);
@@ -256,7 +262,20 @@ OMX_API OMX_ERRORTYPE OMX_APIENTRY OMX_GetHandle(
     p_core_comp->handle[inst_idx], inst_idx,
     comp_idx, g_omxcore);
 
-  p_comp->SetCallbacks(p_comp, callBacks, appData);
+  if (!p_comp->SetCallbacks) {
+    ALOGE("%s:%d] SetCallbacks is NULL", __func__, __LINE__);
+    *handle = NULL;
+    p_core_comp->handle[inst_idx] = NULL;
+    rc = OMX_ErrorInvalidComponent;
+    goto error;
+  }
+  rc = p_comp->SetCallbacks(p_comp, callBacks, appData);
+  if (rc != OMX_ErrorNone) {
+    ALOGE("%s:%d] SetCallbacks failed %d", __func__, __LINE__, rc);
+    *handle = NULL;
+    p_core_comp->handle[inst_idx] = NULL;
+    goto error;
+  }
   pthread_mutex_unlock(&g_omxcore_lock);
   ALOGI("%s:%d] Success", __func__, __LINE__);
   return OMX_ErrorNone;
@@ -374,4 +393,17 @@ OMX_API OMX_ERRORTYPE OMX_APIENTRY OMX_FreeHandle(
   pthread_mutex_unlock(&g_omxcore_lock);
   ALOGV("%s:%d] Success", __func__, __LINE__);
   return rc;
+}
+
+OMX_API OMX_ERRORTYPE OMX_APIENTRY OMX_SetupTunnel(
+  OMX_IN OMX_HANDLETYPE hOutput,
+  OMX_IN OMX_U32 nPortOutput,
+  OMX_IN OMX_HANDLETYPE hInput,
+  OMX_IN OMX_U32 nPortInput)
+{
+  (void)hOutput;
+  (void)nPortOutput;
+  (void)hInput;
+  (void)nPortInput;
+  return OMX_ErrorNotImplemented;
 }

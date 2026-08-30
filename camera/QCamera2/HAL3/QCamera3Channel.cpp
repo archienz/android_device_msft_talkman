@@ -2847,11 +2847,18 @@ void QCamera3PicChannel::jpegEvtHandle(jpeg_job_status_t status,
                         maxJpegSize = obj->mMemory.getSize(bufIdx);
                     }
 
-                    size_t jpeg_eof_offset =
-                            (size_t)(maxJpegSize - (ssize_t)sizeof(jpegHeader));
-                    char *jpeg_eof = &jpeg_buf[jpeg_eof_offset];
-                    memcpy(jpeg_eof, &jpegHeader, sizeof(jpegHeader));
-                    obj->mMemory.cleanInvalidateCache(bufIdx);
+                    if (jpeg_buf == NULL ||
+                            maxJpegSize < (ssize_t)sizeof(jpegHeader)) {
+                        ALOGE("%s: JPEG buffer too small for blob header: %zd",
+                                __func__, maxJpegSize);
+                        resultStatus = CAMERA3_BUFFER_STATUS_ERROR;
+                    } else {
+                        size_t jpeg_eof_offset =
+                                (size_t)maxJpegSize - sizeof(jpegHeader);
+                        char *jpeg_eof = &jpeg_buf[jpeg_eof_offset];
+                        memcpy(jpeg_eof, &jpegHeader, sizeof(jpegHeader));
+                        obj->mMemory.cleanInvalidateCache(bufIdx);
+                    }
                 } else {
                     ALOGE("%s: JPEG buffer not found and index: %d",
                             __func__,

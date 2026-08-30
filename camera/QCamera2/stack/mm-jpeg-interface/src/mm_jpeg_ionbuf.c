@@ -49,8 +49,15 @@ void *buffer_allocate(buffer_t *p_buffer, int cached)
   void *l_buffer = NULL;
 
   int lrc = 0;
+  int share_fd_valid = 0;
   struct ion_handle_data lhandle_data;
 
+   if (p_buffer == NULL) {
+    return NULL;
+   }
+
+   p_buffer->p_pmem_fd = -1;
+   p_buffer->ion_fd = -1;
    p_buffer->alloc.len = p_buffer->size;
    p_buffer->alloc.align = 4096;
    p_buffer->alloc.flags = (cached) ? ION_FLAG_CACHED : 0;
@@ -80,6 +87,7 @@ void *buffer_allocate(buffer_t *p_buffer, int cached)
   }
 
   p_buffer->p_pmem_fd = p_buffer->ion_info_fd.fd;
+  share_fd_valid = 1;
 
   l_buffer = mmap(NULL, p_buffer->alloc.len, PROT_READ  | PROT_WRITE,
     MAP_SHARED,p_buffer->p_pmem_fd, 0);
@@ -93,10 +101,22 @@ void *buffer_allocate(buffer_t *p_buffer, int cached)
   return l_buffer;
 
 ION_MAP_FAILED:
+  if (share_fd_valid && p_buffer->ion_info_fd.fd >= 0) {
+    close(p_buffer->ion_info_fd.fd);
+    p_buffer->p_pmem_fd = -1;
+  }
   lhandle_data.handle = p_buffer->ion_info_fd.handle;
   ioctl(p_buffer->ion_fd, ION_IOC_FREE, &lhandle_data);
+  if (p_buffer->ion_fd >= 0) {
+    close(p_buffer->ion_fd);
+    p_buffer->ion_fd = -1;
+  }
   return NULL;
 ION_ALLOC_FAILED:
+  if (p_buffer->ion_fd >= 0) {
+    close(p_buffer->ion_fd);
+    p_buffer->ion_fd = -1;
+  }
   return NULL;
 
 }

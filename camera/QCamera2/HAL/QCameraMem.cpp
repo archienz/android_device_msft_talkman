@@ -396,6 +396,7 @@ int QCameraMemory::alloc(int count, size_t size, unsigned int heap_id,
         return BAD_INDEX;
     }
 
+    int savedCount = mBufferCount;
     for (int i = mBufferCount; i < new_bufCnt; i ++) {
         if ( NULL == mMemoryPool ) {
             CDBG_HIGH("%s : No memory pool available, allocating now", __func__);
@@ -403,8 +404,9 @@ int QCameraMemory::alloc(int count, size_t size, unsigned int heap_id,
                      secure_mode);
             if (rc < 0) {
                 ALOGE("%s: AllocateIonMemory failed", __func__);
-                for (int j = i-1; j >= 0; j--)
+                for (int j = i - 1; j >= savedCount; j--)
                     deallocOneBuffer(mMemInfo[j]);
+                mBufferCount = (uint8_t)savedCount;
                 break;
             }
         } else {
@@ -416,9 +418,10 @@ int QCameraMemory::alloc(int count, size_t size, unsigned int heap_id,
                                              secure_mode);
             if (rc < 0) {
                 ALOGE("%s: Memory pool allocation failed", __func__);
-                for (int j = i-1; j >= 0; j--)
+                for (int j = i - 1; j >= savedCount; j--)
                     mMemoryPool->releaseBuffer(mMemInfo[j],
                                                mStreamType);
+                mBufferCount = (uint8_t)savedCount;
                 break;
             }
         }

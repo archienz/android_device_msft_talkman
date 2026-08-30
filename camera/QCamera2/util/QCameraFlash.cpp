@@ -39,8 +39,6 @@
 
 #define STRING_LENGTH_OF_64_BIT_NUMBER 21
 
-volatile uint32_t gCamHal3LogLevel = 1;
-
 namespace qcamera {
 
 /*===========================================================================

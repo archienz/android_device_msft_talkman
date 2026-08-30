@@ -8,10 +8,7 @@ include $(CLEAR_VARS)
 LOCAL_PATH := $(OMX_CORE_PATH)
 LOCAL_MODULE_TAGS := optional
 
-omx_core_defines:= -Werror \
-                   -g -O0
-
-LOCAL_CFLAGS := $(omx_core_defines)
+LOCAL_CFLAGS := -Werror -Wall
 
 OMX_HEADER_DIR := frameworks/native/include/media/openmax
 
