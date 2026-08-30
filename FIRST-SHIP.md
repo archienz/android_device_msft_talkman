@@ -69,7 +69,7 @@ The clamp size is not 40.
 The file init.talkman.rc does not contain LGE SKU wifi.
 The file init.talkman.rc does not contain IMS QMI.
 The GnssNavigationMessage commit is b0d3883.
-The GnssNavigationMessage commit is under HEAD e445663.
+The GnssNavigationMessage commit is under HEAD da2d20d.
 The QCamera2 recode is on lineage-18.1-talkman.
 The QCamera2 recode commit is 73947d2.
 The QCamera2 recode sets probe, torch, and msm8992.
@@ -87,9 +87,9 @@ The file init.talkman.rc does not contain mm-qcamera-daemon.
 The file proprietary-blobs.txt does not contain qcamerasvr.
 The file proprietary-blobs.txt does not contain mm-qcamera-daemon.
 The init camera daemon commit is eb97ddb.
-The last-code range is ffb5b27..e445663.
-The last code is e445663d973ee230d779f2de6c4ddcd60c2e83d7.
-The HEAD commit is e445663.
+The last-code parent is e445663.
+The last code is da2d20d.
+The HEAD commit is da2d20d.
 CVE pass 5 landed at c8ac257.
 The file init.talkman.rc sets chmod 0700 on /sys/kernel/debug.
 ATFWD is disabled unless persist.radio.atfwd.start=true.
@@ -102,13 +102,15 @@ It holds MODEM_FS1, MODEM_FS2, MODEM_FSC, MODEM_FSG, and DPP restore notes.
 modem.img stays TALKMAN_LTE_ROW.
 This is not a device-tree change.
 Do not add service rild, radio.img, IMS, or Dual SIM.
-The file proprietary-blobs.txt dropped /system/bin/imsdatadaemon and /system/bin/imsqmidaemon only.
+The e445663 change dropped /system/bin/imsdatadaemon and /system/bin/imsqmidaemon from proprietary-blobs.txt only.
 The file proprietary-blobs.txt still has ims_rtp_daemon.
 The file proprietary-blobs.txt still has embms jars.
 The file proprietary-blobs.txt still has rcs jars.
 The file proprietary-blobs.txt still has QCRIL.
 The file proprietary-blobs.txt still has qmuxd.
 The file proprietary-blobs.txt still has rild.
+The da2d20d change dropped qpnp-flash-led-26 genfscon from sepolicy/genfs_contexts.
+The sysfs_leds label for /class/leds stays.
 
 ## Functions that are not complete
 
