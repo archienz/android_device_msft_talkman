@@ -102,11 +102,11 @@ persist.media.treble_omx=false
 ro.min_freq_0=384000
 ro.min_freq_4=384000
 
-# IMS
-persist.dbg.ims_volte_enable=1
-persist.dbg.volte_avail_ovr=1
-persist.dbg.vt_avail_ovr=1
-persist.dbg.wfc_avail_ovr=1
+# IMS leftover: debug availability overrides off without modem bring-up (no rild)
+persist.dbg.ims_volte_enable=0
+persist.dbg.volte_avail_ovr=0
+persist.dbg.vt_avail_ovr=0
+persist.dbg.wfc_avail_ovr=0
 
 # Properties for Surfaceflinger
 debug.sf.use_phase_offsets_as_durations=1
