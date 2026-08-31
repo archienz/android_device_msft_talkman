@@ -2,8 +2,7 @@
 # nfc_nci.msm8992.so dlopens /vendor/firmware/libpn547_fw.so
 # (WOA nxppn547fw.dat). init.talkman.nfc.rc already chowns the node
 # and symlinks /dev/pn54x. No FeliCa / snfc / Sony FW.
-
-binder_call(nfc, nfc_hal_pn54x)
+# nfc_hal_pn54x is leftover bullhead/FeliCa HAL binary — not packaged.
 
 allow nfc nfc_device:chr_file rw_file_perms;
 
