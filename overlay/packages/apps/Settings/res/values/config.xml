@@ -19,13 +19,24 @@
 
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
-    <!-- Enable color temperature setting. -->
-    <bool name="config_enableColorTemperature">true</bool>
+    <!--
+         Lineage default is false. Bullhead enabled this for
+         /sys/class/graphics/fb0/color_temp. Talkman CAF MDSS has no
+         that node — do not show a Settings slider that writes nowhere.
+    -->
+    <bool name="config_enableColorTemperature">false</bool>
+
+    <!-- No FPC / no face enroll activity. Do not ship a fake HAL. -->
+    <string name="config_face_enroll" translatable="false"></string>
+
+    <!-- No camera laser AF on talkman (IMX230 PDAF). Bullhead leftover off. -->
+    <bool name="config_show_camera_laser_sensor">false</bool>
 
     <!--
          qpnp-fg sysfs (bms). charge_full / charge_full_design are µAh.
          cycle_count is the FG SRAM counter. Not a 50 % overlay stub.
          Health 2.1-impl still walks /sys/class/power_supply (battery + bms).
+         Fast Charge / PD strings live in frameworks overlay, not here.
     -->
     <bool name="config_supportBatteryHealth">true</bool>
     <string name="config_batteryCalculatedCapacity" translatable="false">/sys/class/power_supply/bms/charge_full</string>

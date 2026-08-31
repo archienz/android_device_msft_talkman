@@ -15,6 +15,9 @@
 -->
 
 <resources>
-    <!-- Whether to show a preference item for mobile plan -->
+    <!--
+         Carrier billing “Mobile plan” needs a working RIL + operator
+         portal. Talkman RIL is P2 / dead. Hide the dead Settings tile.
+    -->
     <bool name="config_show_mobile_plan">false</bool>
 </resources>
