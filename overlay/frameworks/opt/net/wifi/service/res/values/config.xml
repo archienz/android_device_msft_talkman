@@ -12,6 +12,10 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
+    <!-- Leftover: no LGE wifi strings here (no gsm.lge.com, no Nexus5X SSID,
+         no com.lge.entitlement). Hotspot provision is the Tethering overlay
+         (already empty). Default SoftAP SSID stays AOSP AndroidAP. QCA6174. -->
+
     <!-- Talkman QCA6174 802.11ac 2x2. No 6 GHz, no 11ax. -->
     <bool translatable="false" name="config_wifi5ghzSupport">true</bool>
     <bool translatable="false" name="config_wifi6ghzSupport">false</bool>
