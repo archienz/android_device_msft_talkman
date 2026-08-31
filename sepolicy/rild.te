@@ -1,5 +1,6 @@
-# Leftover unused rild domain policy (bullhead). No PRODUCT_PACKAGES rild.
-# RIL is P2. Do not add rild. Do not flip enforcing.
+# leftover MATCH 125a191 unused: rild domain policy (bullhead).
+# No PRODUCT_PACKAGES rild. RIL is P2. Do not add rild. Dual SIM no.
+# Do not flip enforcing. init.te unchanged.
 # radio_data_file allows commented: they pull radio neverallow.
 
 binder_call(rild, audioserver)
