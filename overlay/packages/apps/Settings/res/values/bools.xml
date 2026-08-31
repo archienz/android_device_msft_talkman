@@ -16,8 +16,10 @@
 
 <resources>
     <!--
-         Carrier billing “Mobile plan” needs a working RIL + operator
-         portal. Talkman RIL is P2 / dead. Hide the dead Settings tile.
+         MATCH leftover 2fca2c7: no Dual SIM. Carrier billing “Mobile
+         plan” needs a working RIL + operator portal. Talkman RIL is
+         P2 / dead. Hide the dead Settings tile. No Bell IPv4 APN
+         values-mcc302-mnc610 overlay.
     -->
     <bool name="config_show_mobile_plan">false</bool>
 </resources>

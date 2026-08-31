@@ -20,13 +20,14 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
     <!--
-         Lineage default is false. Bullhead enabled this for
+         MATCH leftover 2fca2c7: no Dual SIM, no Bell IPv4 APN overlay,
+         no FPC. Lineage default is false. Bullhead enabled this for
          /sys/class/graphics/fb0/color_temp. Talkman CAF MDSS has no
          that node — do not show a Settings slider that writes nowhere.
     -->
     <bool name="config_enableColorTemperature">false</bool>
 
-    <!-- No FPC / no face enroll activity. Do not ship a fake HAL. -->
+    <!-- MATCH leftover 2fca2c7: no FPC / no face enroll. Do not ship a fake HAL. -->
     <string name="config_face_enroll" translatable="false"></string>
 
     <!-- No camera laser AF on talkman (IMX230 PDAF). Bullhead leftover off. -->
