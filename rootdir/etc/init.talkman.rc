@@ -22,6 +22,7 @@ import /vendor/etc/init/hw/init.talkman.sensors.rc
 import /vendor/etc/init/hw/init.talkman.camera.rc
 import /vendor/etc/init/hw/init.talkman.nfc.rc
 import /vendor/etc/init/hw/init.talkman.gps.rc
+# Charger ICL is init.talkman.charger.sh (exec from on charger / on boot), not an .rc.
 
 on early-init
     mount debugfs debugfs /sys/kernel/debug
@@ -581,11 +582,7 @@ service charger /charger
     critical
     seclabel u:r:charger:s0
 
-service qcamerasvr /vendor/bin/mm-qcamera-daemon
-    class main
-    user camera
-    group camera system inet input graphics
-    writepid /dev/cpuset/system-background/tasks
+# qcamerasvr lives in init.talkman.camera.rc (imported). Duplicate service names abort init.
 
 # chmod debugfs only. Never write scan / slave-id (CCI SID unknown).
 service talkman-cci-perm /vendor/bin/sh -c "chmod 0755 /sys/kernel/debug/talkman-cci-scan; chmod 0660 /sys/kernel/debug/talkman-cci-scan/scan; chown root:shell /sys/kernel/debug/talkman-cci-scan /sys/kernel/debug/talkman-cci-scan/scan"
@@ -655,12 +652,8 @@ service devstart_sh /vendor/bin/init.qcom.devstart.sh
 on property:apexd.status=ready
     mount none /system/etc/swcodec/ld.config.txt /apex/com.android.media.swcodec/etc/ld.config.txt bind
 
-on property:init.svc.media=restarting
-    restart qcamerasvr
+# qcamerasvr media/servicemanager restart is in init.talkman.camera.rc
 
-on property:init.svc.servicemanager=restarting
-    restart qcamerasvr
-    
 on property:vold.decrypt=trigger_restart_framework
     restart camera-provider-2-4
 
