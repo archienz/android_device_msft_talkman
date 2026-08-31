@@ -12,10 +12,14 @@ LocationManager, not NMEA; this only keeps the HAL alive.
 
 Do not vendor a patched `libloc_eng.so`. That was a Magisk test overlay.
 
+Package is `android.hardware.gnss@1.0-impl.talkman` (stem/overrides
+stock `android.hardware.gnss@1.0-impl`). VINTF lives in
+`vintf/android.hardware.gnss@1.0.xml`, not on this impl.
+
 Talkman extras in this copy:
 
 - `locationCb` drops reports without lat/lon, null-island (0,0), or
-  `numSvs == 0`. Engine-on is not a fix.
+  `numSvs == 0`. Engine-on is not a fix. GPS is not marked Working.
 - MSA is stripped (`CAPABILITIES`, `setPositionMode`, `setSuplMode`).
   RIL is P2; standalone + XTRA + SUPL-MSB over `wlan0`.
 - `AGnssRil` watches `/sys/class/net/wlan0` and injects network

@@ -2,10 +2,12 @@
  * Talkman sensor inventory. Not nanohub, not LGE, not FPC, not context hub.
  *
  * Runtime HAL is sensors/sensors_hal.c (module sensors.talkman). This list
- * matches that HAL. Do not add BMI160 / BMM150 / BMP280 / RPR0521, nanohub
- * gestures (twist/tap/tilt/pickup/sync), or fusion types — those chips and
- * the hub firmware are not on this phone. SensorService fuses
- * gravity / linear accel / rotation vector from accel+gyro+mag.
+ * matches that HAL. Leftover BMI160 / AK8963 names are not this phone.
+ * IMU is ICM-206xx, mag AK09912, baro ZPA2326. Do not add BMI160 /
+ * BMM150 / BMP280 / RPR0521, nanohub gestures (twist/tap/tilt/pickup/sync),
+ * or fusion types — those chips and the hub firmware are not on this
+ * phone. SensorService fuses gravity / linear accel / rotation vector
+ * from accel+gyro+mag.
  *
  * WOA ACPI (8992 DSDT/SSDT):
  *   SEN1  QCOM2495   Windows ADSP path; Linux is AP I2C

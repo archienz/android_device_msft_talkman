@@ -7,7 +7,6 @@ cc_library_shared {
     defaults: ["hidl_defaults"],
     vendor: true,
     relative_install_path: "hw",
-    vintf_fragments: ["android.hardware.gnss@1.0.xml"],
     srcs: [
         "ThreadCreationWrapper.cpp",
         "AGnss.cpp",

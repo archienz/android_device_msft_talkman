@@ -5,8 +5,8 @@
  *   /dev/i2c-7  QPDS-T900 / APDS-9930 @ 0x39
  *   GPIO 42 / 75  hall (front / back cover)
  *
- * 0x68 is ICM-20648-class (WHO 0xAB), not stock MPU6500. It boots
- * asleep (PWR_MGMT_1=0x41). LSM6 / BMI / MPU probes remain as fallback.
+ * 0x68 is ICM-20648-class (WHO 0xAB). Leftover BMI160 / MPU6500 / LSM6
+ * names and probes are not this phone. Mag is AK09912, not AK8963.
  *
  * VINTF lists android.hardware.sensors@1.0 as passthrough, so
  * SensorService loads android.hardware.sensors@1.0-impl in-process
@@ -52,10 +52,7 @@
 #define N_SENSORS 9
 
 #define IMU_NONE 0
-#define IMU_LSM6 1
-#define IMU_BMI 2
-#define IMU_MPU 3
-#define IMU_ICM 4
+#define IMU_ICM 1
 
 #define ICM_REG_WHO 0x00
 #define ICM_REG_LP_CONFIG 0x05
@@ -741,11 +738,6 @@ static int accel_looks_like_gravity(float ax, float ay, float az)
     return (m > 6.0f && m < 14.0f);
 }
 
-static int16_t le16(const uint8_t *p)
-{
-    return (int16_t)(p[0] | (p[1] << 8));
-}
-
 static int16_t be16(const uint8_t *p)
 {
     return (int16_t)((p[0] << 8) | p[1]);
@@ -794,100 +786,28 @@ static int imu_try_icm(float *ax, float *ay, float *az)
     return accel_looks_like_gravity(*ax, *ay, *az);
 }
 
-static int imu_try_lsm6(float *ax, float *ay, float *az)
-{
-    uint8_t raw[6];
-    /* CTRL1_XL / CTRL2_G: 104 Hz, ±2 g / ±250 dps. CTRL3_C: BDU+IF_INC. */
-    if (i2c_write_reg(g_i2c4, IMU_ADDR, 0x10, 0x40) != 0)
-        return 0;
-    i2c_write_reg(g_i2c4, IMU_ADDR, 0x11, 0x40);
-    i2c_write_reg(g_i2c4, IMU_ADDR, 0x12, 0x44);
-    usleep(50000);
-    if (i2c_read_regs(g_i2c4, IMU_ADDR, 0x28, raw, 6) != 0)
-        return 0;
-    *ax = le16(raw) * (9.80665f / 16384.0f);
-    *ay = le16(raw + 2) * (9.80665f / 16384.0f);
-    *az = le16(raw + 4) * (9.80665f / 16384.0f);
-    return accel_looks_like_gravity(*ax, *ay, *az);
-}
-
-static int imu_try_bmi(float *ax, float *ay, float *az)
-{
-    uint8_t raw[6];
-    /* CMD: accel normal, gyro normal. Default accel range is ±8 g. */
-    if (i2c_write_reg(g_i2c4, IMU_ADDR, 0x7e, 0x11) != 0)
-        return 0;
-    usleep(50000);
-    i2c_write_reg(g_i2c4, IMU_ADDR, 0x7e, 0x15);
-    usleep(80000);
-    if (i2c_read_regs(g_i2c4, IMU_ADDR, 0x12, raw, 6) != 0)
-        return 0;
-    *ax = le16(raw) * (9.80665f / 4096.0f);
-    *ay = le16(raw + 2) * (9.80665f / 4096.0f);
-    *az = le16(raw + 4) * (9.80665f / 4096.0f);
-    return accel_looks_like_gravity(*ax, *ay, *az);
-}
-
-static int imu_try_mpu(float *ax, float *ay, float *az)
-{
-    uint8_t raw[6];
-    if (i2c_write_reg(g_i2c4, IMU_ADDR, 0x6b, 0x00) != 0)
-        return 0;
-    usleep(100000);
-    if (i2c_read_regs(g_i2c4, IMU_ADDR, 0x3b, raw, 6) != 0)
-        return 0;
-    *ax = be16(raw) * (9.80665f / 16384.0f);
-    *ay = be16(raw + 2) * (9.80665f / 16384.0f);
-    *az = be16(raw + 4) * (9.80665f / 16384.0f);
-    return accel_looks_like_gravity(*ax, *ay, *az);
-}
-
 static int imu_probe(void)
 {
     float ax = 0, ay = 0, az = 0;
-    uint8_t r0 = 0, r0f = 0, r75 = 0, r6b = 0;
+    uint8_t who = 0, pwr1 = 0;
 
-    i2c_read_regs(g_i2c4, IMU_ADDR, 0x00, &r0, 1);
-    i2c_read_regs(g_i2c4, IMU_ADDR, 0x0f, &r0f, 1);
-    i2c_read_regs(g_i2c4, IMU_ADDR, 0x75, &r75, 1);
-    i2c_read_regs(g_i2c4, IMU_ADDR, 0x6b, &r6b, 1);
-    ALOGI("IMU 0x68 regs 00=%02x 0f=%02x 6b=%02x 75=%02x", r0, r0f, r6b, r75);
+    i2c_read_regs(g_i2c4, IMU_ADDR, ICM_REG_WHO, &who, 1);
+    i2c_read_regs(g_i2c4, IMU_ADDR, ICM_REG_PWR_MGMT_1, &pwr1, 1);
+    ALOGI("IMU 0x68 WHO=%02x PWR_MGMT_1=%02x (ICM-206xx, not BMI160)",
+          who, pwr1);
 
     if (imu_try_icm(&ax, &ay, &az)) {
         ALOGI("IMU map=ICM206xx accel=%.2f %.2f %.2f", ax, ay, az);
         return IMU_ICM;
     }
-    if (imu_try_lsm6(&ax, &ay, &az)) {
-        ALOGI("IMU map=LSM6 accel=%.2f %.2f %.2f", ax, ay, az);
-        return IMU_LSM6;
-    }
-    if (imu_try_bmi(&ax, &ay, &az)) {
-        ALOGI("IMU map=BMI accel=%.2f %.2f %.2f", ax, ay, az);
-        return IMU_BMI;
-    }
-    if (imu_try_mpu(&ax, &ay, &az)) {
-        ALOGI("IMU map=MPU accel=%.2f %.2f %.2f", ax, ay, az);
-        return IMU_MPU;
-    }
-    ALOGW("IMU 0x68 not published (no gravity-sized sample)");
+    ALOGW("IMU 0x68 not published (no ICM-206xx gravity-sized sample)");
     return IMU_NONE;
 }
 
 static void imu_enable(void)
 {
-    if (g_imu_kind == IMU_ICM) {
+    if (g_imu_kind == IMU_ICM)
         imu_icm_wake();
-    } else if (g_imu_kind == IMU_LSM6) {
-        i2c_write_reg(g_i2c4, IMU_ADDR, 0x10, 0x40);
-        i2c_write_reg(g_i2c4, IMU_ADDR, 0x11, 0x40);
-        i2c_write_reg(g_i2c4, IMU_ADDR, 0x12, 0x44);
-    } else if (g_imu_kind == IMU_BMI) {
-        i2c_write_reg(g_i2c4, IMU_ADDR, 0x7e, 0x11);
-        usleep(50000);
-        i2c_write_reg(g_i2c4, IMU_ADDR, 0x7e, 0x15);
-    } else if (g_imu_kind == IMU_MPU) {
-        i2c_write_reg(g_i2c4, IMU_ADDR, 0x6b, 0x00);
-    }
 }
 
 static int imu_read_accel(sensors_event_t *ev)
@@ -895,35 +815,15 @@ static int imu_read_accel(sensors_event_t *ev)
     uint8_t raw[6];
     float ax, ay, az;
 
-    if (g_imu_kind == IMU_ICM) {
-        if (!imu_icm_bank(ICM_BANK0))
-            return -1;
-        if (i2c_read_regs(g_i2c4, IMU_ADDR, ICM_REG_ACCEL_XOUT_H, raw, 6) != 0)
-            return -1;
-        ax = be16(raw) * (9.80665f / 16384.0f);
-        ay = be16(raw + 2) * (9.80665f / 16384.0f);
-        az = be16(raw + 4) * (9.80665f / 16384.0f);
-    } else if (g_imu_kind == IMU_LSM6) {
-        if (i2c_read_regs(g_i2c4, IMU_ADDR, 0x28, raw, 6) != 0)
-            return -1;
-        ax = le16(raw) * (9.80665f / 16384.0f);
-        ay = le16(raw + 2) * (9.80665f / 16384.0f);
-        az = le16(raw + 4) * (9.80665f / 16384.0f);
-    } else if (g_imu_kind == IMU_BMI) {
-        if (i2c_read_regs(g_i2c4, IMU_ADDR, 0x12, raw, 6) != 0)
-            return -1;
-        ax = le16(raw) * (9.80665f / 4096.0f);
-        ay = le16(raw + 2) * (9.80665f / 4096.0f);
-        az = le16(raw + 4) * (9.80665f / 4096.0f);
-    } else if (g_imu_kind == IMU_MPU) {
-        if (i2c_read_regs(g_i2c4, IMU_ADDR, 0x3b, raw, 6) != 0)
-            return -1;
-        ax = be16(raw) * (9.80665f / 16384.0f);
-        ay = be16(raw + 2) * (9.80665f / 16384.0f);
-        az = be16(raw + 4) * (9.80665f / 16384.0f);
-    } else {
+    if (g_imu_kind != IMU_ICM)
         return 0;
-    }
+    if (!imu_icm_bank(ICM_BANK0))
+        return -1;
+    if (i2c_read_regs(g_i2c4, IMU_ADDR, ICM_REG_ACCEL_XOUT_H, raw, 6) != 0)
+        return -1;
+    ax = be16(raw) * (9.80665f / 16384.0f);
+    ay = be16(raw + 2) * (9.80665f / 16384.0f);
+    az = be16(raw + 4) * (9.80665f / 16384.0f);
     fill_common(ev, HANDLE_ACCEL, SENSOR_TYPE_ACCELEROMETER);
     ev->acceleration.x = ax;
     ev->acceleration.y = ay;
@@ -938,38 +838,15 @@ static int imu_read_gyro(sensors_event_t *ev)
     float gx, gy, gz;
     const float dps_to_rad = 3.14159265f / 180.0f;
 
-    if (g_imu_kind == IMU_ICM) {
-        if (!imu_icm_bank(ICM_BANK0))
-            return -1;
-        if (i2c_read_regs(g_i2c4, IMU_ADDR, ICM_REG_GYRO_XOUT_H, raw, 6) != 0)
-            return -1;
-        gx = be16(raw) / 131.0f * dps_to_rad;
-        gy = be16(raw + 2) / 131.0f * dps_to_rad;
-        gz = be16(raw + 4) / 131.0f * dps_to_rad;
-    } else if (g_imu_kind == IMU_LSM6) {
-        if (i2c_read_regs(g_i2c4, IMU_ADDR, 0x22, raw, 6) != 0)
-            return -1;
-        /* 250 dps → 8.75 mdps/LSB */
-        gx = le16(raw) * 0.00875f * dps_to_rad;
-        gy = le16(raw + 2) * 0.00875f * dps_to_rad;
-        gz = le16(raw + 4) * 0.00875f * dps_to_rad;
-    } else if (g_imu_kind == IMU_BMI) {
-        if (i2c_read_regs(g_i2c4, IMU_ADDR, 0x0c, raw, 6) != 0)
-            return -1;
-        /* 2000 dps → 16.4 LSB/dps */
-        gx = le16(raw) / 16.4f * dps_to_rad;
-        gy = le16(raw + 2) / 16.4f * dps_to_rad;
-        gz = le16(raw + 4) / 16.4f * dps_to_rad;
-    } else if (g_imu_kind == IMU_MPU) {
-        if (i2c_read_regs(g_i2c4, IMU_ADDR, 0x43, raw, 6) != 0)
-            return -1;
-        /* 250 dps → 131 LSB/dps */
-        gx = be16(raw) / 131.0f * dps_to_rad;
-        gy = be16(raw + 2) / 131.0f * dps_to_rad;
-        gz = be16(raw + 4) / 131.0f * dps_to_rad;
-    } else {
+    if (g_imu_kind != IMU_ICM)
         return 0;
-    }
+    if (!imu_icm_bank(ICM_BANK0))
+        return -1;
+    if (i2c_read_regs(g_i2c4, IMU_ADDR, ICM_REG_GYRO_XOUT_H, raw, 6) != 0)
+        return -1;
+    gx = be16(raw) / 131.0f * dps_to_rad;
+    gy = be16(raw + 2) / 131.0f * dps_to_rad;
+    gz = be16(raw + 4) / 131.0f * dps_to_rad;
     fill_common(ev, HANDLE_GYRO, SENSOR_TYPE_GYROSCOPE);
     ev->gyro.x = gx;
     ev->gyro.y = gy;
