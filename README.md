@@ -211,7 +211,9 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - TWRP overlay battery.capacity is 3000 (`cea7f03`). Kernel FG leftover cutoff/low is 3200/3500 (`91c0c0317c3`).
 - VoLTE, VT, and WFC overlays are false. There is no rild package.
 - CarrierConfig overlay sets IMS, VoLTE, WFC, and VT false. There is no Dual SIM.
-- Telephony overlay IMS packages are empty (`config_ims_mmtel_package`, `config_ims_rcs_package`). Video-calling fallback is false. RTT is false.
+- Telephony overlay IMS packages are empty (`config_ims_mmtel_package`, `config_ims_rcs_package`). Video-calling fallback is false. RTT is false. 5G DSDS is false (`49762ef`).
+- Telephony leftover Sprint MCC `values-mcc310-mnc120` still names SprintDM carrier settings. Talkman is not a Sprint SKU. There is no rild.
+- ContactsCommon leftover (`f3b8ec1`) sets `config_allow_sim_import` false for Sprint MCC 310-120 / 311-490 / 311-870 / 312-530. That is not Dual SIM import.
 - `media_codecs.xml` is Venus VFE44, 3840x2160 at 30 fps. There is no HEVC encode.
 - `libshims` keeps `libcutils_shim`. Bullhead audio and empty sensor shims are gone.
 - NFC overlay leftover (`1ccb479` MATCH `54afc57`): PN547, `enable_nfc_provisioning` false. No FeliCa SKU bools. `libnfc-nci.conf` is untouched. GPIOs stay in kernel `nfc.dtsi`.
@@ -222,7 +224,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - Vendor COPY_FILES for PIL use adsp, venus, and cpe. They do not use qcadsp8992.
 - Kernel SD card detect is PM8994 GPIO 8. Haptic is PMI8994 ERM. HDMI 5 V enable is PM MPP4.
 - There is no ORIGA2 Linux driver. Unknown pack charge uses OCV.
-- `ueventd.talkman.rc` labels jpeg0 / jpeg3, video/media, flash_0/1 torch_0/1 flash_torch, pn547. No jpeg1/jpeg2.
+- `ueventd.talkman.rc` labels jpeg0 / jpeg3, video/media, flash_0/1 torch_0/1 flash_torch, pn547. No jpeg1/jpeg2. No `led::`.
 - Camera sepolicy already covers vendor lib + XML. Init does not write CCI scan. SELinux stays permissive.
 - Wi-Fi MAC comes from factory DPP. The image does not contain a MAC address.
 - Sensors HAL is `sensors.talkman.so`. No BMI160. No nanohub. SAP names match ICM-206xx / AK09912 / ZPA2326.
