@@ -50,6 +50,7 @@ Push personal work to **archienz**. Do not open pull requests on the community o
 | Name | Fact |
 |---|---|
 | Device | Lumia 950, `talkman` |
+| Schematic | RM-1104 board **4VM_08r** only. Dual SIM RM-1118 / **4VM_08d** is not this product |
 | SoC | MSM8992 (4× Cortex-A53 + 2× Cortex-A57) |
 | GPU | Adreno 418 |
 | PMIC | PM8994 + PMI8994 |
@@ -64,7 +65,11 @@ Push personal work to **archienz**. Do not open pull requests on the community o
 
 CCI 7-bit slave IDs are **not** in this tree. Do not invent `qcom,slave-id`.
 
-Rear camera I2C is **CCI master 1** (RM-1104 schematic 4VM_08r page 2, plus EpicLPer lab). Front/iris stay on CCI0. Dual SIM RM-1118 is not this product.
+Rear camera I2C is **CCI master 1** (RM-1104 schematic 4VM_08r page 2, plus EpicLPer lab). Front and iris stay on CCI0.
+
+LVS1 is always-on. LVS1 is not a camera vreg.
+
+Schematic notes live in workspace `docs/hardware/SCHEMATIC-RM-1104.md`.
 
 Hill ident candidates **0x20** / **0x7c** / **0x22** are lab notes in `CAMERA-IDENT.md`. They are not DT.
 
@@ -75,8 +80,6 @@ Hill ident candidates **0x20** / **0x7c** / **0x22** are lab notes in `CAMERA-ID
 **Definition of done:** a physical talkman log in `out/qa-*`. Source in Git is not a pass.
 
 No P0 item is **Working**.
-
-Waves 2–11 closed in trees. Wave 12/13 leftover still live. Wave 14 **DONE** in trees: LVS1 always-on (not a cam vreg), leftover init/overlay/BT/media, Hill ident notes only.
 
 Host blockers: no WSL Ubuntu 22.04. About 23 GB free on C:. CCI scan never ran. No GPSTest log.
 
@@ -89,17 +92,7 @@ Host blockers: no WSL Ubuntu 22.04. About 23 GB free on C:. CCI scan never ran. 
 | P0.4 | Camera | Not Working | DT name `mot_imx230`. XML CameraId 0. Clark 32-bit sensor libraries. Flash/torch PMI nodes. HAL1 props. LVS1 always-on, not a cam vreg. `cam_vio` is not in rear/front `qcom,cam-vreg-name`. OIS `.kar` staged, not loaded | CCI scan on the telephone, JPEG still, OIS `.so` |
 | P2 | RIL | Deferred | Research notes only | Modem SMD |
 
-### EpicLPer compare (camera / NFC / audio)
-
 Keep QCamera2 MSMB `mot_imx230`. EpicLPer HAL1 “preview” is CSID test-generator, not live CSI. Do not ship TG.
-
-`qcom,cci-master` is still `<0>`. Hill ident used CCI1. Conflict is **open**. Resolve with `talkman-cci-scan`. Do not pick a master by guess.
-
-LVS1 1.8 V is regulator-always-on. `cam_vio` is not in rear/front `qcom,cam-vreg-name`. That matches the EpicLPer bootloop, not CSID TG.
-
-NFC and TAS already match his measured fixes: PN547 VEN without eSE, 250 ms timeout, no IRQ `read_mutex`; TAS PGA **11 dB**. Keep our userspace. Do not Magisk.
-
-His 8-bit IDs (`0x20` / `0x7c` / SID remap `0x22`) are lab measurements. They are **not** DT. Do not write `qcom,slave-id`.
 
 ---
 
@@ -164,6 +157,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - Do not enable USB Power Delivery in the UI. The hardware has no PD.
 - Do not ship CSID test-generator as camera.
 - Do not Magisk-bind a random `imx230` HAL.
+- Do not use Dual SIM RM-1118 / board 4VM_08d as talkman schematic.
 
 ---
 
