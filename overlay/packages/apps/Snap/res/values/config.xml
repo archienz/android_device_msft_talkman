@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Talkman leftover Snap overlay. CameraId 0 is mot_imx230 (clark
+     MSM8992 HAL1 / openLegacy). MATCH leftover msm8992_camera.xml:
+     no CameraId 1, no Dual SIM, no slave-id in overlay XML.
+     Front SMIA is unnamed; do not overlay a second camera.
+-->
+<resources>
+    <!-- QCamera2 HAL1. CameraId 0 mot_imx230. Not Camera API2. -->
+    <bool name="support_camera_api_v2">false</bool>
+    <bool name="back_camera_open_legacy">true</bool>
+</resources>
