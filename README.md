@@ -144,7 +144,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - `BOARD_QTI_CAMERA_32BIT_ONLY` is true. `USE_CAMERA_STUB` is false.
 - `system.prop` and `vendor.prop` force HAL1: `persist.camera.HAL3.enabled=0`. `vendor.prop` also sets IS type 4, TNR off, EIS enable (unused while HAL3 is off).
 - Media profiles: rear 3840×2160 at 30 fps, H.264 (IMX230). No HEVC encode. No 4K60.
-- Kernel DT `msm8992-chi.dtsi` includes `talkman-camera.dtsi`.
+- Kernel DT `msm8992-chi.dtsi` includes `talkman-camera.dtsi`, `wlan.dtsi`, `leds.dtsi`, `thermal.dtsi`, `usbc.dtsi`, and `pil.dtsi`.
 - LVS1 is always-on. `cam_vio` is not in rear or front cam-vreg / power-seq.
 - OIS `.kar` files are in COPY_FILES (`6e4d4c2`). CAF `msm_ois` does not `request_firmware` those `.kar` files. There is no `libmmcamera_ois_bu24210.so` in the dumps. Do not make a stub library.
 
