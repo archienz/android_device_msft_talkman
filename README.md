@@ -134,6 +134,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - SUPL uses `wlan0`. The tree does not send IMSI.
 - `sepolicy/gps_conf.te` and `location.te` let `location` (`loc_launcher`) and `hal_gnss_default` search `vendor_configs_file` and read `gps_conf_file`. They also read `izat.conf`, `sap.conf`, `flp.conf`, and `lowi.conf` as `vendor_configs_file`. SELinux stays permissive. No IMSI. No rild.
 - `gps.conf` is in this tree (`gps/gps.conf` copied to system and vendor).
+- Framework overlay `config_gpsParameters` matches that file: SUPL 2.0 MSB, NTP `pool.ntp.org`, XTRA `xtra3grc.bin`. There is no `GPS_LOCK`. There is no MSA.
 - Vendor `sap.conf` (`e65e4b2`) uses NDK names ICM-206xx Accelerometer / Gyroscope, AK09912 Magnetometer, ZPA2326 Pressure / Temperature. `SENSOR_PROVIDER=2`. Not nanohub. Not SSC.
 
 ### Camera
