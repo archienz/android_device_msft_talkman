@@ -36,7 +36,9 @@
          qpnp-fg sysfs (bms). charge_full / charge_full_design are µAh.
          cycle_count is the FG SRAM counter. Not a 50 % overlay stub.
          Health 2.1-impl still walks /sys/class/power_supply (battery + bms).
-         Fast Charge / PD strings live in frameworks overlay, not here.
+         dumpstate leftover MATCH bf43f49 walks the same psy plus torch
+         sysfs / /dev/video* list. Fast Charge / PD strings live in
+         frameworks overlay, not here.
     -->
     <bool name="config_supportBatteryHealth">true</bool>
     <string name="config_batteryCalculatedCapacity" translatable="false">/sys/class/power_supply/bms/charge_full</string>

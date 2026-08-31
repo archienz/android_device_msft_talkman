@@ -29,4 +29,15 @@
     <!-- Set the notificaiton pulse to be off by default. -->
     <bool name="def_notification_pulse">false</bool>
 
+    <!--
+         leftover MATCH dumpstate bf43f49: Settings "Take bug report" /
+         power-menu bugreport starts dumpstate, which calls vendor
+         android.hardware.dumpstate@1.0-service.talkman (dumpstateBoard).
+         That HAL already lists torch/flash LED sysfs and /dev/video*
+         (no open, no CCI write). AOSP default is false; leave it on so
+         the leftover dump is reachable without a sim dumpstate C++.
+         Do not overlay dumpstate C++ from here.
+    -->
+    <bool name="def_bugreport_in_power_menu">true</bool>
+
 </resources>
