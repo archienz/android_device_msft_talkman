@@ -78,17 +78,21 @@ Schematic PDF pages are rendered as PNG in workspace `docs/hardware/schematic-pn
 
 Hill ident candidates **0x20** / **0x7c** / **0x22** are lab notes in `CAMERA-IDENT.md`. They are not DT.
 
+Iris `qcom,camera@2` is **disabled** (CSI2 / CCI0 GPIO 14 / 102). No iris slave-id. No XML CameraId for iris.
+
+Qi GPIOs match 4VM_08r: `wc-en` GPIO **2**, `wc-det` GPIO **14**.
+
 ---
 
 ## Progress (2026-08-31)
 
-Wave 15 **DONE** (source only, not a meter pass). Keep `1d143f5`. Do not restore `abeb48a`.
+Wave 16 **DONE** (source only, not a meter pass). Keep `1d143f5`. Do not restore `abeb48a`.
 
 **Definition of done:** a physical talkman log in `out/qa-*`. Source in Git is not a pass.
 
-No P0 item is **Working**. Mixer speaker is QUAT_MI2S (`66c7d50`). `extract-files.sh` dests match COPY_FILES (`6e4d4c2`). WCNSS QCA6174 `gNumRxAnt=2`. Location sepolicy `0c0a081`. USB `g_android` (`93506aa`). Thermal HAL `thermal.talkman` (`9b6cd42` vendor julian). `privapp-permissions` dropped LGE (`ca9adee`). NFC GPIOs match schematic DT (IRQ 29, VEN 30, DWL 94). Rear camera is CCI1. LVS1 is always-on.
+No P0 item is **Working**. Mixer speaker is QUAT_MI2S (`66c7d50`). `extract-files.sh` dests match COPY_FILES (`6e4d4c2`). WCNSS QCA6174 `gNumRxAnt=2`. Location sepolicy `0c0a081`. USB `g_android` (`93506aa`). `androidboot.usbconfigfs=0` (`5d03a73`). Thermal HAL `thermal.talkman` (`9b6cd42` vendor julian). `privapp-permissions` dropped LGE (`ca9adee`). NFC GPIOs match schematic DT (IRQ 29, VEN 30, DWL 94). Rear camera is CCI1 (bus, not SID). LVS1 is always-on. `ueventd` jpeg0/jpeg3 (`e9b365a`). CAMERA-IDENT CCI1 (`63bed4c`).
 
-Wave 15 source (not a pass): `extract-files.sh` dests match COPY_FILES; WCNSS QCA6174 `gNumRxAnt=2`; location sepolicy lets `loc_launcher` and GNSS HIDL read `gps.conf`; `init.talkman.usb.rc` is g_android (no configfs); thermal HAL `thermal.talkman`; `vendor.prop` HAL1 persist.
+Wave 16 source (not a pass): iris `camera@2` disabled; Qi GPIOs match; CAMERA-IDENT CCI1 is bus not slave-id; Fluence is mic AEC; `usbconfigfs=0`; ueventd jpeg0/jpeg3; camera sepolicy already vendor lib+XML. Wave 15 still in tree: mixer QUAT, WCNSS 2×2, g_android, thermal, extract-files.
 
 Host blockers: no WSL Ubuntu 22.04. About 23 GB free on C:. CCI scan never ran. No GPSTest log.
 
@@ -113,7 +117,7 @@ Do this list as a description of files, not as a procedure.
 
 - `power_profile.xml` uses battery capacity **3000** (BV-T5E). The bullhead value 2700 is not used.
 - Overlay warning levels are 15 percent and 5 percent.
-- Charge UI strings are 5 V 1.8 A and Qi 900 mA. The UI does not say PD or Quick Charge.
+- Charge UI strings are 5 V 1.8 A and Qi 900 mA. The UI does not say PD or Quick Charge. Qi `wc-en` GPIO 2 and `wc-det` GPIO 14 match 4VM_08r.
 - Settings Battery Health reads `bms/charge_full`, `charge_full_design`, and `cycle_count`.
 - Dumpstate reads `battery`, `bms`, `usb`, and `dc`. Dumpstate does not write CCI scan.
 - `sepolicy/dumpstate.te` lets `dumpstate` read `sysfs_batteryinfo`. SELinux stays permissive.
@@ -131,7 +135,8 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 ### Camera
 
 - XML `SensorName` is `mot_imx230` for CameraId 0.
-- There is no CameraId 1. Front sensor name is not known.
+- There is no CameraId 1. Front sensor name is not known. Iris `qcom,camera@2` is disabled. No iris XML.
+- CAMERA-IDENT: CCI master 1 is a bus index. It is not `qcom,slave-id`.
 - `BOARD_QTI_CAMERA_32BIT_ONLY` is true. `USE_CAMERA_STUB` is false.
 - `system.prop` and `vendor.prop` force HAL1: `persist.camera.HAL3.enabled=0`. `vendor.prop` also sets IS type 4, TNR off, EIS enable (unused while HAL3 is off).
 - Media profiles: rear 3840×2160 at 30 fps, H.264. No HEVC encode. No 4K60.
@@ -151,8 +156,11 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - Mixer speaker path is QUAT_MI2S (TAS2553). WCD SPK DRV is not wired.
 - `extract-files.sh` dests match COPY_FILES. 32-bit `mot_imx230` and bu24210 `.kar` only. Banned dests: IMX377, OV5693, nanohub, OMADM, LGE entitlement, LifeTimer.
 - WCNSS `wifi/WCNSS_qcom_cfg.ini` is QCA6174 2×2 (`gEnable2x2=1`, `gNumRxAnt=2`). No 11ax, no 6 GHz, no WPA3/SAE ini keys. MAC is not in this ini.
-- `init.talkman.usb.rc` is `g_android` sysfs. `sys.usb.configfs=0`. No `/config/usb_gadget`. Default `persist.sys.usb.config=adb`.
+- `init.talkman.usb.rc` is `g_android` sysfs. `sys.usb.configfs=0`. `BoardConfig` `androidboot.usbconfigfs=0`. No `/config/usb_gadget`. Default `persist.sys.usb.config=adb`.
 - Thermal HAL package is `thermal.talkman` (`thermal/thermal.c`, vendor partition). Not a P0 meter pass.
+- Fluence UUIDs in `audio_effects.xml` are mic AEC/NS. They are not the TAS speaker path.
+- `ueventd.talkman.rc` labels jpeg0 / jpeg3, video/media, flash_0/1 torch_0/1 flash_torch, pn547. No jpeg1/jpeg2.
+- Camera sepolicy already covers vendor lib + XML. Init does not write CCI scan. SELinux stays permissive.
 - Wi-Fi MAC comes from factory DPP. The image does not contain a MAC address.
 - Sensors HAL is `sensors.talkman.so`. No BMI160. No nanohub.
 - Speaker volume curves are AOSP defaults for TAS2553. Bullhead WCD DRC curves are gone. TAS PGA default is **11 dB**.
