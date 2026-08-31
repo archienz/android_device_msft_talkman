@@ -69,7 +69,7 @@ Rear camera I2C is **CCI master 1** (RM-1104 schematic 4VM_08r page 2, plus Epic
 
 LVS1 is always-on. LVS1 is not a camera vreg.
 
-Schematic notes live in workspace `docs/hardware/SCHEMATIC-RM-1104.md`.
+Schematic PDF pages are rendered as PNG in workspace `docs/hardware/schematic-png/`. Notes: `docs/hardware/SCHEMATIC-RM-1104.md`.
 
 Hill ident candidates **0x20** / **0x7c** / **0x22** are lab notes in `CAMERA-IDENT.md`. They are not DT.
 
