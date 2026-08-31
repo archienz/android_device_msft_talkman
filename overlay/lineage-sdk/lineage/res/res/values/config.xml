@@ -56,11 +56,31 @@
     <integer name="config_deviceLightCapabilities">67</integer>
 
     <!--
-         QPDS-T900 exists. Timeout is lineage-sdk default; not a measured
-         sub-300ms claim. Off until the user enables it.
+         Bullhead leftover off. lineage-sdk default is false. Enable only
+         with a measured <300ms wake path. QPDS-T900 is on the AP; that
+         is not a nanohub proximity-check-on-wake claim.
     -->
-    <bool name="config_proximityCheckOnWake">true</bool>
+    <bool name="config_proximityCheckOnWake">false</bool>
     <integer name="config_proximityCheckTimeout">250</integer>
     <bool name="config_proximityCheckOnWakeEnabledByDefault">false</bool>
+
+    <!--
+         No /sys/class/graphics/fb0/color_temp (bullhead). CAF MDSS on
+         talkman has no that node. Do not run LiveDisplay against a
+         missing backend. Matches Settings leftover 2fca2c7.
+    -->
+    <bool name="config_enableLiveDisplay">false</bool>
+    <bool name="config_defaultAutoOutdoorMode">false</bool>
+    <bool name="config_defaultColorEnhancement">false</bool>
+    <bool name="config_defaultCABC">false</bool>
+
+    <!-- No FPC. Do not cleanup fingerprints against a missing daemon. -->
+    <bool name="config_cleanupUnusedFingerprints">false</bool>
+    <bool name="config_fingerprintPostResetRunnableForAllClients">false</bool>
+
+    <!--
+         Duke command-mode AMOLED: no MDSS doze/ULPS AOD. AOD bools live
+         in frameworks/base overlay (already false). Not overlaid here.
+    -->
 
 </resources>
