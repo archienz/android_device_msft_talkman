@@ -17,6 +17,13 @@
 #ifndef _BDROID_BUILDCFG_H
 #define _BDROID_BUILDCFG_H
 
+/* MAC is not here. libbt-vendor:
+ *  1. /persist/bdaddr.txt (ro.bt.bdaddr_path; installer DPP/QCOM/BT.PROVISION)
+ *  2. QCA OTP when persist is missing (talkman nvm_tlv_3.2.bin / btnv32.bin
+ *     NVM tag 2 is zeros; QCOM_BT_READ_ADDR_FROM_PROP analog of g_use_otpmac=1)
+ * Do not put CAF/bullhead sample BD_ADDR (77:78:23:01:56:22) here.
+ */
+
 #define BLE_VND_INCLUDED TRUE
 #define BTA_DISABLE_DELAY 1000 /* in milliseconds */
 

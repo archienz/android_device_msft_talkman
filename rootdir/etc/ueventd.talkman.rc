@@ -9,31 +9,29 @@
 /dev/jpeg1                0660   system     camera
 /dev/jpeg2                0660   system     camera
 /dev/jpeg3                0660   system     camera
+# Camera flash. PMI8994 qpnp-flash-led (msm-pmi8994.dtsi); flash_torch is CAF mm-qcamera.
+/sys/class/leds/led:flash_0               brightness           0660    system    camera
+/sys/class/leds/led:flash_1               brightness           0660    system    camera
+/sys/class/leds/led:flash_torch           brightness           0660    system    camera
+/sys/class/leds/led:torch_0               brightness           0660    system    camera
+/sys/class/leds/led:torch_1               brightness           0660    system    camera
+# mdss lcd-backlight + PMI8994 RGB (lights HIDL 2.0)
+/sys/class/leds/lcd-backlight             brightness           0660    system    system
+/sys/class/leds/red                       brightness           0660    system    system
+/sys/class/leds/green                     brightness           0660    system    system
+/sys/class/leds/blue                      brightness           0660    system    system
+/sys/class/leds/red                       trigger              0660    system    system
+/sys/class/leds/green                     trigger              0660    system    system
+/sys/class/leds/blue                      trigger              0660    system    system
 /dev/rtc0                 0660   system     system
 /dev/diag                 0660   radio      radio
 /dev/ttyUSB0              0660   system     system
 
-#nfc permissions
-#/dev/nfc-nci              0660    nfc         nfc
-#/dev/assd                 0660    nfc         nfc
+# NFC is NXP PN547 on I2C6 (WOA ACPI PNP0547). No FeliCa / snfc UART.
 /dev/pn547                 0660    nfc         nfc
-/dev/snfc_uart      0660    nfc nfc
-/dev/snfc_intu_poll 0440    nfc nfc
-/dev/snfc_rfs       0440    nfc nfc
-/dev/snfc_uart_control  0660    nfc nfc
-/dev/snfc_cen       0660    nfc nfc
-/dev/snfc_available_poll    0440    nfc nfc
-/dev/ttyHSL2              0660  nfc       nfc
 /dev/i2c-4                0660  system    system
 /dev/i2c-6                0660  nfc       nfc
 /dev/i2c-7                0660  system    system
-/dev/felica               0660  nfc       system
-/dev/felica_cen           0460  nfc       nfc
-/dev/felica_pon           0660  nfc       system
-/dev/felica_rfs           0440  nfc       nfc
-/dev/felica_rws           0440  nfc       nfc
-/dev/felica_cal           0660  system    system
-/dev/felica_test          0660  system    system
 
 /dev/smd0                 0660   system     system
 /dev/smd4                 0660   system     system
@@ -102,3 +100,56 @@
 /dev/block/platform/soc.0/f9824900.sdhci/by-name/persistent 0600 system system
 # sensor HUB
 /dev/spich                0640   system     system
+
+# Health 2.1 walks type to pick Battery vs USB vs Wireless. qpnp-fg is bms.
+/sys/devices/soc.0/qpnp-fg*               type                 0644    system    system
+/sys/devices/soc.0/qpnp-fg*               capacity             0644    system    system
+/sys/devices/soc.0/qpnp-fg*               voltage_now          0644    system    system
+/sys/devices/soc.0/qpnp-fg*               current_now          0644    system    system
+/sys/devices/soc.0/qpnp-fg*               temp                 0644    system    system
+/sys/devices/soc.0/qpnp-fg*               charge_full          0644    system    system
+/sys/devices/soc.0/qpnp-fg*               charge_full_design   0644    system    system
+/sys/devices/soc.0/qpnp-fg*               cycle_count          0644    system    system
+/sys/devices/soc.0/qpnp-fg*               battery_type         0644    system    system
+/sys/devices/soc.0/qpnp-fg*               resistance_id        0644    system    system
+/sys/devices/soc.0/qpnp-smbcharger*       type                 0644    system    system
+/sys/devices/soc.0/qpnp-smbcharger*       status               0644    system    system
+/sys/devices/soc.0/qpnp-smbcharger*       health               0644    system    system
+/sys/devices/soc.0/qpnp-smbcharger*       present              0644    system    system
+/sys/devices/soc.0/qpnp-smbcharger*       capacity             0644    system    system
+/sys/devices/soc.0/qpnp-smbcharger*       voltage_now          0644    system    system
+/sys/devices/soc.0/qpnp-smbcharger*       current_now          0644    system    system
+/sys/devices/soc.0/qpnp-smbcharger*       temp                 0644    system    system
+/sys/devices/soc.0/qpnp-smbcharger*       charge_full          0644    system    system
+/sys/devices/soc.0/qpnp-smbcharger*       charge_full_design   0644    system    system
+/sys/devices/soc.0/qpnp-smbcharger*       charge_counter       0644    system    system
+/sys/devices/soc.0/qpnp-smbcharger*       cycle_count          0644    system    system
+/sys/devices/soc.0/qpnp-smbcharger*       technology           0644    system    system
+/sys/devices/soc.0/qpnp-smbcharger*       charging_enabled     0664    system    system
+/sys/devices/soc.0/qpnp-smbcharger*       battery_charging_enabled 0664 system system
+/sys/devices/soc.0/qpnp-smbcharger*       current_max          0664    system    system
+/sys/devices/soc.0/qpnp-smbcharger*       input_current_max    0664    system    system
+/sys/devices/soc.0/qpnp-smbcharger*       online               0644    system    system
+/sys/devices/soc.0/f9200000.ssusb*        type                 0644    system    system
+/sys/devices/soc.0/f9200000.ssusb*        online               0644    system    system
+/sys/devices/soc.0/f9200000.ssusb*        present              0644    system    system
+
+# lights.talkman: PMI8994 RGB + mdss lcd-backlight (system uid, 0644 root fails)
+/sys/class/leds/red                  brightness      0664    system    system
+/sys/class/leds/red                  trigger         0664    system    system
+/sys/class/leds/green                brightness      0664    system    system
+/sys/class/leds/green                trigger         0664    system    system
+/sys/class/leds/blue                 brightness      0664    system    system
+/sys/class/leds/blue                 trigger         0664    system    system
+/sys/class/leds/lcd-backlight        brightness      0664    system    system
+# gpio-leds torch.dtsi label led::flash_torch; init.talkman.rc also led:flash_*
+/sys/class/leds/led::flash_torch     brightness      0660    system    camera
+/sys/class/leds/led:flash_torch      brightness      0660    system    camera
+/sys/class/leds/led:flash_0          brightness      0660    system    camera
+/sys/class/leds/led:flash_1          brightness      0660    system    camera
+# vibrator HIDL: qpnp-haptic timed_output (also chmod in vibrator service rc)
+/sys/class/timed_output/vibrator     enable          0660    system    system
+/sys/class/timed_output/vibrator     vtg_level       0660    system    system
+/sys/class/timed_output/vibrator     vtg_min         0444    system    system
+/sys/class/timed_output/vibrator     vtg_max         0444    system    system
+/sys/class/timed_output/vibrator     vtg_default     0444    system    system

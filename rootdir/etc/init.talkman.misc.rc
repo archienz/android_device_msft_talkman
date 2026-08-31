@@ -1,4 +1,4 @@
-# This file gets copied as /init.talkman.misc.rc
+# Talkman BT persist. Not LGE bullhead lge_handle_panic sysfs.
 
-on early-boot
-    write /sys/module/lge_handle_panic/parameters/use_hardreset 0
+on post-fs
+    exec - root root -- /vendor/bin/init.talkman.bt.sh

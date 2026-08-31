@@ -36,7 +36,7 @@ PRODUCT_MODEL := Lumia 950
 PRODUCT_MANUFACTURER := Microsoft
 PRODUCT_RESTRICT_VENDOR_FILES := false
 
-#PRODUCT_COPY_FILES += device/msft/talkman/fstab.aosp_talkman:root/fstab.talkman
+#PRODUCT_COPY_FILES += device/msft/talkman/rootdir/etc/fstab.aosp_talkman:root/fstab.talkman
 
 $(call inherit-product, device/msft/talkman/device.mk)
 $(call inherit-product, vendor/msft/talkman/talkman-vendor.mk)

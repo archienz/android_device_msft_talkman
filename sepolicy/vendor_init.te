@@ -1,2 +1,21 @@
 allow vendor_init time_data_file:dir { search setattr };
 allow vendor_init time_data_file:file setattr;
+
+# init.talkman.rc mkdir /persist/camera, /data/vendor/camera, /data/vendor/location
+allow vendor_init persist_file:dir { search write add_name relabelfrom };
+allow vendor_init persist_camera_file:dir create_dir_perms;
+allow vendor_init vendor_data_file:dir { search write add_name relabelfrom };
+allow vendor_init vendor_camera_data_file:dir create_dir_perms;
+allow vendor_init location_data_file:dir create_dir_perms;
+
+# chmod /vendor/etc/gps.conf
+allow vendor_init gps_conf_file:file { getattr setattr };
+
+# init.talkman.rc on charger / on boot ICL
+allow vendor_init sysfs_battery:dir r_dir_perms;
+allow vendor_init sysfs_battery:file rw_file_perms;
+allow vendor_init sysfs_battery:lnk_file r_file_perms;
+allow vendor_init sysfs_batteryinfo:dir r_dir_perms;
+allow vendor_init sysfs_batteryinfo:file rw_file_perms;
+allow vendor_init sysfs_batteryinfo:lnk_file r_file_perms;
+allow vendor_init sysfs_usb:file rw_file_perms;

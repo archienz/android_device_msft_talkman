@@ -8,7 +8,13 @@
   {
     "repository"  : "Android4Lumia950/android_vendor_msft_talkman",
     "target_path" : "vendor/msft/talkman",
-    "branch"      : "lineage-18.1-talkman",
+    "branch"      : "lineage-18.1-julian",
+    "remote"      : "github"
+  },
+  {
+    "repository"  : "Android4Lumia950/firmware-microsoft-talkman",
+    "target_path" : "firmware/microsoft/talkman",
+    "branch"      : "main",
     "remote"      : "github"
   },
   {

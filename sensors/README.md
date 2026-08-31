@@ -15,9 +15,8 @@ Userspace I²C HAL for the buses enabled in
 VINTF already lists `android.hardware.sensors@1.0` as passthrough;
 `android.hardware.sensors@1.0-impl` wraps this module in-process.
 
-Do not enable `sensors.qcom` or the leftover `sensorhal/` tree.
-Those are bullhead ADSP / nanohub leftovers and do not match this
-hardware.
+Do not enable `sensors.qcom` / `sensors.ssc`. `sensorhal/sensorlist.cpp`
+is inventory only (same chips as this HAL). No nanohub, no FPC.
 
 Gravity, linear acceleration, rotation vector, and the other
 fusion types are produced by Android from accel + gyro + mag.

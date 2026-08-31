@@ -1,0 +1,34 @@
+<!--
+  mm-qcamera-daemon sensor list for talkman (MSM8992).
+  CameraId 0 SensorName mot_imx230 -> libmmcamera_mot_imx230.so (clark MSM8992).
+  4-lane CSI: LaneMask 0x1F LaneAssign 0x4320 (CAF 80-NU323-2 MSM8992;
+  talkman-camera.dtsi qcom,csi-lane-mask / qcom,csi-lane-assign).
+  No CameraId 1: front SMIA die unnamed (not ov5693, not imx230).
+  No ActuatorName / OisName / FlashName / EepromName: VCM unknown,
+  no libmmcamera_ois_bu24210, flash is not sky81296, NVM is Nokia DCC.
+  No slave-id in this file.
+-->
+<CameraConfigurationRoot>
+  <CameraModuleConfig>
+    <CameraId>0</CameraId>
+    <SensorName>mot_imx230</SensorName>
+    <ChromatixName>mot_imx230_chromatix</ChromatixName>
+    <ModesSupported>1</ModesSupported>
+    <Position>BACK</Position>
+    <MountAngle>360</MountAngle>
+    <CSIInfo>
+      <CSIDCore>0</CSIDCore>
+      <LaneMask>0x1F</LaneMask>
+      <LaneAssign>0x4320</LaneAssign>
+      <ComboMode>0</ComboMode>
+    </CSIInfo>
+    <LensInfo>
+      <FocalLength>4.52</FocalLength>
+      <FNumber>1.9</FNumber>
+      <TotalFocusDistance>1.2</TotalFocusDistance>
+      <HorizontalViewAngle>65.0</HorizontalViewAngle>
+      <VerticalViewAngle>51.0</VerticalViewAngle>
+      <MinFocusDistance>0.1</MinFocusDistance>
+    </LensInfo>
+  </CameraModuleConfig>
+</CameraConfigurationRoot>

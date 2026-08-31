@@ -22,8 +22,8 @@
     <!-- Nothing -->
     <item name="none">0</item>
 
-    <!-- This is the battery capacity in mAh -->
-    <item name="battery.capacity">2700</item>
+    <!-- This is the battery capacity in mAh. BV-T5E / Talkman stock pack is 3000; 2700 was bullhead. -->
+    <item name="battery.capacity">3000</item>
 
     <!-- Number of cores each CPU cluster contains -->
     <array name="cpu.clusters.cores">

@@ -18,6 +18,15 @@
 
 #include "DumpstateDevice.h"
 
+#include <dirent.h>
+#include <errno.h>
+#include <fnmatch.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include <log/log.h>
 
 #include "DumpstateUtil.h"
@@ -31,6 +40,240 @@ namespace hardware {
 namespace dumpstate {
 namespace V1_0 {
 namespace implementation {
+
+namespace {
+
+/* Health 2.1 / BatteryService / QA-CHECKLIST §1.2: battery + bms + usb + dc (Qi). */
+static const char* const kRequiredPsys[] = {"battery", "bms", "usb", "dc"};
+static constexpr size_t kRequiredPsyCount =
+        sizeof(kRequiredPsys) / sizeof(kRequiredPsys[0]);
+
+static void DumpPowerSupply(int fd, const char* psy) {
+    char dirpath[128];
+    snprintf(dirpath, sizeof(dirpath), "/sys/class/power_supply/%s", psy);
+
+    DIR* dir = opendir(dirpath);
+    if (dir == nullptr) {
+        dprintf(fd, "------ power_supply %s: %s ------\n", psy, strerror(errno));
+        return;
+    }
+
+    char title[96];
+    char path[192];
+    snprintf(path, sizeof(path), "%s/uevent", dirpath);
+    snprintf(title, sizeof(title), "power_supply %s/uevent", psy);
+    DumpFileToFd(fd, title, path);
+
+    struct dirent* de;
+    while ((de = readdir(dir)) != nullptr) {
+        if (de->d_name[0] == '.' || strcmp(de->d_name, "uevent") == 0) {
+            continue;
+        }
+        snprintf(path, sizeof(path), "%s/%s", dirpath, de->d_name);
+        struct stat st;
+        if (lstat(path, &st) != 0 || S_ISDIR(st.st_mode) || S_ISLNK(st.st_mode)) {
+            continue;
+        }
+        if (access(path, R_OK) != 0) {
+            continue;
+        }
+        snprintf(title, sizeof(title), "power_supply %s/%s", psy, de->d_name);
+        DumpFileToFd(fd, title, path);
+    }
+    closedir(dir);
+}
+
+static void DumpTalkmanPowerSupply(int fd) {
+    bool dumped[kRequiredPsyCount] = {};
+
+    DIR* cls = opendir("/sys/class/power_supply");
+    if (cls == nullptr) {
+        dprintf(fd, "------ /sys/class/power_supply: %s ------\n", strerror(errno));
+    } else {
+        dprintf(fd, "------ /sys/class/power_supply ------\n");
+        struct dirent* de;
+        while ((de = readdir(cls)) != nullptr) {
+            if (de->d_name[0] == '.') {
+                continue;
+            }
+            dprintf(fd, "%s\n", de->d_name);
+        }
+        rewinddir(cls);
+        while ((de = readdir(cls)) != nullptr) {
+            if (de->d_name[0] == '.') {
+                continue;
+            }
+            DumpPowerSupply(fd, de->d_name);
+            for (size_t i = 0; i < kRequiredPsyCount; ++i) {
+                if (strcmp(de->d_name, kRequiredPsys[i]) == 0) {
+                    dumped[i] = true;
+                }
+            }
+        }
+        closedir(cls);
+    }
+
+    for (size_t i = 0; i < kRequiredPsyCount; ++i) {
+        if (!dumped[i]) {
+            DumpPowerSupply(fd, kRequiredPsys[i]);
+        }
+    }
+}
+
+/* Read-only: a write to talkman-cci-scan/scan starts a CCI bus walk. */
+static const char* const kCciScanDebugfs[] = {
+        "/sys/kernel/debug/talkman-cci-scan/scan",
+        "/sys/kernel/debug/talkman_cci_scan/scan",
+        "/d/talkman-cci-scan/scan",
+};
+
+/* genfs_contexts / file_contexts sysfs_camera prefixes (msm8992-camera.dtsi). */
+static const char* const kCamssSysfs[] = {
+        "/sys/devices/soc.0/fd8c0000.qcom,msm-cam",
+        "/sys/devices/soc.0/fda0c000.qcom,cci",
+        "/sys/devices/soc.0/fda0ac00.qcom,csiphy",
+        "/sys/devices/soc.0/fda0b000.qcom,csiphy",
+        "/sys/devices/soc.0/fda0b400.qcom,csiphy",
+        "/sys/devices/soc.0/fda08000.qcom,csid",
+        "/sys/devices/soc.0/fda08400.qcom,csid",
+        "/sys/devices/soc.0/fda08800.qcom,csid",
+        "/sys/devices/soc.0/fda08c00.qcom,csid",
+        "/sys/devices/soc.0/fda0a000.qcom,ispif",
+        "/sys/devices/soc.0/fda00000.qcom,irqrouter",
+        "/sys/devices/soc.0/fda04000.qcom,cpp",
+        "/sys/devices/soc.0/fda10000.qcom,vfe",
+        "/sys/devices/soc.0/fda14000.qcom,vfe",
+        "/sys/devices/soc.0/fda1c000.qcom,jpeg",
+        "/sys/devices/soc.0/fdaa0000.qcom,jpeg",
+        "/sys/module/msm_camera",
+        "/sys/module/msm_cci",
+        "/sys/module/msm_csid",
+        "/sys/module/msm_csiphy",
+        "/sys/module/msm_isp",
+        "/sys/module/msm_cpp",
+        "/sys/module/msm_jpeg",
+};
+
+/*
+ * ice5lp2k CDONE + hd3ss460 mux (mmo-usbc.c). Root DT nodes land on
+ * platform; soc.0 is the other of_platform parent. Missing = ENOENT.
+ */
+static const char* const kUsbcSysfs[] = {
+        "/sys/devices/platform/ice5lp2k/cdone",
+        "/sys/devices/soc.0/ice5lp2k/cdone",
+        "/sys/devices/platform/hd3ss460/mux",
+        "/sys/devices/soc.0/hd3ss460/mux",
+};
+
+static void DumpReadableDir(int fd, const char* title, const char* dirpath) {
+    DIR* dir = opendir(dirpath);
+    if (dir == nullptr) {
+        dprintf(fd, "------ %s (%s): %s ------\n", title, dirpath, strerror(errno));
+        return;
+    }
+
+    dprintf(fd, "------ %s (%s) ------\n", title, dirpath);
+
+    char path[256];
+    char file_title[192];
+    struct dirent* de;
+    while ((de = readdir(dir)) != nullptr) {
+        if (de->d_name[0] == '.' || strcmp(de->d_name, "notes") == 0) {
+            continue;
+        }
+        snprintf(path, sizeof(path), "%s/%s", dirpath, de->d_name);
+        struct stat st;
+        if (lstat(path, &st) != 0) {
+            continue;
+        }
+        if (S_ISDIR(st.st_mode)) {
+            if (strcmp(de->d_name, "parameters") == 0) {
+                snprintf(file_title, sizeof(file_title), "%s/%s", title, de->d_name);
+                DumpReadableDir(fd, file_title, path);
+            }
+            continue;
+        }
+        if (S_ISLNK(st.st_mode) || !S_ISREG(st.st_mode)) {
+            continue;
+        }
+        if (access(path, R_OK) != 0) {
+            continue;
+        }
+        snprintf(file_title, sizeof(file_title), "%s/%s", title, de->d_name);
+        DumpFileToFd(fd, file_title, path);
+    }
+    closedir(dir);
+}
+
+/* List dirpath/pattern (path + size). Missing dir or no match: ENOENT.
+ * dump_contents is for text XML only — never cat .kar firmware. */
+static void DumpGlobListing(int fd, const char* title, const char* dirpath,
+                            const char* pattern, bool dump_contents) {
+    DIR* dir = opendir(dirpath);
+    if (dir == nullptr) {
+        dprintf(fd, "------ %s (%s/%s): %s ------\n", title, dirpath, pattern,
+                strerror(errno));
+        return;
+    }
+
+    dprintf(fd, "------ %s (%s/%s) ------\n", title, dirpath, pattern);
+
+    int hits = 0;
+    struct dirent* de;
+    while ((de = readdir(dir)) != nullptr) {
+        if (de->d_name[0] == '.') {
+            continue;
+        }
+        if (fnmatch(pattern, de->d_name, 0) != 0) {
+            continue;
+        }
+
+        char path[256];
+        int n = snprintf(path, sizeof(path), "%s/%s", dirpath, de->d_name);
+        if (n < 0 || n >= (int)sizeof(path)) {
+            continue;
+        }
+
+        struct stat st;
+        if (lstat(path, &st) != 0) {
+            dprintf(fd, "%s: %s\n", path, strerror(errno));
+            continue;
+        }
+        if (!S_ISREG(st.st_mode)) {
+            continue;
+        }
+
+        dprintf(fd, "%s  %lld\n", path, (long long)st.st_size);
+        hits++;
+        if (dump_contents && access(path, R_OK) == 0) {
+            DumpFileToFd(fd, title, path);
+        }
+    }
+    closedir(dir);
+
+    if (hits == 0) {
+        dprintf(fd, "%s: %s\n", pattern, strerror(ENOENT));
+    }
+}
+
+static void DumpTalkmanCameraCciUsbc(int fd) {
+    for (size_t i = 0; i < sizeof(kCciScanDebugfs) / sizeof(kCciScanDebugfs[0]); ++i) {
+        DumpFileToFd(fd, "talkman-cci-scan", kCciScanDebugfs[i]);
+    }
+
+    for (size_t i = 0; i < sizeof(kCamssSysfs) / sizeof(kCamssSysfs[0]); ++i) {
+        DumpReadableDir(fd, "CAMSS", kCamssSysfs[i]);
+    }
+
+    for (size_t i = 0; i < sizeof(kUsbcSysfs) / sizeof(kUsbcSysfs[0]); ++i) {
+        DumpFileToFd(fd, "USB-C", kUsbcSysfs[i]);
+    }
+
+    DumpGlobListing(fd, "OIS firmware", "/vendor/firmware", "bu24210*.kar", false);
+    DumpGlobListing(fd, "camera XML", "/vendor/etc/camera", "*.xml", true);
+}
+
+}  // namespace
 
 // Methods from ::android::hardware::dumpstate::V1_0::IDumpstateDevice follow.
 Return<void> DumpstateDevice::dumpstateBoard(const hidl_handle& handle) {
@@ -55,7 +298,8 @@ Return<void> DumpstateDevice::dumpstateBoard(const hidl_handle& handle) {
     DumpFileToFd(fd, "IPC Router Log", "/d/ipc_logging/ipc_router/log");
     RunCommandToFd(fd, "ION HEAPS", {"/system/bin/sh", "-c", "for d in $(ls -d /d/ion/*); do for f in $(ls $d); do echo --- $d/$f; cat $d/$f; done; done"});
     DumpFileToFd(fd, "dmabuf info", "/d/dma_buf/bufinfo");
-    DumpFileToFd(fd, "Battery Type", "/sys/class/power_supply/bms/battery_type");
+    DumpTalkmanPowerSupply(fd);
+    DumpTalkmanCameraCciUsbc(fd);
     RunCommandToFd(fd, "Temperatures", {"/system/bin/sh", "-c", "for f in emmc_therm msm_therm pa_therm0 xo_therm ; do echo -n \"$f : \" ; cat /sys/class/hwmon/hwmon2/device/$f ; done ; for f in `ls /sys/class/thermal` ; do type=`cat /sys/class/thermal/$f/type` ; temp=`cat /sys/class/thermal/$f/temp` ; echo \"$type: $temp\" ; done"}, CommandOptions::AS_ROOT);
     DumpFileToFd(fd, "dmesg-ramoops-0", "/sys/fs/pstore/dmesg-ramoops-0");
     DumpFileToFd(fd, "dmesg-ramoops-1", "/sys/fs/pstore/dmesg-ramoops-1");

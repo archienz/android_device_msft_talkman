@@ -1,4 +1,4 @@
-# Qualcomm MSM camera
+# Qualcomm MSM camera — mm-qcamera-daemon (init qcamerasvr)
 type camera, domain;
 type camera_exec, exec_type, vendor_file_type, file_type;
 
@@ -14,6 +14,7 @@ allow camera system_server:unix_stream_socket { read write };
 # Interact with other media devices
 allow camera camera_device:chr_file rw_file_perms;
 allow camera gpu_device:chr_file rw_file_perms;
+allow camera video_device:dir r_dir_perms;
 allow camera video_device:chr_file rw_file_perms;
 allow camera { audioserver cameraserver mediaserver surfaceflinger }:fd use;
 hal_client_domain(camera, hal_graphics_allocator)
@@ -21,15 +22,26 @@ hal_client_domain(camera, hal_graphics_allocator)
 allow camera hal_renderscript_hwservice:hwservice_manager find;
 
 # Create camera socket
-allow camera camera_data_file:sock_file { create unlink };
+allow camera camera_data_file:sock_file { create setattr unlink write };
 
 # read/write to /data/misc/camera
 allow camera camera_data_file:dir w_dir_perms;
 allow camera camera_data_file:file create_file_perms;
 
-# write to /sys/kernel/range/enable_ps_sensor
+# /data/vendor/camera (init.talkman.rc mkdir 0770 camera camera)
+allow camera vendor_camera_data_file:dir rw_dir_perms;
+allow camera vendor_camera_data_file:file create_file_perms;
+allow camera vendor_camera_data_file:sock_file create_file_perms;
+
+# CAMSS / CCI / CSIPHY / CSID / ISPIF / VFE / JPEG / CPP + flash.
+# Char nodes: camera_device (/dev/media*, /dev/jpeg*) and video_device
+# (/dev/v4l-subdev*, /dev/video*) already allowed above.
+allow camera sysfs_camera:dir r_dir_perms;
 allow camera sysfs_camera:file rw_file_perms;
-allow camera sysfs_camera:dir search;
+allow camera sysfs_camera:lnk_file r_file_perms;
+allow camera sysfs_leds:dir r_dir_perms;
+allow camera sysfs_leds:file rw_file_perms;
+allow camera sysfs_leds:lnk_file r_file_perms;
 
 # Read to /dev/input
 allow camera input_device:dir r_dir_perms;
@@ -38,20 +50,30 @@ allow camera input_device:chr_file r_file_perms;
 # Find sensorservice
 allow camera sensorservice_service:service_manager find;
 
-# Read persist_camera_file
+# /persist/camera (init.talkman.rc mkdir 0770 camera camera)
 allow camera persist_file:dir search;
-allow camera persist_camera_file:dir search;
-allow camera persist_camera_file:file r_file_perms;
+allow camera persist_camera_file:dir rw_dir_perms;
+allow camera persist_camera_file:file create_file_perms;
 
 allow cameraserver kernel:system module_request;
 allow camera kernel:system module_request;
 
 allow camera debugfs_kgsl:dir { search read open };
-allow camera debugfs_kgsl:file { read write getattr setattr };
+allow camera debugfs_kgsl:file r_file_perms;
 
 allow camera hal_camera_default:fd use;
-allow camera ion_device:chr_file write;
-allow camera proc:file r_file_perms;
-allow camera sysfs:file r_file_perms;
+allow camera ion_device:chr_file rw_file_perms;
+allow camera proc_cpuinfo:file r_file_perms;
 
 allow camera mnt_vendor_file:dir search;
+
+r_dir_file(camera, firmware_file)
+
+# mot_imx230 /vendor/lib: libmmcamera_mot_imx230.so + libchromatix_mot_imx230_*.so
+allow camera vendor_file:dir r_dir_perms;
+allow camera vendor_file:file { r_file_perms execute };
+allow camera vendor_file:lnk_file r_file_perms;
+
+# /vendor/etc/camera XML (msm8992_camera.xml, mot_imx230_chromatix.xml)
+allow camera vendor_configs_file:dir r_dir_perms;
+r_dir_file(camera, camera_config_file)

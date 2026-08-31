@@ -5,13 +5,12 @@ allow init sysfs_g_android_param:file rw_file_perms;
 allow init sysfs_lge_handle_panic_param:dir search;
 allow init sysfs_lge_handle_panic_param:file rw_file_perms;
 allow init sysfs_usb:file { open read write getattr setattr };
+allow init sysfs_usb:dir r_dir_perms;
+allow init init-usb-sh_exec:file { read open getattr execute execute_no_trans };
 allow init sysfs_devices_block:dir { search open };
 allow init sysfs_devices_block:file { read write open getattr setattr };
 allow init sysfs_wlan_fwpath:file { read open write getattr setattr open };
 allow init sysfs_power_management:file { read open write getattr setattr open };
-allow init sysfs_leds:file { read open write getattr setattr open };
-allow init sysfs_leds:lnk_file r_file_perms;
-allow init sysfs_leds:dir search;
 allow init sysfs_graphics:file { read open write getattr setattr open };
 allow init sysfs_graphics:lnk_file r_file_perms;
 allow init sysfs_graphics:dir search;
@@ -20,6 +19,11 @@ allow init sysfs_graphics:dir search;
 allow init sysfs_rfkill0:dir { search read open };
 allow init sysfs_rfkill0:file { read open write getattr setattr };
 allow init sysfs_rfkill0:lnk_file rw_file_perms;
+
+# init.talkman.bt.sh (post-fs exec): persist BD_ADDR chmod / strip sample / OTP
+allow init vendor_shell_exec:file { read open getattr execute execute_no_trans };
+allow init vendor_toolbox_exec:file rx_file_perms;
+allow init persist_file:file { read write getattr setattr unlink };
 
 allow init sysfs:file { setattr getattr };
 
@@ -43,8 +47,21 @@ allow init sysfs_kgsl:file { read write getattr setattr };
 allow init system_file:file mounton;
 
 allow init persist_file:dir mounton;
+allow init persist_file:dir { search write add_name relabelfrom };
+allow init persist_camera_file:dir create_dir_perms;
+
+# chmod /vendor/etc/gps.conf (on boot + post-fs-data)
+allow init gps_conf_file:file { getattr setattr };
 allow init firmware_file:dir mounton;
 
 allow init sysfs_rndis:file rw_file_perms;
 
 allow init sysfs_poweroff:file rw_file_perms;
+
+# on charger / on boot ICL writes (usb + dc + battery psy)
+allow init sysfs_battery:dir r_dir_perms;
+allow init sysfs_battery:file rw_file_perms;
+allow init sysfs_battery:lnk_file r_file_perms;
+allow init sysfs_batteryinfo:dir r_dir_perms;
+allow init sysfs_batteryinfo:file rw_file_perms;
+allow init sysfs_batteryinfo:lnk_file r_file_perms;

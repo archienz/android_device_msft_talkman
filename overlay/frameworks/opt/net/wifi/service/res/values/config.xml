@@ -12,17 +12,47 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
-    <!-- Boolean indicating whether the wifi chipset has 5GHz frequency band support -->
+    <!-- Talkman QCA6174 802.11ac 2x2. No 6 GHz, no 11ax. -->
     <bool translatable="false" name="config_wifi5ghzSupport">true</bool>
+    <bool translatable="false" name="config_wifi6ghzSupport">false</bool>
+    <bool translatable="false" name="config_wifi11axSupportOverride">false</bool>
 
-    <!-- Boolean indicating whether the wifi chipset has background scan support -->
+    <bool translatable="false" name="config_wifiFrameworkMaxNumSpatialStreamDeviceOverrideEnable">true</bool>
+    <integer translatable="false" name="config_wifiFrameworkMaxNumSpatialStreamDeviceOverrideValue">2</integer>
+
+    <!-- WCNSS FastRoamEnabled=1 -->
+    <bool translatable="false" name="config_wifi_fast_bss_transition_enabled">true</bool>
+
     <bool translatable="false" name="config_wifi_background_scan_support">true</bool>
+
+    <!-- Country comes from init.talkman.rc SKU (RM-1105=US, RM-1104/1108=00). RIL MCC is not available. -->
+    <bool translatable="false" name="config_wifi_revert_country_code_on_cellular_loss">true</bool>
+
+    <bool translatable="false" name="config_wifi_turn_off_during_emergency_call">true</bool>
 
     <!-- Configure wifi tcp buffersizes in the form:
          rmem_min,rmem_def,rmem_max,wmem_min,wmem_def,wmem_max -->
     <string name="config_wifi_tcp_buffers" translatable="false">524288,6291456,8291456,524288,6291456,8291456</string>
 
-    <!-- Enable WPA2 to WPA3 auto-upgrade -->
+    <!-- talkman qwlan30.bin is Windows-era QCA6174 firmware. No WPA3 SAE. -->
     <bool translatable="false" name="config_wifiSaeUpgradeEnabled">false</bool>
+    <bool translatable="false" name="config_wifiSaeUpgradeOffloadEnabled">false</bool>
+    <bool translatable="false" name="config_wifi_softap_sae_supported">false</bool>
+
+    <!-- gApAutoChannelSelection=0 in WCNSS_qcom_cfg.ini -->
+    <bool translatable="false" name="config_wifi_softap_acs_supported">false</bool>
+    <bool translatable="false" name="config_wifi_softap_ieee80211ac_supported">false</bool>
+    <bool translatable="false" name="config_wifiSoftapIeee80211axSupported">false</bool>
+    <bool translatable="false" name="config_wifiSoftap6ghzSupported">false</bool>
+
+    <!-- Empty = no extra clamp; SKU country code is the regulator (US 1-11 vs world 1-13). -->
+    <string translatable="false" name="config_wifiSoftap2gChannelList"></string>
+    <string translatable="false" name="config_wifiSoftap5gChannelList"></string>
+    <string translatable="false" name="config_wifiSoftap6gChannelList"></string>
+
+    <!-- qcacld-2.0 on CAF 3.10 does not expose MAC randomization. -->
+    <bool translatable="false" name="config_wifi_connected_mac_randomization_supported">false</bool>
+    <bool translatable="false" name="config_wifi_p2p_mac_randomization_supported">false</bool>
+    <bool translatable="false" name="config_wifi_ap_mac_randomization_supported">false</bool>
 
 </resources>

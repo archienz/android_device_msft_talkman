@@ -8,3 +8,18 @@ allow hal_camera scheduling_policy_service:service_manager find;
 # access /data/misc/camera
 allow hal_camera camera_data_file:dir create_dir_perms;
 allow hal_camera camera_data_file:file create_file_perms;
+
+# /data/vendor/camera
+allow hal_camera vendor_camera_data_file:dir create_dir_perms;
+allow hal_camera vendor_camera_data_file:file create_file_perms;
+
+# /persist/camera
+allow hal_camera persist_file:dir search;
+allow hal_camera persist_camera_file:dir r_dir_perms;
+allow hal_camera persist_camera_file:file r_file_perms;
+
+allow hal_camera sysfs_camera:dir r_dir_perms;
+allow hal_camera sysfs_camera:file r_file_perms;
+allow hal_camera sysfs_leds:dir r_dir_perms;
+allow hal_camera sysfs_leds:file rw_file_perms;
+allow hal_camera sysfs_leds:lnk_file r_file_perms;

@@ -127,3 +127,29 @@ get-set-forall /sys/devices/soc.0/qcom,bcl.*/mode enable
 
 # set GPU default power level to 5 (180MHz) instead of 4 (305MHz)
 write /sys/class/kgsl/kgsl-3d0/default_pwrlevel 5
+
+# Power HAL runs as system. Nodes it writes (A57 online, interactive created).
+chown system system /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
+chown system system /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+chown system system /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq
+chown system system /sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq
+chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
+chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq
+chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq
+chown system system /sys/devices/system/cpu/cpu0/cpufreq/interactive/hispeed_freq
+chown system system /sys/devices/system/cpu/cpu4/cpufreq/interactive/hispeed_freq
+chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/interactive/hispeed_freq
+chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/interactive/hispeed_freq
+chown system system /sys/module/cpu_boost/parameters/input_boost_freq
+chown system system /sys/module/cpu_boost/parameters/input_boost_ms
+chmod 0664 /sys/module/cpu_boost/parameters/input_boost_freq
+chmod 0664 /sys/module/cpu_boost/parameters/input_boost_ms
+chown system system /sys/module/msm_performance/parameters/cpu_max_freq
+chmod 0664 /sys/module/msm_performance/parameters/cpu_max_freq
+chown system system /sys/class/kgsl/kgsl-3d0/max_pwrlevel
+chown system system /sys/class/kgsl/kgsl-3d0/min_pwrlevel
+chown system system /sys/class/kgsl/kgsl-3d0/default_pwrlevel
+chmod 0664 /sys/class/kgsl/kgsl-3d0/max_pwrlevel
+chmod 0664 /sys/class/kgsl/kgsl-3d0/min_pwrlevel
+chmod 0664 /sys/class/kgsl/kgsl-3d0/default_pwrlevel

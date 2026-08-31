@@ -1,0 +1,2 @@
+# qpnp-haptic sysfs: sysfs_vibrator.te
+# Platform already: hal_vibrator sysfs_vibrator file rw + dir search.

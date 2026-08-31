@@ -1,0 +1,33 @@
+# qpnp-haptic timed_output. Types come from platform public/file.te.
+# HIDL 1.0 service opens:
+#   /sys/class/timed_output/vibrator/enable
+#   /sys/class/timed_output/vibrator/vtg_level
+#   /sys/class/timed_output/vibrator/vtg_min
+#   /sys/class/timed_output/vibrator/vtg_max
+#   /sys/class/timed_output/vibrator/vtg_default
+# Class path is a symlink to /sys/devices/virtual/timed_output/vibrator.
+# Platform genfs only labels .../vibrator/enable; talkman genfs labels the dir.
+
+# android.hardware.vibrator@1.0-service.talkman.rc post-fs-data + ueventd.talkman.rc
+allow init sysfs_vibrator:dir r_dir_perms;
+allow init sysfs_vibrator:file { getattr setattr };
+allow init sysfs_vibrator:lnk_file r_file_perms;
+allow ueventd sysfs_vibrator:dir r_dir_perms;
+allow ueventd sysfs_vibrator:file { getattr setattr };
+allow ueventd sysfs_vibrator:lnk_file r_file_perms;
+
+r_dir_file(hal_vibrator_default, sysfs_vibrator)
+allow hal_vibrator_default sysfs_vibrator:file rw_file_perms;
+allow hal_vibrator_default sysfs_vibrator:lnk_file r_file_perms;
+
+# /sys/class is unlabeled sysfs until /class/timed_output genfs matches.
+allow hal_vibrator_default sysfs:dir search;
+allow hal_vibrator_default sysfs:lnk_file r_file_perms;
+
+r_dir_file(dumpstate, sysfs_vibrator)
+r_dir_file(hal_dumpstate_impl, sysfs_vibrator)
+
+userdebug_or_eng(`
+  r_dir_file(shell, sysfs_vibrator)
+  r_dir_file(su, sysfs_vibrator)
+')

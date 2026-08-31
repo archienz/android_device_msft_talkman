@@ -15,7 +15,19 @@
 -->
 
 <audioPolicyConfiguration version="1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-    <globalConfiguration speaker_drc_enabled="true"/>
+    <!--
+        Default output is AUDIO_DEVICE_OUT_SPEAKER. audio.primary.msm8992 maps
+        that to mixer path "speaker" / backend QUAT_MI2S_RX (TI TAS2553 on
+        BLSP1 I2C-2 @ 0x40). speaker_drc_enabled would tell AudioPolicy to
+        treat the speaker as a WCD9330 speaker-protection device
+        (SND_DEVICE_OUT_SPEAKER_PROTECTED + SPK DRV VI-sense). That codec
+        path is not wired on talkman; TAS has its own protection.
+        BoardConfig AUDIO_FEATURE_ENABLED_SPKR_PROTECTION=false and
+        persist.speaker.prot.enable=false already keep the HAL on the TAS
+        path. Do not add a speaker-prot devicePort — it is not an Android
+        AUDIO_DEVICE and the mixer node would be missing.
+    -->
+    <globalConfiguration speaker_drc_enabled="false"/>
 
     <modules>
         <module name="primary" halVersion="2.0">
@@ -80,6 +92,7 @@
             <devicePorts>
                 <devicePort tagName="Earpiece" type="AUDIO_DEVICE_OUT_EARPIECE" role="sink">
                 </devicePort>
+                <!-- TAS2553 loudspeaker, HAL mixer "speaker", QUAT_MI2S_RX. -->
                 <devicePort tagName="Speaker" type="AUDIO_DEVICE_OUT_SPEAKER" role="sink">
                 </devicePort>
                 <devicePort tagName="Wired Headset" type="AUDIO_DEVICE_OUT_WIRED_HEADSET" role="sink">

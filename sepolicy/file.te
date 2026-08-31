@@ -24,6 +24,9 @@ type qmuxd_socket, file_type;
 type location_data_file, file_type, data_file_type, core_data_file_type;
 type location_app_data_file, file_type, data_file_type;
 
+# loc_eng + GNSS HIDL. /vendor/etc/gps.conf (system copy stays system_file).
+type gps_conf_file, file_type, vendor_file_type;
+
 # Socket node needed by ims_data daemon
 type ims_socket, file_type;
 
@@ -47,6 +50,12 @@ type persist_drm_file, file_type;
 type persist_wifi_file, file_type;
 type persist_sensortool_file, file_type;
 type persist_camera_file, file_type;
+
+# mm-qcamera-daemon /data/vendor/camera (not core camera_data_file)
+type vendor_camera_data_file, file_type, data_file_type;
+
+# mm-qcamera-daemon /vendor/etc/camera XML (msm8992_camera, mot_imx230_chromatix)
+type camera_config_file, file_type, vendor_file_type;
 
 # File types required by mdm-helper
 type sysfs_msm_subsys, sysfs_type, fs_type;
@@ -89,7 +98,7 @@ type sysfs_audio, sysfs_type, fs_type;
 type debugfs_kgsl, fs_type, debugfs_type;
 type sysfs_kgsl, fs_type, sysfs_type;
 
-# type for healthd
+# QPNP smbcharger / fg power_supply (Health 2.1 also uses sysfs_batteryinfo)
 type sysfs_battery, fs_type, sysfs_type;
 
 # type for privapp

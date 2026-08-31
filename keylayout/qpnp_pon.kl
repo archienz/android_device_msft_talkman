@@ -1,3 +1,6 @@
+# Lumia 950 (talkman) qpnp-power-on — input name "qpnp_pon"
+# KPDPWR (pon-type 0) = POWER 116; RESIN (pon-type 1) = VOLUME_DOWN 114.
+# msm-pm8994.dtsi qcom,pon_1 / qcom,pon_2. Volume-up is gpio-keys, not PON.
+
 key 116   POWER
-key 115   VOLUME_UP
 key 114   VOLUME_DOWN

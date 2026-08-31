@@ -22,4 +22,16 @@
     <!-- [CHAR_LIMIT=NONE] Battery saver: Feature description -->
     <string name="battery_saver_description">To help improve battery life, battery saver reduces your device’s performance and limits vibration, ambient display, location services, and most background data. Email, messaging, and other apps that rely on syncing may not update unless you open them.\n\nBattery saver turns off automatically when your device is charging.</string>
 
+    <!--
+         Talkman has no USB-PD PHY and HVDCP/QC is off. Cable is 5 V × ~1.8 A.
+         Qi is ~900 mA. Do not label the path PD or Quick Charge. Fast
+         threshold is 15 W so "Charging rapidly" never lights on this port.
+    -->
+    <string name="battery_info_status_charging">Charging (5V 1.8A)</string>
+    <string name="battery_info_status_charging_ac">Charging (5V 1.8A)</string>
+    <string name="battery_info_status_charging_usb">Charging (5V 1.8A)</string>
+    <string name="battery_info_status_charging_fast">Charging (5V 1.8A)</string>
+    <string name="battery_info_status_charging_slowly">Charging slowly</string>
+    <string name="battery_info_status_charging_wireless">Wireless charging (Qi 900mA)</string>
+
 </resources>

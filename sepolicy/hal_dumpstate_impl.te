@@ -13,10 +13,13 @@ allow hal_dumpstate_impl debugfs_rpm:file r_file_perms;
 allow hal_dumpstate_impl debugfs_ipc:dir r_dir_perms;
 allow hal_dumpstate_impl debugfs_ipc:file r_file_perms;
 allow hal_dumpstate_impl debugfs_bufinfo:file r_file_perms;
-allow hal_dumpstate_impl sysfs_batteryinfo:file r_file_perms;
+# Walk /sys/class/power_supply/{battery,bms,usb,dc} (Health 2.1 + dumpstateBoard).
+r_dir_file(hal_dumpstate_impl, sysfs_batteryinfo)
+r_dir_file(hal_dumpstate_impl, sysfs_battery)
+r_dir_file(hal_dumpstate_impl, sysfs_usb)
 allow hal_dumpstate_impl sysfs_devices_system_cpu:dir r_dir_perms;
 allow hal_dumpstate_impl sysfs_devices_system_cpu:file r_file_perms;
-allow hal_dumpstate_impl sysfs_hwmon:file r_file_perms;
-allow hal_dumpstate_impl sysfs_thermal:dir r_dir_perms;
+r_dir_file(hal_dumpstate_impl, sysfs_hwmon)
+r_dir_file(hal_dumpstate_impl, sysfs_thermal)
 allow hal_dumpstate_impl proc_interrupts:file r_file_perms;
 allow hal_dumpstate_impl pstorefs:dir r_dir_perms;

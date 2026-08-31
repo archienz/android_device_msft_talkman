@@ -1,0 +1,8 @@
+# Lumia 950 (talkman) Synaptics RMI4 F1A 0D
+# Input name synaptics_rmi4_i2c (DRIVER_NAME in synaptics_i2c_rmi4.c).
+# DT synaptics@4b synaptics,button-map = <158 172 217> (touch.dtsi).
+# Linux KEY_BACK / KEY_HOMEPAGE / KEY_SEARCH. No FPC fingerprint keys.
+
+key 158   BACK
+key 172   HOME
+key 217   SEARCH

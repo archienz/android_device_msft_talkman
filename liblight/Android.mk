@@ -31,5 +31,8 @@ LOCAL_MODULE_RELATIVE_PATH := hw
 LOCAL_SHARED_LIBRARIES := liblog
 LOCAL_MODULE := lights.talkman
 LOCAL_MODULE_TAGS := optional
+LOCAL_PROPRIETARY_MODULE := true
+LOCAL_CFLAGS := -Wall -Werror
+LOCAL_REQUIRED_MODULES := android.hardware.light@2.0-service.talkman
 
 include $(BUILD_SHARED_LIBRARY)

@@ -1,5 +1,7 @@
-allow healthd sysfs_thermal:dir search;
-allow healthd sysfs_thermal:file { open read };
-allow healthd sysfs_battery:dir search;
-allow healthd sysfs_battery:file { open read getattr };
-allow healthd sysfs:file { open read getattr };
+# healthd is also a Health HAL server in charger mode (LOS 18.1).
+# Same sysfs walk as android.hardware.health@2.1-service.
+r_dir_file(healthd, sysfs_thermal)
+r_dir_file(healthd, sysfs_battery)
+r_dir_file(healthd, sysfs_batteryinfo)
+r_dir_file(healthd, sysfs_usb)
+r_dir_file(healthd, sysfs_wakeup)

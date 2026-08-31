@@ -2,7 +2,12 @@
 type location, domain;
 type location_exec, exec_type, vendor_file_type, file_type;
 
+# /data/misc/location is core_data_file_type (XTRA bin, mq, xtwifi).
+typeattribute location data_between_core_and_vendor_violators;
+
 init_daemon_domain(location)
+net_domain(location)
+wakelock_use(location)
 
 binder_use(location)
 binder_call(location, per_mgr)
@@ -22,15 +27,30 @@ allow location self:netlink_route_socket create_socket_perms_no_ioctl;
 allow location self:udp_socket create_socket_perms;
 allowxperm location self:udp_socket ioctl { SIOCGIFINDEX SIOCGIFHWADDR SIOCIWFIRSTPRIV_05 };
 
+# XTRA HTTPS 443 + SUPL TCP 7275 over Wi-Fi. SIOCGIFHWADDR is privileged.
+allow location self:tcp_socket create_stream_socket_perms;
+allow location port_type:tcp_socket name_connect;
+allow location node_type:tcp_socket node_bind;
+unix_socket_connect(location, dnsproxyd, netd)
+unix_socket_connect(location, fwmarkd, netd)
+allowxperm location self:tcp_socket ioctl { SIOCGIFINDEX SIOCGIFHWADDR SIOCGIFCONF SIOCGIFFLAGS SIOCGIFADDR };
+
+# wlan0 + /proc/net for XTRA/SUPL path selection (RIL is P2).
+r_dir_file(location, sysfs_wlan0)
+r_dir_file(location, sysfs_net)
+allow location proc_net:dir r_dir_perms;
+allow location proc_net:file r_file_perms;
+
 # create location socket location-mq-s
 allow location location_data_file:sock_file { create setattr unlink };
 
 # daemon starts as root to obtain all DAC capabilities
 # TODO start as gps user and use filesystem-config to give
 # proper DAC capabilities.
-allow location self:capability { setuid setgid net_admin net_raw };
+allow location self:capability { setuid setgid net_admin net_raw net_bind_service };
+allow location self:capability2 wake_alarm;
 
-# execute /system/bin/lowi-server and /vendor/bin/slim_daemon
+# execute /vendor/bin/lowi-server and /vendor/bin/slim_daemon
 allow location location_exec:file rx_file_perms;
 
 # slim_daemon receives data from Loc_hal_worker

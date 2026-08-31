@@ -13,9 +13,13 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<!-- Volume section defines a volume curve for a given use case and device category.
-It contains a list of points of this curve expressing the attenuation in Millibels for a given
-volume index from 0 to 100.
+<!-- Volume curves for the primary HAL. Filename is historical (bullhead DRC).
+     speaker_drc_enabled is false in audio_policy_configuration.xml: talkman
+     loudspeaker is TAS2553 on QUAT_MI2S, not WCD9330 speaker-prot. These
+     tables are the installed volume section, not a WCD DRC overlay.
+     Volume section defines a volume curve for a given use case and device category.
+     It contains a list of points of this curve expressing the attenuation in Millibels for a given
+     volume index from 0 to 100.
 <volume stream=”AUDIO_STREAM_MUSIC” deviceCategory=””>
 <point>0,-9600</point>
 <point>100,0</point>

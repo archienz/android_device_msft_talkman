@@ -1,5 +1,8 @@
 #type alarm_device, dev_type, mlstrustedobject;
 
+# /dev/pn547 is AOSP nfc_device (file_contexts). Do not add snfc_* or pn548.
+# Kernel nq-nci; userspace BOARD_NFC_DEVICE="/dev/pn547".
+
 #Define the logging device type
 type diag_device, dev_type, mlstrustedobject;
 type smem_log_device, dev_type;

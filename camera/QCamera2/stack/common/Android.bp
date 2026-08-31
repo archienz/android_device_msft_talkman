@@ -1,0 +1,6 @@
+// Headers for libmmcamera_interface (LOCAL_HEADER_LIBRARIES += camera_common_headers).
+cc_library_headers {
+    name: "camera_common_headers",
+    export_include_dirs: ["."],
+    vendor: true,
+}

@@ -1,2 +1,7 @@
+# Lumia 950 (talkman) gpio-keys — input-name "gpio-keys"
+# PM8994 GPIO 3/4/5 (ACPI BTNS 0x0610 / 0x0618 / 0x0620).
+# WOA KeypadDeviceImplLib: 115 GPIO3, 766 GPIO4; DT sidekeys.dtsi also 528 GPIO5.
+
 key 115   VOLUME_UP
-key 114   VOLUME_DOWN
+key 766   CAMERA
+key 528   FOCUS

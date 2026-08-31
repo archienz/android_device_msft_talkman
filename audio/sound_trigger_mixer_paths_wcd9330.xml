@@ -26,6 +26,12 @@
 <!--- OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN    -->
 <!--- IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                             -->
 
+<!--
+     Tomtom / WCD9330 sound-trigger mixer. audio.primary and sound_trigger
+     HALs open this file when snd_card_name is msm8994-tomtom-snd-card.
+     MAD listens on the codec DMIC, not TAS2553. Speaker default remains
+     QUAT_MI2S_RX in mixer_paths.xml / audio_platform_info.xml.
+-->
 <mixer>
     <!-- These are the initial mixer settings -->
     <ctl name="LSM1 MUX" value="None" />
@@ -73,6 +79,12 @@
     <path name="listen-voice-wakeup-8">
         <ctl name="SLIMBUS_5_TX LSM Function" value="AUDIO" />
         <ctl name="LSM8 MUX" value="SLIMBUS_5_TX" />
+    </path>
+
+   <path name="listen-cpe-handset-mic low-speed-intf">
+        <ctl name="MADONOFF Switch" value="1" />
+        <ctl name="MAD Input" value="DMIC1" />
+	<ctl name="CPE AFE MAD Enable" value="1"/>
     </path>
 
     <path name="listen-cpe-handset-mic">

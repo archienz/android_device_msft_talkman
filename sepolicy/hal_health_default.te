@@ -1,6 +1,13 @@
-allow hal_health_default sysfs:file r_file_perms;
-allow hal_health_default sysfs_battery:dir search;
-allow hal_health_default sysfs_battery:file r_file_perms;
-
-#allow healthd sysfs_thermal:dir search;
-#allow healthd sysfs_thermal:file { open read };
+# Health 2.1 BatteryMonitor (LineageOS/android_system_core lineage-18.1):
+#   opendir /sys/class/power_supply
+#   read type on every node (battery, bms, usb, dc)
+#   Battery (qpnp-smbcharger): status health present capacity voltage_now
+#     current_now temp charge_full charge_full_design charge_counter
+#     cycle_count technology current_avg capacity_level time_to_full_now
+#   USB/Wireless: online type current_max voltage_max
+# qpnp-fg bms type is "BMS" (skipped for SoC) but type itself is still read.
+r_dir_file(hal_health_default, sysfs_batteryinfo)
+r_dir_file(hal_health_default, sysfs_battery)
+r_dir_file(hal_health_default, sysfs_usb)
+r_dir_file(hal_health_default, sysfs_thermal)
+r_dir_file(hal_health_default, sysfs_wakeup)

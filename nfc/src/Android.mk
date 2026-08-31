@@ -26,5 +26,11 @@ LOCAL_MODULE_PATH_32 := $(TARGET_OUT_VENDOR)/firmware
 LOCAL_MODULE_PATH_64 := $(TARGET_OUT_VENDOR)/firmware
 LOCAL_MODULE_TAGS := optional
 LOCAL_PACK_MODULE_RELOCATIONS := false
+# nfc_nci.msm8992.so dlopens /system/vendor/firmware/libpn547_fw.so
+# Array is WOA nxppn547fw.dat (FirmwareMap 5/8), not the Sony 8.1 dump.
+LOCAL_POST_INSTALL_CMD := \
+    mkdir -p $(TARGET_OUT)/vendor/firmware && \
+    ln -sfn /vendor/firmware/libpn547_fw.so \
+        $(TARGET_OUT)/vendor/firmware/libpn547_fw.so
 
 include $(BUILD_SHARED_LIBRARY)

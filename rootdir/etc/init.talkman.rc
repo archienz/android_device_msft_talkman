@@ -19,6 +19,9 @@ import /vendor/etc/init/hw/init.talkman.diag.rc
 import /vendor/etc/init/hw/init.talkman.ramdump.rc
 import /vendor/etc/init/hw/init.talkman.misc.rc
 import /vendor/etc/init/hw/init.talkman.sensors.rc
+import /vendor/etc/init/hw/init.talkman.camera.rc
+import /vendor/etc/init/hw/init.talkman.nfc.rc
+import /vendor/etc/init/hw/init.talkman.gps.rc
 
 on early-init
     mount debugfs debugfs /sys/kernel/debug
@@ -47,6 +50,72 @@ on charger
     write /sys/module/lpm_levels/system/a53/a53-l2-retention/idle_enabled 0
     write /sys/module/lpm_levels/system/a57/a57-l2-retention/idle_enabled 0
 
+    # PMI8994 smbcharger off-mode: 5 V cable ceiling ~9 W, Qi DCIN 900 mA.
+    # Kernel already asserted WC_EN. No PD / HVDCP path exists.
+    write /sys/class/power_supply/usb/current_max 1800000
+    write /sys/class/power_supply/dc/current_max 900000
+
+    # Off-mode Health/charger: qpnp-fg (bms) + smbcharger (battery/usb/dc).
+    chown system system /sys/class/power_supply/battery
+    chown system system /sys/class/power_supply/bms
+    chown system system /sys/class/power_supply/usb
+    chown system system /sys/class/power_supply/dc
+    chmod 0755 /sys/class/power_supply/battery
+    chmod 0755 /sys/class/power_supply/bms
+    chmod 0755 /sys/class/power_supply/usb
+    chmod 0755 /sys/class/power_supply/dc
+    chmod 0644 /sys/class/power_supply/battery/uevent
+    chmod 0644 /sys/class/power_supply/battery/status
+    chmod 0644 /sys/class/power_supply/battery/health
+    chmod 0644 /sys/class/power_supply/battery/present
+    chmod 0644 /sys/class/power_supply/battery/capacity
+    chmod 0644 /sys/class/power_supply/battery/voltage_now
+    chmod 0644 /sys/class/power_supply/battery/current_now
+    chmod 0644 /sys/class/power_supply/battery/temp
+    chmod 0644 /sys/class/power_supply/battery/charge_full
+    chmod 0644 /sys/class/power_supply/battery/charge_full_design
+    chmod 0644 /sys/class/power_supply/battery/charge_counter
+    chmod 0644 /sys/class/power_supply/battery/cycle_count
+    chmod 0644 /sys/class/power_supply/battery/technology
+    chmod 0644 /sys/class/power_supply/battery/type
+    chmod 0644 /sys/class/power_supply/bms/uevent
+    chmod 0644 /sys/class/power_supply/bms/type
+    chmod 0644 /sys/class/power_supply/bms/capacity
+    chmod 0644 /sys/class/power_supply/bms/voltage_now
+    chmod 0644 /sys/class/power_supply/bms/current_now
+    chmod 0644 /sys/class/power_supply/bms/temp
+    chmod 0644 /sys/class/power_supply/bms/battery_type
+    chmod 0644 /sys/class/power_supply/bms/resistance_id
+    chmod 0644 /sys/class/power_supply/bms/charge_full
+    chmod 0644 /sys/class/power_supply/bms/charge_full_design
+    chmod 0644 /sys/class/power_supply/bms/cycle_count
+    chmod 0644 /sys/class/power_supply/usb/uevent
+    chmod 0644 /sys/class/power_supply/usb/online
+    chmod 0644 /sys/class/power_supply/usb/type
+    chmod 0644 /sys/class/power_supply/usb/present
+    chmod 0644 /sys/class/power_supply/dc/uevent
+    chmod 0644 /sys/class/power_supply/dc/online
+    chmod 0644 /sys/class/power_supply/dc/type
+    chown system system /sys/class/power_supply/battery/charging_enabled
+    chown system system /sys/class/power_supply/battery/battery_charging_enabled
+    chown system system /sys/class/power_supply/battery/current_max
+    chown system system /sys/class/power_supply/battery/input_current_max
+    chown system system /sys/class/power_supply/battery/system_temp_level
+    chown system system /sys/class/power_supply/usb/current_max
+    chown system system /sys/class/power_supply/dc/current_max
+    chmod 0664 /sys/class/power_supply/battery/charging_enabled
+    chmod 0664 /sys/class/power_supply/battery/battery_charging_enabled
+    chmod 0664 /sys/class/power_supply/battery/current_max
+    chmod 0664 /sys/class/power_supply/battery/input_current_max
+    chmod 0664 /sys/class/power_supply/battery/system_temp_level
+    chmod 0664 /sys/class/power_supply/usb/current_max
+    chmod 0664 /sys/class/power_supply/dc/current_max
+
+    exec - root root -- /vendor/bin/init.talkman.charger.sh
+
+    start thermal-engine
+    start charger
+
 on property:sys.boot_completed=1
     # allow CPUs to go in deeper idle state than C0
     write /sys/module/lpm_levels/parameters/sleep_disabled 0
@@ -59,6 +128,11 @@ on property:sys.boot_completed=1
     write /sys/block/dm-2/queue/read_ahead_kb 128
     write /sys/block/mmcblk0/queue/iostats 1
 
+    start thermal-engine
+    start loc_launcher
+    start vendor.gnss_service
+    start qcamerasvr
+    start talkman-cci-perm
     restart cameraserver
 
 on init
@@ -67,6 +141,10 @@ on init
     write /sys/block/zram0/max_comp_streams 4
 
     write /proc/sys/vm/page-cluster 0
+
+    # Gadget is g_android (CONFIG_USB_G_ANDROID). init.talkman.usb.rc
+    # owns adb/mtp. No CONFIG_USB_CONFIGFS, no PD PHY.
+    setprop sys.usb.configfs 0
 
 on fs
     mount_all /vendor/etc/fstab.talkman --early
@@ -106,6 +184,118 @@ on boot
     # execute script to set initial CPU settings
     # don't run as a service to avoid race conditions
     exec - root root system -- /vendor/bin/init.talkman.power.sh
+
+    # Qi ICL. USB ICL is set by smbcharger from detection (SDP 500 / DCP ≤ 1800).
+    write /sys/class/power_supply/dc/current_max 900000
+
+    # Health 2.1 / dumpstate: qpnp-fg bms + smbcharger battery/usb/dc.
+    chown system system /sys/class/power_supply/battery
+    chown system system /sys/class/power_supply/bms
+    chown system system /sys/class/power_supply/usb
+    chown system system /sys/class/power_supply/dc
+    chmod 0755 /sys/class/power_supply/battery
+    chmod 0755 /sys/class/power_supply/bms
+    chmod 0755 /sys/class/power_supply/usb
+    chmod 0755 /sys/class/power_supply/dc
+    chmod 0644 /sys/class/power_supply/battery/uevent
+    chmod 0644 /sys/class/power_supply/battery/status
+    chmod 0644 /sys/class/power_supply/battery/health
+    chmod 0644 /sys/class/power_supply/battery/present
+    chmod 0644 /sys/class/power_supply/battery/capacity
+    chmod 0644 /sys/class/power_supply/battery/voltage_now
+    chmod 0644 /sys/class/power_supply/battery/current_now
+    chmod 0644 /sys/class/power_supply/battery/temp
+    chmod 0644 /sys/class/power_supply/battery/charge_full
+    chmod 0644 /sys/class/power_supply/battery/charge_full_design
+    chmod 0644 /sys/class/power_supply/battery/charge_counter
+    chmod 0644 /sys/class/power_supply/battery/cycle_count
+    chmod 0644 /sys/class/power_supply/battery/technology
+    chmod 0644 /sys/class/power_supply/battery/type
+    chmod 0644 /sys/class/power_supply/bms/uevent
+    chmod 0644 /sys/class/power_supply/bms/type
+    chmod 0644 /sys/class/power_supply/bms/capacity
+    chmod 0644 /sys/class/power_supply/bms/voltage_now
+    chmod 0644 /sys/class/power_supply/bms/current_now
+    chmod 0644 /sys/class/power_supply/bms/temp
+    chmod 0644 /sys/class/power_supply/bms/battery_type
+    chmod 0644 /sys/class/power_supply/bms/resistance_id
+    chmod 0644 /sys/class/power_supply/bms/charge_full
+    chmod 0644 /sys/class/power_supply/bms/charge_full_design
+    chmod 0644 /sys/class/power_supply/bms/cycle_count
+    chmod 0644 /sys/class/power_supply/usb/uevent
+    chmod 0644 /sys/class/power_supply/usb/online
+    chmod 0644 /sys/class/power_supply/usb/type
+    chmod 0644 /sys/class/power_supply/usb/present
+    chmod 0644 /sys/class/power_supply/dc/uevent
+    chmod 0644 /sys/class/power_supply/dc/online
+    chmod 0644 /sys/class/power_supply/dc/type
+    chown system system /sys/class/power_supply/battery/charging_enabled
+    chown system system /sys/class/power_supply/battery/battery_charging_enabled
+    chown system system /sys/class/power_supply/battery/current_max
+    chown system system /sys/class/power_supply/battery/input_current_max
+    chown system system /sys/class/power_supply/battery/system_temp_level
+    chown system system /sys/class/power_supply/usb/current_max
+    chown system system /sys/class/power_supply/dc/current_max
+    chmod 0664 /sys/class/power_supply/battery/charging_enabled
+    chmod 0664 /sys/class/power_supply/battery/battery_charging_enabled
+    chmod 0664 /sys/class/power_supply/battery/current_max
+    chmod 0664 /sys/class/power_supply/battery/input_current_max
+    chmod 0664 /sys/class/power_supply/battery/system_temp_level
+    chmod 0664 /sys/class/power_supply/usb/current_max
+    chmod 0664 /sys/class/power_supply/dc/current_max
+
+    # loc_eng / GNSS HIDL (user gps) and loc_launcher. Image is 0644; chmod
+    # is a no-op on ro vendor/system if already set.
+    chmod 0644 /vendor/etc/gps.conf
+    chmod 0644 /system/etc/gps.conf
+    chmod 0644 /vendor/etc/izat.conf
+    chmod 0644 /vendor/etc/sap.conf
+    chmod 0644 /vendor/etc/flp.conf
+    chmod 0644 /vendor/etc/lowi.conf
+    chmod 0644 /system/etc/thermal-engine-8992.conf
+    chmod 0644 /vendor/etc/thermal-engine-8992.conf
+
+    # thermal HAL reads zone 1/8-10/12-14 + xo_therm.
+    chmod 0644 /sys/class/thermal/thermal_zone1/temp
+    chmod 0644 /sys/class/thermal/thermal_zone8/temp
+    chmod 0644 /sys/class/thermal/thermal_zone9/temp
+    chmod 0644 /sys/class/thermal/thermal_zone10/temp
+    chmod 0644 /sys/class/thermal/thermal_zone12/temp
+    chmod 0644 /sys/class/thermal/thermal_zone13/temp
+    chmod 0644 /sys/class/thermal/thermal_zone14/temp
+    chmod 0644 /sys/class/hwmon/hwmon2/device/xo_therm
+    chmod 0644 /sys/class/hwmon/hwmon2/device/emmc_therm
+    chmod 0644 /sys/class/hwmon/hwmon2/device/msm_therm
+    chmod 0644 /sys/class/hwmon/hwmon2/device/pa_therm0
+
+    # mm-qcamera-daemon char nodes (ueventd also labels these).
+    chown system camera /dev/video0
+    chown system camera /dev/video1
+    chown system camera /dev/media0
+    chown system camera /dev/media1
+    chown system camera /dev/jpeg0
+    chown system camera /dev/v4l-subdev0
+    chmod 0660 /dev/video0
+    chmod 0660 /dev/video1
+    chmod 0660 /dev/media0
+    chmod 0660 /dev/media1
+    chmod 0660 /dev/jpeg0
+    chmod 0660 /dev/v4l-subdev0
+    chown system camera /sys/class/leds/led:flash_0/brightness
+    chown system camera /sys/class/leds/led:flash_1/brightness
+    chown system camera /sys/class/leds/led:flash_torch/brightness
+    chmod 0660 /sys/class/leds/led:flash_0/brightness
+    chmod 0660 /sys/class/leds/led:flash_1/brightness
+    chmod 0660 /sys/class/leds/led:flash_torch/brightness
+
+    start thermal-engine
+    start qcamerasvr
+
+    # Perms only. Do not echo 1 (that would invent a slave-id in logs).
+    chmod 0755 /sys/kernel/debug/talkman-cci-scan
+    chmod 0660 /sys/kernel/debug/talkman-cci-scan/scan
+    chown root shell /sys/kernel/debug/talkman-cci-scan
+    chown root shell /sys/kernel/debug/talkman-cci-scan/scan
 
     # update foreground cpuset now that processors are up
     # foreground gets all CPUs except CPU 3
@@ -173,15 +363,6 @@ on boot
     write /proc/sys/net/core/rmem_max  8388608
     write /proc/sys/net/core/wmem_max  8388608
 
-    # permissions for NFC
-    chmod 0600 /dev/pn547
-    chown nfc nfc /dev/pn547
-    setprop debug.nfc.fw_download "true"
-    setprop debug.nfc.fw_boot_download "false"
-
-    # HAL looks for pn54x but kernel driver uses pn547
-    symlink /dev/pn547 /dev/pn54x
-
     # Wifi firmware reload path
     chown wifi wifi /sys/module/wlan/parameters/fwpath
 
@@ -190,12 +371,19 @@ on boot
 
 on post-fs
     symlink /dev/block/platform/soc.0/f9824900.sdhci /dev/block/bootdevice
+    # CNSS loads qwlan30.bin from here (not /system, not bullhead paths).
+    write /sys/module/firmware_class/parameters/path /vendor/firmware
 
     mkdir /persist/data 0700 system system
     mkdir /persist/data/sfs 0700 system system
     mkdir /persist/data/tz 0700 system system
     mkdir /persist/data/app_g 0700 system system
     mkdir /persist/widevine 0770 drm system
+    mkdir /persist/camera 0770 camera camera
+    # Standard Android wifi MAC persist file (installer: DPP/QCOM/WLAN.PROVISION).
+    # Missing file is QCA OTP (g_use_otpmac=1). No baked address in the image.
+    chmod 0644 /persist/wlan_mac.bin
+    restorecon /persist/wlan_mac.bin
 
     start qseecomd
     # Busy loop to wait for qseecomd started
@@ -224,9 +412,9 @@ on post-fs-data
     chown radio radio /data/misc/radio/copy_complete
     chmod 0660 /data/misc/radio/copy_complete
 
-    #Update touch firmware if required
-    write /sys/bus/i2c/devices/2-0020/check_fw 1
-    write /sys/devices/soc.0/f9924000.i2c/power/control on
+    # Synaptics RMI4 @ 0x4b on BLSP1 QUP1 (i2c@f9923000). Firmware
+    # SynaFWVendor1.img is requested at probe (synaptics,check-build).
+    write /sys/devices/soc.0/f9923000.i2c/power/control on
 
     # Create the directories used by the Wireless subsystem
     mkdir /data/misc/wifi 0770 wifi wifi
@@ -244,13 +432,6 @@ on post-fs-data
     # Create the directories used by CnE subsystem
     mkdir /data/connectivity 0771 system system
 
-    # NFC local data and nfcee xml storage
-    mkdir /data/nfc 0770 nfc nfc
-    mkdir /data/nfc/param 0770 nfc nfc
-    
-    # NFC libnfc-nxpConfigState.bin
-    mkdir /data/vendor/nfc/ 0770 nfc nfc
-
     # use qcril.db to handle Ecc and load MBN
     copy /system/etc/qcril.db /data/misc/radio/qcril.db
     chown radio radio /data/misc/radio/qcril.db
@@ -258,20 +439,22 @@ on post-fs-data
 
     # Create folder for mm-qcamera-daemon
     mkdir /data/misc/camera 0770 camera camera
-
-    # change permission for ldaf
-    chown input system /persist/calibration
-    chmod 0650 /persist/calibration
-    chown input system /persist/calibration/offset
-    chmod 0640 /persist/calibration/offset
-    chown input system /persist/calibration/xtalk
-    chmod 0640 /persist/calibration/xtalk
+    mkdir /data/vendor/camera 0770 camera camera
+    mkdir /persist/camera 0770 camera camera
+    # No LDAF / VL6180 persist/calibration — talkman AF is VCM+OIS, not ToF.
 
     #Create directories for Location services
     mkdir /data/misc/location 0770 gps gps
     mkdir /data/misc/location/mq 0770 gps gps
     mkdir /data/misc/location/xtwifi 0770 gps gps
     mkdir /data/misc/location/gpsone_d 0770 system gps
+    mkdir /data/vendor/location 0770 gps gps
+    chmod 0644 /vendor/etc/gps.conf
+    chmod 0644 /system/etc/gps.conf
+    chmod 0644 /vendor/etc/izat.conf
+    chmod 0644 /vendor/etc/sap.conf
+    chmod 0644 /vendor/etc/flp.conf
+    chmod 0644 /vendor/etc/lowi.conf
 
     # Audio
     mkdir /data/misc/audio 0770 audio audio
@@ -337,11 +520,7 @@ service qti /vendor/bin/qti
     user radio
     group radio net_raw diag usb net_admin
 
-service sensors /vendor/bin/sensors.qcom
-    class core
-    user root
-    group root
-    disabled
+# Talkman uses sensors.talkman (AP I2C HAL). Do not start sensors.qcom / nanohub.
 
 service netmgrd /vendor/bin/netmgrd
     class main
@@ -364,30 +543,23 @@ on property:init.svc.per_mgr=running
 on property:sys.shutdown.requested=*
     stop per_proxy
 
-on property:ro.boot.hardware.sku=LGH790
+# Talkman retail SKUs (not Nexus 5X LGH79x). RM-1105 is the US unit.
+on property:ro.boot.hardware.sku=RM-1105
     setprop ro.boot.wificountrycode US
 
-on property:ro.boot.hardware.sku=LGH791
+on property:ro.boot.hardware.sku=RM-1104
     setprop ro.boot.wificountrycode 00
 
-on property:ro.boot.hardware.sku=LGH791F
+on property:ro.boot.hardware.sku=RM-1108
     setprop ro.boot.wificountrycode 00
 
-on property:ro.boot.hardware.sku=LGH798
-    setprop ro.boot.wificountrycode 00
-
-service thermal-engine /vendor/bin/thermal-engine
+service thermal-engine /vendor/bin/thermal-engine -c /vendor/etc/thermal-engine-8992.conf
     class main
     user root
     socket thermal-send-client stream 0660 system system
     socket thermal-recv-client stream 0660 system system
     socket thermal-recv-passive-client stream 0660 system system
     group root radio system
-
-service loc_launcher /vendor/bin/loc_launcher
-    #loc_launcher will start as root and set its uid to gps
-    class late_start
-    group gps inet net_raw diag net_admin wifi
 
 service cnss-daemon /vendor/bin/cnss-daemon -n -l
     class late_start
@@ -414,6 +586,13 @@ service qcamerasvr /vendor/bin/mm-qcamera-daemon
     user camera
     group camera system inet input graphics
     writepid /dev/cpuset/system-background/tasks
+
+# chmod debugfs only. Never write scan / slave-id (CCI SID unknown).
+service talkman-cci-perm /vendor/bin/sh -c "chmod 0755 /sys/kernel/debug/talkman-cci-scan; chmod 0660 /sys/kernel/debug/talkman-cci-scan/scan; chown root:shell /sys/kernel/debug/talkman-cci-scan /sys/kernel/debug/talkman-cci-scan/scan"
+    class late_start
+    user root
+    group root shell
+    oneshot
 
 on property:persist.radio.atfwd.start=false
     stop atfwd
@@ -485,12 +664,4 @@ on property:init.svc.servicemanager=restarting
 on property:vold.decrypt=trigger_restart_framework
     restart camera-provider-2-4
 
-# start sensor daemon as core class [START]
-service lge-sensor-sh /vendor/bin/init.msm8992.sensor.sh
-    class core
-    user root
-    group root wakelock
-    oneshot
-    seclabel u:r:sensors:s0
-    writepid /dev/cpuset/system-background/tasks
-# start sensor daemon as core class [END]
+# LGE/bullhead ADSP sensor bringup (init.msm8992.sensor.sh) is not used.

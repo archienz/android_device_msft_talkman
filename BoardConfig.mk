@@ -19,7 +19,7 @@ DEVICE_PATH := device/msft/talkman
 BUILD_BROKEN_DUP_RULES := true
 BUILD_BROKEN_USES_BUILD_COPY_HEADERS := true
 
-TARGET_OTA_ASSERT_DEVICE := talkman,bullhead,angler
+TARGET_OTA_ASSERT_DEVICE := talkman
 
 # Architecture
 TARGET_ARCH := arm64
@@ -40,6 +40,7 @@ TARGET_USES_AOSP := true
 # Bootloader
 TARGET_NO_BOOTLOADER := true
 TARGET_NO_RADIOIMAGE := true
+TARGET_BOOTLOADER_BOARD_NAME := talkman
 TARGET_BOARD_PLATFORM := msm8992
 
 WITH_DEXPREOPT := true
@@ -56,11 +57,15 @@ BOARD_KERNEL_CMDLINE := console=ttyHSL0,115200,n8 androidboot.hardware=talkman b
 BOARD_KERNEL_CMDLINE += lpm_levels.sleep_disabled=1 msm_poweroff.download_mode=0
 BOARD_KERNEL_CMDLINE += loop.max_part=7 androidboot.boot_devices=soc.0/f9824900.sdhci
 BOARD_KERNEL_CMDLINE += androidboot.selinux=permissive
+BOARD_KERNEL_CMDLINE += firmware_class.path=/vendor/firmware
 BOARD_MKBOOTIMG_ARGS := --ramdisk_offset $(BOARD_RAMDISK_OFFSET) --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)
 #KERNEL_TOOLCHAIN := $(shell pwd)/prebuilts/arm64-gcc/bin
 #KERNEL_TOOLCHAIN_PREFIX := aarch64-elf-
 # Audio / NFC / sensor I2C live in android_kernel_mmo_msm8994
 # (lineage-18.1-talkman, mmo_defconfig). Talkman DT only.
+# Camera (QCamera2 / libmmcamera_interface) and audio HAL pull uapi from
+# $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include on this tree — not
+# device kernel-headers/ (bullhead nanohub spi-contexthub leftover).
 TARGET_KERNEL_SOURCE := kernel/mmo/msm8994
 TARGET_KERNEL_CONFIG := mmo_defconfig
 TARGET_KERNEL_CLANG_COMPILE := false
@@ -78,28 +83,37 @@ TARGET_KERNEL_HEADER_ARCH := arm64
 # APEX
 TARGET_FLATTEN_APEX := true
 
-# Audio
+# Audio — TAS2553 on QUAT_MI2S (mixer_paths + audio_platform_info + DT).
+# WCD9330 SPK DRV / speaker-protection feedback is not wired. No HAL flag
+# named QUAT_MI2S on the 8992 audio-caf HAL; backend is XML, not BoardConfig.
 BOARD_USES_ALSA_AUDIO := true
 AUDIO_FEATURE_ENABLED_MULTI_VOICE_SESSIONS := true
-AUDIO_FEATURE_ENABLED_SPKR_PROTECTION := true
+AUDIO_FEATURE_ENABLED_SPKR_PROTECTION := false
 USE_XML_AUDIO_POLICY_CONF := 1
 
 # Binder
 TARGET_USES_64_BIT_BINDER := true
 
-# Bluetooth
+# Bluetooth — QCA Rome. MAC: persist /persist/bdaddr.txt or chip OTP
+# (NVM tag 2 zeros). QCOM_BT_READ_ADDR_FROM_PROP is the g_use_otpmac analog;
+# init.talkman.bt.sh sets ro.boot.btmacaddr from persist or 00:00:00:00:00:00.
+# Do not generate a MAC. Do not enable QCOM_BT_USE_BTNV (no .bt_nv.bin).
 BOARD_HAVE_BLUETOOTH := true
 BOARD_HAVE_BLUETOOTH_QCOM := true
 BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := $(DEVICE_PATH)/bluetooth
 BOARD_HAS_QCA_BT_ROME := true
 WCNSS_FILTER_USES_SIBS := true
+QCOM_BT_READ_ADDR_FROM_PROP := true
 
-# Camera
+# Camera — mm-camera v2 32-bit daemon + QCamera2 HAL. Headers: see
+# TARGET_COMPILE_WITH_MSM_KERNEL. No 64-bit camera HAL on 8992.
 BOARD_QTI_CAMERA_32BIT_ONLY := true
+TARGET_USES_MEDIA_EXTENSIONS := true
+USE_CAMERA_STUB := false
 TARGET_PROCESS_SDK_VERSION_OVERRIDE += \
     /vendor/bin/mm-qcamera-daemon=27
 
-# Charger
+# Charger — qpnp-smbcharger 5 V / ~1.8 A + Qi DCIN. No USB-PD PHY.
 BOARD_CHARGER_ENABLE_SUSPEND := true
 
 # Display
@@ -126,7 +140,7 @@ ifeq ($(HOST_OS),linux)
   endif
 endif
 
-# GPS
+# GPS — MSM8992 IZat / loc HAL (hardware/qcom/gps msm8994). Not nanohub.
 BOARD_VENDOR_QCOM_GPS_LOC_API_HARDWARE := $(TARGET_BOARD_PLATFORM)
 BOARD_VENDOR_QCOM_LOC_PDK_FEATURE_SET := true
 TARGET_NO_RPC := true
@@ -134,6 +148,7 @@ TARGET_NO_RPC := true
 # HIDL
 PRODUCT_ENFORCE_VINTF_MANIFEST_OVERRIDE := true
 DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/manifest.xml
+DEVICE_MANIFEST_FILE += $(DEVICE_PATH)/vintf/android.hardware.camera.provider@2.4.xml
 DEVICE_MATRIX_FILE := $(DEVICE_PATH)/compatibility_matrix.xml
 TARGET_FS_CONFIG_GEN += $(DEVICE_PATH)/config.fs
 
@@ -155,6 +170,10 @@ TARGET_COPY_OUT_VENDOR := vendor
 
 BOARD_USES_SECURE_SERVICES := true
 BOARD_ROOT_EXTRA_FOLDERS := persist firmware
+# CAF libbt-vendor Rome 3.2 opens /bt_firmware/image/{btfw32.tlv,btnv32.bin}.
+# Talkman has no BTFM GPT; files are /vendor/firmware (talkman nvm/rampatch).
+BOARD_ROOT_EXTRA_FOLDERS += bt_firmware
+BOARD_ROOT_EXTRA_SYMLINKS += /vendor/firmware:bt_firmware/image
 
 # Netd
 TARGET_OMIT_NETD_TETHER_FTP_HELPER := true
@@ -162,14 +181,15 @@ TARGET_OMIT_NETD_TETHER_FTP_HELPER := true
 # Peripheral manager
 TARGET_PER_MGR_ENABLED := true
 
-# Power
+# Power — device HIDL 1.0 (power/) writes cpufreq/cpu_boost/msm_performance.
+# A57 ceiling 1824000 kHz (CAF table-4 / thermal). Not 1960000. Not qti stub.
 TARGET_USES_INTERACTION_BOOST := true
 TARGET_USES_NON_LEGACY_POWERHAL := true
 
-# Recovery
-TARGET_RECOVERY_UI_LIB := librecovery_ui_nanohub
+# Recovery — default ScreenRecoveryUI. Talkman has no nanohub.
+# recovery.fstab (not runtime fstab.talkman): GPT modem VFAT /firmware, vendor ext4, persist, USB-OTG.
 BOARD_SUPPRESS_SECURE_ERASE := true
-TARGET_RECOVERY_FSTAB = $(DEVICE_PATH)/rootdir/etc/fstab.talkman
+TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery.fstab
 
 # Releasetools
 TARGET_RELEASETOOLS_EXTENSIONS := $(DEVICE_PATH)
@@ -183,13 +203,9 @@ SELINUX_IGNORE_NEVERALLOWS := true
 TARGET_LD_SHIM_LIBS := \
     /vendor/bin/ATFWD-daemon|libcutils_shim.so \
     /vendor/bin/cnd|libcutils_shim.so \
-    /vendor/lib64/libcne.so|libcutils_shim.so \
-    /system/vendor/lib64/libril-qc-qmi-1.so|libaudioclient_shim.so
-#    /vendor/bin/slim_daemon|/vendor/lib64/slim_shim.so
+    /vendor/lib/libcne.so|libcutils_shim.so \
+    /vendor/lib64/libcne.so|libcutils_shim.so
 
-
-# Testing related defines
-BOARD_PERFSETUP_SCRIPT := platform_testing/scripts/perf-setup/bullhead-setup.sh
 
 # Telephony
 TARGET_USES_ALTERNATIVE_MANUAL_NETWORK_SELECT := true
@@ -211,5 +227,7 @@ WIFI_HIDL_UNIFIED_SUPPLICANT_SERVICE_RC_ENTRY := true
 BOARD_NFC_CHIPSET := pn547
 BOARD_NFC_HAL_SUFFIX := msm8992
 BOARD_NFC_DEVICE := "/dev/pn547"
+
+# Talkman has no FPC. Do not set BOARD_HAS_FINGERPRINT_FPC.
 
 -include vendor/msft/talkman/BoardConfigVendor.mk

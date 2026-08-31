@@ -61,13 +61,14 @@ PRODUCT_COPY_FILES := \
     vendor/qcom/talkman/proprietary/subsystem_ramdump:system/bin/subsystem_ramdump:qcom \
     vendor/qcom/talkman/proprietary/test_diag:system/bin/test_diag:qcom \
     vendor/qcom/talkman/proprietary/thermal-engine:system/bin/thermal-engine:qcom \
-    vendor/qcom/talkman/proprietary/MTP_Bluetooth_cal.acdb:system/etc/acdbdata/MTP/MTP_Bluetooth_cal.acdb:qcom \
-    vendor/qcom/talkman/proprietary/MTP_General_cal.acdb:system/etc/acdbdata/MTP/MTP_General_cal.acdb:qcom \
-    vendor/qcom/talkman/proprietary/MTP_Global_cal.acdb:system/etc/acdbdata/MTP/MTP_Global_cal.acdb:qcom \
-    vendor/qcom/talkman/proprietary/MTP_Handset_cal.acdb:system/etc/acdbdata/MTP/MTP_Handset_cal.acdb:qcom \
-    vendor/qcom/talkman/proprietary/MTP_Hdmi_cal.acdb:system/etc/acdbdata/MTP/MTP_Hdmi_cal.acdb:qcom \
-    vendor/qcom/talkman/proprietary/MTP_Headset_cal.acdb:system/etc/acdbdata/MTP/MTP_Headset_cal.acdb:qcom \
-    vendor/qcom/talkman/proprietary/MTP_Speaker_cal.acdb:system/etc/acdbdata/MTP/MTP_Speaker_cal.acdb:qcom \
+    vendor/qcom/talkman/proprietary/Bluetooth_cal_8994.acdb:system/etc/acdbdata/Bluetooth_cal_8994.acdb:qcom \
+    vendor/qcom/talkman/proprietary/Codec_cal_8994.acdb:system/etc/acdbdata/Codec_cal_8994.acdb:qcom \
+    vendor/qcom/talkman/proprietary/General_cal_8994.acdb:system/etc/acdbdata/General_cal_8994.acdb:qcom \
+    vendor/qcom/talkman/proprietary/Global_cal_8994.acdb:system/etc/acdbdata/Global_cal_8994.acdb:qcom \
+    vendor/qcom/talkman/proprietary/Handset_cal_8994.acdb:system/etc/acdbdata/Handset_cal_8994.acdb:qcom \
+    vendor/qcom/talkman/proprietary/Hdmi_cal_8994.acdb:system/etc/acdbdata/Hdmi_cal_8994.acdb:qcom \
+    vendor/qcom/talkman/proprietary/Headset_cal_8994.acdb:system/etc/acdbdata/Headset_cal_8994.acdb:qcom \
+    vendor/qcom/talkman/proprietary/Speaker_cal_8994.acdb:system/etc/acdbdata/Speaker_cal_8994.acdb:qcom \
     vendor/qcom/talkman/proprietary/profile.txt:system/etc/cne/profile.txt:qcom \
     vendor/qcom/talkman/proprietary/dsi_config.xml:system/etc/data/dsi_config.xml:qcom \
     vendor/qcom/talkman/proprietary/netmgr_config.xml:system/etc/data/netmgr_config.xml:qcom \

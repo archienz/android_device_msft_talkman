@@ -25,6 +25,11 @@
 <!--- WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE      -->
 <!--- OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN    -->
 <!--- IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                             -->
+<!--
+     Sound-trigger platform for talkman tomtom (WCD9330) CPE.
+     qccpe8992.mbn is the CPE image. This is hotword on the codec MAD
+     mic, not TAS2553 speaker-prot. execution_type stays CPE.
+-->
 <sound_trigger_platform_info>
     <param version="0x0101" /> <!-- this must be the first param -->
 

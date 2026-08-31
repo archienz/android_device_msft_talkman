@@ -1,0 +1,15 @@
+# Talkman CCI slave scanner debugfs. Not CAMSS /sys/devices/soc.0/fda*.
+# Kernel: debugfs_create_dir("talkman-cci-scan") + "scan" 0644.
+
+type debugfs_cci_scan, fs_type, debugfs_type;
+
+allow dumpstate debugfs_cci_scan:dir r_dir_perms;
+allow dumpstate debugfs_cci_scan:file r_file_perms;
+allow hal_dumpstate_impl debugfs_cci_scan:dir r_dir_perms;
+allow hal_dumpstate_impl debugfs_cci_scan:file r_file_perms;
+
+userdebug_or_eng(`
+  allow { shell su } debugfs:dir search;
+  allow { shell su } debugfs_cci_scan:dir r_dir_perms;
+  allow { shell su } debugfs_cci_scan:file rw_file_perms;
+')

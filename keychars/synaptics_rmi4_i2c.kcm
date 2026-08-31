@@ -1,0 +1,17 @@
+# Lumia 950 (talkman) Synaptics RMI4 F1A capacitive buttons.
+# Same input name as keylayout/synaptics_rmi4_i2c.kl.
+# Character map for KEY_BACK / KEY_HOMEPAGE / KEY_SEARCH (linux 158 172 217).
+
+type OVERLAY
+
+key BACK {
+    base: fallback BACK
+}
+
+key HOME {
+    base: fallback HOME
+}
+
+key SEARCH {
+    base: fallback SEARCH
+}

@@ -1,0 +1,19 @@
+#
+# Vendor persist for Talkman QCamera2 (MSM8992, MSMB, 32-bit daemon).
+# Same persist.camera.* names as QCamera2Factory / QCameraParameters
+# (property_get("persist.camera....")). Do not invent sensor count or I2C.
+#
+
+# HAL1, not HAL3. QCamera2Factory default is "1" (HAL3) if this is absent.
+persist.camera.HAL3.enabled=0
+
+# HAL1 DIS/EIS type (QCameraParameters default "4" = IS_TYPE_EIS_2_0).
+persist.camera.is_type=4
+
+# VFE44 TNR off (QCameraParameters persist.camera.tnr.{preview,video}).
+persist.camera.tnr.preview=0
+persist.camera.tnr.video=0
+
+# HAL3 EIS flag; unused when HAL3.enabled=0. Kept so a future HAL3
+# path does not silently drop EIS. Not a sensor-count or CCI address.
+persist.camera.eis.enable=1

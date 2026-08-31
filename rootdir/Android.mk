@@ -21,7 +21,11 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := fstab.talkman
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE_CLASS := ETC
+ifeq ($(TARGET_BUILD_VARIANT),user)
+LOCAL_SRC_FILES := etc/fstab-verity.talkman
+else
 LOCAL_SRC_FILES := etc/fstab.talkman
+endif
 LOCAL_MODULE_PATH  := $(TARGET_OUT_VENDOR_ETC)
 include $(BUILD_PREBUILT)
 
@@ -34,11 +38,11 @@ LOCAL_MODULE_PATH  := $(TARGET_OUT_VENDOR_ETC)/init/hw
 include $(BUILD_PREBUILT)
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := init.talkman.fp.rc
+LOCAL_MODULE := init.talkman.charger.sh
 LOCAL_MODULE_TAGS := optional
-LOCAL_MODULE_CLASS := ETC
-LOCAL_SRC_FILES := etc/init.talkman.fp.rc
-LOCAL_MODULE_PATH  := $(TARGET_OUT_VENDOR_ETC)/init/hw
+LOCAL_MODULE_CLASS := EXECUTABLES
+LOCAL_SRC_FILES := etc/init.talkman.charger.sh
+LOCAL_MODULE_PATH := $(TARGET_OUT_VENDOR_EXECUTABLES)
 include $(BUILD_PREBUILT)
 
 include $(CLEAR_VARS)
@@ -47,6 +51,7 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE_CLASS := ETC
 LOCAL_SRC_FILES := etc/init.talkman.rc
 LOCAL_MODULE_PATH  := $(TARGET_OUT_VENDOR_ETC)/init/hw
+LOCAL_REQUIRED_MODULES := init.talkman.charger.sh
 include $(BUILD_PREBUILT)
 
 include $(CLEAR_VARS)
@@ -58,11 +63,27 @@ LOCAL_MODULE_PATH  := $(TARGET_OUT_VENDOR_ETC)/init/hw
 include $(BUILD_PREBUILT)
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := init.talkman.sensorhub.rc
+LOCAL_MODULE := init.talkman.camera.rc
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE_CLASS := ETC
-LOCAL_SRC_FILES := etc/init.talkman.sensorhub.rc
+LOCAL_SRC_FILES := etc/init.talkman.camera.rc
 LOCAL_MODULE_PATH  := $(TARGET_OUT_VENDOR_ETC)/init/hw
+include $(BUILD_PREBUILT)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := init.talkman.gps.rc
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE_CLASS := ETC
+LOCAL_SRC_FILES := etc/init.talkman.gps.rc
+LOCAL_MODULE_PATH  := $(TARGET_OUT_VENDOR_ETC)/init/hw
+include $(BUILD_PREBUILT)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := init.talkman.usb.sh
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE_CLASS := EXECUTABLES
+LOCAL_SRC_FILES := etc/init.talkman.usb.sh
+LOCAL_MODULE_PATH := $(TARGET_OUT_VENDOR_EXECUTABLES)
 include $(BUILD_PREBUILT)
 
 include $(CLEAR_VARS)
@@ -71,6 +92,7 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE_CLASS := ETC
 LOCAL_SRC_FILES := etc/init.talkman.usb.rc
 LOCAL_MODULE_PATH  := $(TARGET_OUT_VENDOR_ETC)/init/hw
+LOCAL_REQUIRED_MODULES := init.talkman.usb.sh
 include $(BUILD_PREBUILT)
 
 include $(CLEAR_VARS)
@@ -79,6 +101,7 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE_CLASS := ETC
 LOCAL_SRC_FILES := etc/init.talkman.misc.rc
 LOCAL_MODULE_PATH  := $(TARGET_OUT_VENDOR_ETC)/init/hw
+LOCAL_REQUIRED_MODULES := init.talkman.bt.sh
 include $(BUILD_PREBUILT)
 
 include $(CLEAR_VARS)

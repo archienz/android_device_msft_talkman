@@ -1,0 +1,40 @@
+# Talkman loc_launcher + GNSS HIDL 1.0.
+# loc_launcher starts as root and setuid to gps, then forks izat children
+# from izat.conf (location-mq, lowi-server, slim_daemon).
+# vendor.gnss_service overrides AOSP class-hal so SUPL/XTRA can use wlan0
+# (RIL is P2).
+
+service loc_launcher /vendor/bin/loc_launcher
+    #loc_launcher will start as root and set its uid to gps
+    class late_start
+    group gps inet net_raw diag net_admin wifi
+
+# AOSP ships this as class hal / user gps / group system gps radio.
+# Talkman SUPL/XTRA is wlan0 (RIL is P2), so inet+wifi must be present.
+service vendor.gnss_service /vendor/bin/hw/android.hardware.gnss@1.0-service
+    override
+    class hal
+    user gps
+    group system gps radio inet wifi net_raw
+    interface android.hardware.gnss@1.0::IGnss default
+
+on post-fs-data
+    mkdir /data/misc/location 0770 gps gps
+    mkdir /data/misc/location/mq 0770 gps gps
+    mkdir /data/misc/location/xtwifi 0770 gps gps
+    mkdir /data/misc/location/gpsone_d 0770 system gps
+    mkdir /data/vendor/location 0770 gps gps
+    chmod 0644 /vendor/etc/gps.conf
+    chmod 0644 /system/etc/gps.conf
+    chmod 0644 /vendor/etc/izat.conf
+    chmod 0644 /vendor/etc/sap.conf
+    chmod 0644 /vendor/etc/flp.conf
+    chmod 0644 /vendor/etc/lowi.conf
+
+on property:init.svc.qmuxd=running
+    start loc_launcher
+    start vendor.gnss_service
+
+on property:sys.boot_completed=1
+    start loc_launcher
+    start vendor.gnss_service

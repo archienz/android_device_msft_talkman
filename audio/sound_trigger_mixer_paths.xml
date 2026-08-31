@@ -26,6 +26,12 @@
 <!--- OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN    -->
 <!--- IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                             -->
 
+<!--
+     Sound-trigger mixer for WCD9330 (tomtom) MAD/CPE on SLIMBUS_5_TX.
+     snd_card_name is msm8994-tomtom-snd-card. This is the always-on mic
+     path, not the TAS2553 loudspeaker (QUAT_MI2S_RX). HAL also loads
+     sound_trigger_mixer_paths_wcd9330.xml for this card.
+-->
 <mixer>
     <!-- These are the initial mixer settings -->
     <ctl name="LSM1 MUX" value="None" />

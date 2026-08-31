@@ -59,7 +59,6 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.sensor.ambient_temperature.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/android.hardware.sensor.ambient_temperature.xml \
     frameworks/native/data/etc/android.hardware.sensor.stepcounter.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/android.hardware.sensor.stepcounter.xml \
     frameworks/native/data/etc/android.hardware.sensor.stepdetector.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/android.hardware.sensor.stepdetector.xml \
-    frameworks/native/data/etc/android.hardware.sensor.hifi_sensors.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/android.hardware.sensor.hifi_sensors.xml \
     frameworks/native/data/etc/android.hardware.touchscreen.multitouch.jazzhand.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/android.hardware.touchscreen.multitouch.jazzhand.xml \
     frameworks/native/data/etc/android.software.sip.voip.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/android.software.sip.voip.xml \
     frameworks/native/data/etc/android.hardware.usb.accessory.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/android.hardware.usb.accessory.xml \
@@ -118,46 +117,62 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/audio/audio_effects.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_effects.xml \
+    $(LOCAL_PATH)/audio/audio_output_policy.conf:$(TARGET_COPY_OUT_VENDOR)/etc/audio_output_policy.conf \
+    $(LOCAL_PATH)/audio/audio_output_policy.conf:$(TARGET_COPY_OUT_SYSTEM)/etc/audio_output_policy.conf \
     $(LOCAL_PATH)/audio/mixer_paths.xml:$(TARGET_COPY_OUT_VENDOR)/etc/mixer_paths.xml \
+    $(LOCAL_PATH)/audio/mixer_paths.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/mixer_paths.xml \
+    $(LOCAL_PATH)/audio/audio_platform_info.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_platform_info.xml \
     $(LOCAL_PATH)/audio/audio_platform_info.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/audio_platform_info.xml \
     $(LOCAL_PATH)/audio/audio_policy_configuration.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/audio_policy_configuration.xml \
     $(LOCAL_PATH)/audio/audio_policy_volumes_drc.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/audio_policy_volumes_drc.xml \
     $(LOCAL_PATH)/audio/sound_trigger_mixer_paths.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/sound_trigger_mixer_paths.xml \
+    $(LOCAL_PATH)/audio/sound_trigger_mixer_paths.xml:$(TARGET_COPY_OUT_VENDOR)/etc/sound_trigger_mixer_paths.xml \
+    $(LOCAL_PATH)/audio/sound_trigger_mixer_paths_wcd9330.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/sound_trigger_mixer_paths_wcd9330.xml \
+    $(LOCAL_PATH)/audio/sound_trigger_mixer_paths_wcd9330.xml:$(TARGET_COPY_OUT_VENDOR)/etc/sound_trigger_mixer_paths_wcd9330.xml \
     $(LOCAL_PATH)/audio/sound_trigger_platform_info.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/sound_trigger_platform_info.xml \
+    $(LOCAL_PATH)/audio/sound_trigger_platform_info.xml:$(TARGET_COPY_OUT_VENDOR)/etc/sound_trigger_platform_info.xml \
     frameworks/av/services/audiopolicy/config/a2dp_audio_policy_configuration.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/a2dp_audio_policy_configuration.xml \
     frameworks/av/services/audiopolicy/config/r_submix_audio_policy_configuration.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/r_submix_audio_policy_configuration.xml \
     frameworks/av/services/audiopolicy/config/usb_audio_policy_configuration.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/usb_audio_policy_configuration.xml \
     frameworks/av/services/audiopolicy/config/default_volume_tables.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/default_volume_tables.xml \
 
-# Bluetooth HAL
+# Bluetooth HAL — QCA Rome (qcom.bluetooth.soc=rome).
+# btfw32.tlv / btnv32.bin are talkman rampatch_tlv_3.2.tlv / nvm_tlv_3.2.bin
+# (talkman-vendor.mk). NVM tag 2 is zeros. MAC is not baked:
+#   1. /persist/bdaddr.txt (ro.bt.bdaddr_path; installer DPP/QCOM/BT.PROVISION)
+#   2. QCA OTP when persist is missing (g_use_otpmac analog: NVM zeros +
+#      QCOM_BT_READ_ADDR_FROM_PROP so libbt-vendor does not overlay a random)
+# Do not ship CAF/bullhead sample BD_ADDR (77:78:23:01:56:22).
 PRODUCT_PACKAGES += \
     libbt-vendor \
-    android.hardware.bluetooth@1.0-impl
+    android.hardware.bluetooth@1.0-impl \
+    init.talkman.bt.sh
 
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
     ro.bt.bdaddr_path=/persist/bdaddr.txt
 
 # Charger
 PRODUCT_PACKAGES += \
-    charger_res_images
+    charger_res_images \
+    init.talkman.charger.sh
 
-# Camera
+# Camera — QCamera2 LOCAL_MODULE names from camera/
+# msm8992_camera.xml SensorName mot_imx230 (CameraId 0 only). No slave-id.
 PRODUCT_PACKAGES += \
     camera.msm8992 \
-    libcamera \
     libmmcamera_interface \
-    libmmcamera_interface2 \
     libmmjpeg_interface \
     libqomx_core \
+    libmm-qcamera \
     mm-qcamera-app \
     android.hardware.camera.provider@2.4-impl \
     camera.device@1.0-impl \
     camera.device@3.2-impl \
-    Snap
-
-PRODUCT_PACKAGES += \
-    vendor.qti.hardware.camera.device@1.0 \
-    vendor.qti.hardware.camera.device@1.0_vendor
+    Snap \
+    msm8992_camera.xml \
+    mot_imx230_chromatix.xml \
+    msm8992_camera.xml.system \
+    mot_imx230_chromatix.xml.system
 
 # Display
 PRODUCT_PACKAGES += \
@@ -185,9 +200,10 @@ PRODUCT_PACKAGES += \
     android.hardware.drm@1.0-service \
     android.hardware.drm@1.2-service.clearkey
 
-# Dumpstate HAL
+# Dumpstate HAL + board script (qpnp-fg bms / smbcharger battery+usb+dc)
 PRODUCT_PACKAGES += \
-    android.hardware.dumpstate@1.0-service.talkman
+    android.hardware.dumpstate@1.0-service.talkman \
+    dumpstate_board.sh
 
 # For android_filesystem_config.h
 PRODUCT_PACKAGES += \
@@ -200,9 +216,9 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     libtinyxml
 
-# GNSS HAL
+# GNSS HAL — gnss/1.0/default (nmeaCb); overrides AOSP 1.0-impl
 PRODUCT_PACKAGES += \
-    android.hardware.gnss@1.0-impl \
+    android.hardware.gnss@1.0-impl.talkman \
     android.hardware.gnss@1.0-service
 
 # GPS
@@ -214,7 +230,12 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/sec_config:$(TARGET_COPY_OUT_SYSTEM)/etc/sec_config \
-    $(LOCAL_PATH)/gps/gps.conf:$(TARGET_COPY_OUT_SYSTEM)/etc/gps.conf
+    $(LOCAL_PATH)/gps/gps.conf:$(TARGET_COPY_OUT_SYSTEM)/etc/gps.conf \
+    $(LOCAL_PATH)/gps/gps.conf:$(TARGET_COPY_OUT_VENDOR)/etc/gps.conf \
+    vendor/msft/talkman/proprietary/etc/izat.conf:$(TARGET_COPY_OUT_VENDOR)/etc/izat.conf \
+    vendor/msft/talkman/proprietary/etc/sap.conf:$(TARGET_COPY_OUT_VENDOR)/etc/sap.conf \
+    vendor/msft/talkman/proprietary/etc/flp.conf:$(TARGET_COPY_OUT_VENDOR)/etc/flp.conf \
+    vendor/msft/talkman/proprietary/etc/lowi.conf:$(TARGET_COPY_OUT_VENDOR)/etc/lowi.conf
 
 # Health
 PRODUCT_PACKAGES += \
@@ -239,6 +260,9 @@ PRODUCT_PACKAGES += \
     init.talkman.rc \
     init.talkman.usb.rc \
     init.talkman.sensors.rc \
+    init.talkman.camera.rc \
+    init.talkman.nfc.rc \
+    init.talkman.gps.rc \
     fstab.talkman \
     ueventd.talkman.rc \
     init.recovery.talkman.rc \
@@ -249,14 +273,29 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/rootdir/etc/init.qcom.devwait.sh:$(TARGET_COPY_OUT_VENDOR)/bin/init.qcom.devwait.sh \
     $(LOCAL_PATH)/rootdir/etc/init.qcom.devstart.sh:$(TARGET_COPY_OUT_VENDOR)/bin/init.qcom.devstart.sh \
+    $(LOCAL_PATH)/recovery.fstab:recovery/root/etc/recovery.fstab
+
+
+ifeq ($(TARGET_BUILD_VARIANT),user)
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/rootdir/etc/fstab-verity.talkman:$(TARGET_COPY_OUT_ROOT)/fstab.talkman \
+    $(LOCAL_PATH)/rootdir/etc/fstab-verity.talkman:$(TARGET_COPY_OUT_RAMDISK)/fstab.talkman
+else
+PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/rootdir/etc/fstab.talkman:$(TARGET_COPY_OUT_ROOT)/fstab.talkman \
     $(LOCAL_PATH)/rootdir/etc/fstab.talkman:$(TARGET_COPY_OUT_RAMDISK)/fstab.talkman
+endif
 #    $(LOCAL_PATH)/rootdir/etc/init.msm8992.sensor.sh:$(TARGET_COPY_OUT_VENDOR)/bin/init.msm8992.sensor.sh
 
-# Keylayout
+# Keylayout / keychars
+# gpio-keys: PM8994 GPIO3/4/5 VOLUME_UP/CAMERA/FOCUS (sidekeys.dtsi 115/766/528)
+# qpnp_pon: KPDPWR POWER 116, RESIN VOLUME_DOWN 114 (msm-pm8994.dtsi pon_1/pon_2)
+# synaptics_rmi4_i2c: F1A button-map 158/172/217 BACK/HOME/SEARCH (touch.dtsi)
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/keylayout/gpio-keys.kl:$(TARGET_COPY_OUT_SYSTEM)/usr/keylayout/gpio-keys.kl \
-    $(LOCAL_PATH)/keylayout/qpnp_pon.kl:$(TARGET_COPY_OUT_SYSTEM)/usr/keylayout/qpnp_pon.kl
+    $(LOCAL_PATH)/keylayout/qpnp_pon.kl:$(TARGET_COPY_OUT_SYSTEM)/usr/keylayout/qpnp_pon.kl \
+    $(LOCAL_PATH)/keylayout/synaptics_rmi4_i2c.kl:$(TARGET_COPY_OUT_SYSTEM)/usr/keylayout/synaptics_rmi4_i2c.kl \
+    $(LOCAL_PATH)/keychars/synaptics_rmi4_i2c.kcm:$(TARGET_COPY_OUT_SYSTEM)/usr/keychars/synaptics_rmi4_i2c.kcm
 
 # Keymaster HAL
 PRODUCT_PACKAGES += \
@@ -265,13 +304,11 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/keylayout/synaptics_rmi4_i2c.idc:$(TARGET_COPY_OUT_SYSTEM)/usr/idc/synaptics_rmi4_i2c.idc
-# Light HAL
+# Light HAL — mdss lcd-backlight + PMI8994 RGB sysfs (software blink)
 PRODUCT_PACKAGES += \
     lights.talkman \
-    lights.vts \
-    android.hardware.light@2.0-impl \
-    android.hardware.light@2.0-service
-    
+    android.hardware.light@2.0-service.talkman
+
 # MBN
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/rootdir/etc/init.talkman.sh:$(TARGET_COPY_OUT_VENDOR)/bin/init.talkman.sh
@@ -292,17 +329,20 @@ PRODUCT_COPY_FILES += \
     frameworks/av/media/libstagefright/data/media_codecs_google_video.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/media_codecs_google_video.xml \
     $(LOCAL_PATH)/configs/media_codecs.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/media_codecs.xml \
     $(LOCAL_PATH)/configs/media_codecs_performance.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/media_codecs_performance.xml \
-    $(LOCAL_PATH)/configs/media_profiles.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/media_profiles.xml
+    $(LOCAL_PATH)/configs/media_profiles.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/media_profiles.xml \
+    $(LOCAL_PATH)/configs/media_profiles_V1_0.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_profiles_V1_0.xml
 
 # MSM IRQ Balancer configuration file
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/msm_irqbalance.conf:$(TARGET_COPY_OUT_VENDOR)/etc/msm_irqbalance.conf
 
-# NFC packages
+# NFC — PN547 (nfc/src/libpn547_fw.c). Init fragment is init.talkman.nfc.rc.
 PRODUCT_PACKAGES += \
     com.android.nfc_extras \
     Tag \
-    NfcNci
+    NfcNci \
+    libpn547_fw \
+    init.talkman.nfc.rc
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/nfc/libnfc-nci.conf:$(TARGET_COPY_OUT_VENDOR)/etc/libnfc-nci.conf \
@@ -317,12 +357,12 @@ DEVICE_PACKAGE_OVERLAYS := \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/privapp-permissions-talkman.xml:system/etc/permissions/privapp-permissions-talkman.xml
 
-# Power HAL
+# Power HAL — MSM8992 sysfs (A57 cap 1824000 kHz). Not perfd-less SUCCESS stub.
 PRODUCT_PACKAGES += \
-    android.hardware.power-service-qti
+    android.hardware.power@1.0-service.talkman
 
-# Power configuration file
 PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/configs/powerhint.xml:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.xml \
     $(LOCAL_PATH)/rootdir/etc/init.talkman.power.sh:$(TARGET_COPY_OUT_VENDOR)/bin/init.talkman.power.sh
 
 # Qseecomd configuration file
@@ -341,9 +381,7 @@ PRODUCT_PACKAGES += \
     qti-telephony-utils \
     qti_telephony_utils.xml \
     librmnetctl \
-    rmnetcli \
-    libaudioclient_shim \
-    slim_shim
+    rmnetcli
 
 PRODUCT_BOOT_JARS += \
     telephony-ext
@@ -393,11 +431,21 @@ PRODUCT_PACKAGES += \
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
     ro.oem_unlock_supported=1
 
-# Vibrator HAL
+# Vibrator HAL — qpnp-haptic timed_output (/sys/class/timed_output/vibrator/enable)
+# HIDL 1.0 is the Wave 5 sysfs service (hwbinder). AOSP 1.0-impl is passthrough
+# and would collide with android.hardware.vibrator@1.0-service.talkman.
 PRODUCT_PACKAGES += \
-    android.hardware.vibrator@1.0-impl
+    vibrator.talkman \
+    android.hardware.vibrator@1.0-service.talkman
 
-# Wi-Fi
+# Wi-Fi — QCA6174 on PCIe0.
+# CNSS (cnss_pci.c QCA6174_FW_3_0/3_2) request_firmware("qwlan30.bin") with
+# firmware_class.path=/vendor/firmware. talkman-vendor.mk copies talkman
+# qwlan30.bin / bdwlan30.bin there (1068368 B STA image, not bullhead 750788 B).
+# WCNSS_qcom_cfg.ini is talkman 2x2. MAC is not baked: talkman_wlan_mac
+# installs /vendor/firmware/wlan/qca_cld/wlan_mac.bin -> /persist/wlan_mac.bin
+# (installer provision.sh copies DPP/QCOM/WLAN.PROVISION, qcacld format).
+# Missing persist -> QCA OTP (g_use_otpmac=1). Do not ship Intf* samples.
 PRODUCT_PACKAGES += \
     android.hardware.wifi@1.0-service \
     libwpa_client \
@@ -412,17 +460,37 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/wifi/wpa_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/wpa_supplicant_overlay.conf \
     $(LOCAL_PATH)/wifi/p2p_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/p2p_supplicant_overlay.conf \
     $(LOCAL_PATH)/wifi/WCNSS_cfg.dat:$(TARGET_COPY_OUT_SYSTEM)/etc/firmware/wlan/qca_cld/WCNSS_cfg.dat \
-    $(LOCAL_PATH)/wifi/WCNSS_qcom_cfg.ini:$(TARGET_COPY_OUT_SYSTEM)/etc/firmware/wlan/qca_cld/WCNSS_qcom_cfg.ini
+    $(LOCAL_PATH)/wifi/WCNSS_qcom_cfg.ini:$(TARGET_COPY_OUT_SYSTEM)/etc/firmware/wlan/qca_cld/WCNSS_qcom_cfg.ini \
+    $(LOCAL_PATH)/wifi/WCNSS_cfg.dat:$(TARGET_COPY_OUT_VENDOR)/firmware/wlan/qca_cld/WCNSS_cfg.dat \
+    $(LOCAL_PATH)/wifi/WCNSS_qcom_cfg.ini:$(TARGET_COPY_OUT_VENDOR)/firmware/wlan/qca_cld/WCNSS_qcom_cfg.ini
 
 # only include verity on user builds for LineageOS
+# fstab-verity.talkman is copied to root/ramdisk/vendor etc above.
 ifeq ($(TARGET_BUILD_VARIANT),user)
-   PRODUCT_COPY_FILES += $(LOCAL_PATH)/fstab-verity.talkman:root/fstab.talkman
-
-# setup dm-verity configs
 PRODUCT_SYSTEM_VERITY_PARTITION := /dev/block/platform/soc.0/f9824900.sdhci/by-name/system
 #PRODUCT_VENDOR_VERITY_PARTITION := /dev/block/platform/soc.0/f9824900.sdhci/by-name/vendor
 $(call inherit-product, build/target/product/verity.mk)
 endif
 
+# Fallback if talkman-camera-xml.mk is absent. Before inherit-product
+# (that overwrites LOCAL_PATH).
+ifeq ($(wildcard vendor/msft/talkman/talkman-camera-xml.mk),)
+ifneq ($(wildcard $(LOCAL_PATH)/configs/msm8992_camera.xml),)
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/configs/msm8992_camera.xml:$(TARGET_COPY_OUT_VENDOR)/etc/camera/msm8992_camera.xml \
+    $(LOCAL_PATH)/configs/msm8992_camera.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/camera/msm8992_camera.xml
+endif
+endif
+
 $(call inherit-product-if-exists, hardware/qcom/msm8994/msm8992.mk)
 $(call inherit-product-if-exists, vendor/qcom/gpu/msm8994/msm8994-gpu-vendor.mk)
+# DSP/OIS/camera XML COPY_FILES stay in the vendor fragments.
+ifneq ($(wildcard vendor/msft/talkman/talkman-dsp.mk),)
+$(call inherit-product, vendor/msft/talkman/talkman-dsp.mk)
+endif
+ifneq ($(wildcard vendor/msft/talkman/talkman-ois.mk),)
+$(call inherit-product, vendor/msft/talkman/talkman-ois.mk)
+endif
+ifneq ($(wildcard vendor/msft/talkman/talkman-camera-xml.mk),)
+$(call inherit-product, vendor/msft/talkman/talkman-camera-xml.mk)
+endif

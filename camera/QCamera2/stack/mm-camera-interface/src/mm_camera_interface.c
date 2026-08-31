@@ -39,11 +39,15 @@
 #include <media/msm_cam_sensor.h>
 #include <cutils/properties.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "mm_camera_dbg.h"
 #include "mm_camera_interface.h"
 #include "mm_camera_sock.h"
 #include "mm_camera.h"
+
+/* Daemon XML SensorName for CameraId 0. No slave-id. */
+#define TALKMAN_REAR_SENSOR_NAME "mot_imx230"
 
 static pthread_mutex_t g_intf_lock = PTHREAD_MUTEX_INITIALIZER;
 
@@ -1430,8 +1434,8 @@ void get_sensor_info()
                 temp = entity.flags >> 8;
                 mount_angle = (temp & 0xFF) * 90;
                 facing = (temp >> 8);
-                ALOGD("index = %u flag = %x mount_angle = %u facing = %u\n",
-                    (unsigned int)num_cameras, (unsigned int)temp,
+                CDBG_HIGH("%s: sensor '%s' index=%u mount_angle=%u facing=%u",
+                    __func__, entity.name, (unsigned int)num_cameras,
                     (unsigned int)mount_angle, (unsigned int)facing);
                 g_cam_ctrl.info[num_cameras].facing = (int)facing;
                 g_cam_ctrl.info[num_cameras].orientation = (int)mount_angle;
@@ -1517,6 +1521,10 @@ uint8_t get_num_of_cameras()
     struct sensor_init_cfg_data cfg;
     char prop[PROPERTY_VALUE_MAX];
     uint32_t globalLogLevel = 0;
+    int found_sensor_init = 0;
+
+    memset(subdev_name, 0, sizeof(subdev_name));
+    memset(&cfg, 0, sizeof(cfg));
 
     property_get("persist.camera.hal.debug", prop, "0");
     int val = atoi(prop);
@@ -1584,25 +1592,42 @@ uint8_t get_num_of_cameras()
                 entity.name, entity.type, entity.group_id);
             if (entity.type == MEDIA_ENT_T_V4L2_SUBDEV &&
                 entity.group_id == MSM_CAMERA_SUBDEV_SENSOR_INIT) {
-                snprintf(subdev_name, sizeof(dev_name), "/dev/%s", entity.name);
+                snprintf(subdev_name, sizeof(subdev_name), "/dev/%s",
+                    entity.name);
+                found_sensor_init = 1;
                 break;
             }
         }
         close(dev_fd);
         dev_fd = -1;
+        if (found_sensor_init)
+            break;
     }
 
-    /* Open sensor_init subdev */
+    /* Open sensor_init subdev; daemon probed CameraId 0 mot_imx230. */
+    if (!found_sensor_init || subdev_name[0] == '\0') {
+        CDBG_ERROR("%s: sensor_init subdev not found (%s)",
+            __func__, TALKMAN_REAR_SENSOR_NAME);
+        pthread_mutex_unlock(&g_intf_lock);
+        return 0;
+    }
+
     sd_fd = open(subdev_name, O_RDWR);
     if (sd_fd < 0) {
-        CDBG_ERROR("Open sensor_init subdev failed");
-        return FALSE;
+        CDBG_ERROR("%s: Open sensor_init %s failed: %s",
+            __func__, subdev_name, strerror(errno));
+        pthread_mutex_unlock(&g_intf_lock);
+        return 0;
     }
 
     cfg.cfgtype = CFG_SINIT_PROBE_WAIT_DONE;
     cfg.cfg.setting = NULL;
     if (ioctl(sd_fd, VIDIOC_MSM_SENSOR_INIT_CFG, &cfg) < 0) {
-        CDBG_ERROR("failed");
+        CDBG_ERROR("%s: CFG_SINIT_PROBE_WAIT_DONE failed (%s)",
+            __func__, TALKMAN_REAR_SENSOR_NAME);
+    } else {
+        CDBG_HIGH("%s: sensor_init wait done for %s",
+            __func__, TALKMAN_REAR_SENSOR_NAME);
     }
     close(sd_fd);
     dev_fd = -1;
@@ -1666,7 +1691,8 @@ uint8_t get_num_of_cameras()
     sort_camera_info(g_cam_ctrl.num_cam);
     /* unlock the mutex */
     pthread_mutex_unlock(&g_intf_lock);
-    CDBG("%s: num_cameras=%d\n", __func__, (int)g_cam_ctrl.num_cam);
+    CDBG_HIGH("%s: num_cameras=%d rear=%s",
+        __func__, (int)g_cam_ctrl.num_cam, TALKMAN_REAR_SENSOR_NAME);
     return(uint8_t)g_cam_ctrl.num_cam;
 }
 

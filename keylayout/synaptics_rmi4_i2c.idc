@@ -1,20 +1,7 @@
-# Copyright 2015 The Android Open Source Project
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-#
-# Input Device Calibration File for the Talkman touch screen.
-#
+# Lumia 950 (talkman) Synaptics RMI4 F12
+# Input name synaptics_rmi4_i2c (compatible synaptics,rmi4 @ 0x4b, BLSP1 QUP1).
+# Firmware SynaFWVendor1.img (talkman_SynapticsTouch.inf / vendor/firmware).
+# Panel 1440x2560, 64.80 x 115.20 mm (INF DisplayWidth/Height10um 0x1950 / 0x2d00).
 
 device.internal = 1
 
@@ -22,8 +9,8 @@ touch.deviceType = touchScreen
 touch.orientationAware = 1
 
 touch.size.calibration = diameter
-touch.size.scale = 12.653
-touch.size.bias = 7.396
+touch.size.scale = 10
+touch.size.bias = 0
 touch.size.isSummed = 0
 
 touch.pressure.calibration = amplitude

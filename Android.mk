@@ -25,12 +25,7 @@
 
 LOCAL_PATH := $(call my-dir)
 
-include $(CLEAR_VARS)
-LOCAL_MODULE := talkman_wlan_mac
-wlan_mac_path := $(TARGET_OUT_ETC)/firmware/wlan/qca_cld/wlan_mac.bin
-LOCAL_POST_INSTALL_CMD := $(hide) mkdir -p $(dir $(wlan_mac_path)) && ln -sf /persist/wlan_mac.bin $(wlan_mac_path)
-wlan_mac_path :=
-include $(BUILD_PHONY_PACKAGE)
+# talkman_wlan_mac: wifi/Android.mk (persist /wlan_mac.bin symlink).
 
 ifneq ($(filter talkman, $(TARGET_DEVICE)),)
 

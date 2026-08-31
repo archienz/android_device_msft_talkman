@@ -53,13 +53,20 @@
             system/bin/test_diag \
             system/bin/thermal-engine \
             system/bin/time_daemon \
-            system/etc/acdbdata/MTP/MTP_Bluetooth_cal.acdb \
-            system/etc/acdbdata/MTP/MTP_General_cal.acdb \
-            system/etc/acdbdata/MTP/MTP_Global_cal.acdb \
-            system/etc/acdbdata/MTP/MTP_Handset_cal.acdb \
-            system/etc/acdbdata/MTP/MTP_Hdmi_cal.acdb \
-            system/etc/acdbdata/MTP/MTP_Headset_cal.acdb \
-            system/etc/acdbdata/MTP/MTP_Speaker_cal.acdb \
+            system/etc/acdbdata/Bluetooth_cal_8994.acdb \
+            system/etc/acdbdata/Codec_cal_8994.acdb \
+            system/etc/acdbdata/General_cal_8994.acdb \
+            system/etc/acdbdata/Global_cal_8994.acdb \
+            system/etc/acdbdata/Handset_cal_8994.acdb \
+            system/etc/acdbdata/Hdmi_cal_8994.acdb \
+            system/etc/acdbdata/Headset_cal_8994.acdb \
+            system/etc/acdbdata/Speaker_cal_8994.acdb \
+            vendor/firmware/ice40.bin \
+            vendor/firmware/qwlan30.bin \
+            vendor/firmware/mba.b00 \
+            vendor/firmware/mba.mbn \
+            vendor/firmware/modem.mdt \
+            vendor/lib/libmmcamera_mot_imx230.so \
             system/etc/cne/profile.txt \
             system/etc/data/dsi_config.xml \
             system/etc/data/netmgr_config.xml \

@@ -1,19 +1,16 @@
-# Copyright 2015 The Android Open Source Project
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Talkman USB gadget — CAF 3.10 g_android (CONFIG_USB_G_ANDROID).
+# No CONFIG_USB_CONFIGFS. Do not mkdir /config/usb_gadget.
+# Dual-role DWC3 stays UFP/sink so USBIN charges. No PD PHY.
+# Composition is android_usb sysfs. persist.sys.usb.config=adb until /data.
+
+on early-init
+    setprop sys.usb.configfs 0
 
 on init
-    write /sys/class/android_usb/android0/f_rndis/manufacturer LGE
+    setprop sys.usb.configfs 0
+    setprop persist.sys.usb.config adb
+
+    write /sys/class/android_usb/android0/f_rndis/manufacturer Microsoft
     write /sys/class/android_usb/android0/f_rndis/vendorID 18D1
     write /sys/class/android_usb/android0/f_rndis/wceis 1
 
@@ -22,8 +19,18 @@ on boot
     write /sys/class/android_usb/android0/iManufacturer ${ro.product.manufacturer}
     write /sys/class/android_usb/android0/iProduct ${ro.product.model}
 
+    write /sys/devices/soc.0/f9200000.ssusb/mode peripheral
+    write /sys/devices/soc.0/f9200000.ssusb/f9200000.dwc3/mode peripheral
     chown root system /sys/class/dual_role_usb/otg_default/mode
     chmod 664 /sys/class/dual_role_usb/otg_default/mode
+    write /sys/class/dual_role_usb/otg_default/mode ufp
+
+on charger
+    write /sys/devices/soc.0/f9200000.ssusb/mode peripheral
+    write /sys/class/dual_role_usb/otg_default/mode ufp
+    exec - root root -- /vendor/bin/init.talkman.usb.sh
+    setprop sys.usb.config adb
+    start adbd
 
 on post-fs
     mkdir /dev/usb-ffs 0770 shell shell
@@ -35,15 +42,38 @@ on post-fs
     setprop sys.usb.ffs.max_read 262144
     setprop sys.usb.mtp.device_type 3
     write /sys/class/android_usb/android0/f_ffs/aliases adb
-
     setprop sys.usb.ffs.aio_compat 1
+    setprop persist.adb.nonblocking_ffs 0
+    setprop ro.adb.nonblocking_ffs 0
+    exec - root root -- /vendor/bin/init.talkman.usb.sh
 
 on post-fs-data
     write /sys/module/rndis_ipa/parameters/min_cpu_freq 1036800
     write /sys/class/android_usb/android0/f_rndis_qc/rndis_transports BAM2BAM_IPA
+    write /sys/class/android_usb/android0/f_ffs/aliases adb
+    write /sys/class/android_usb/android0/iSerial ${ro.serialno}
+    write /sys/class/android_usb/android0/iManufacturer ${ro.product.manufacturer}
+    write /sys/class/android_usb/android0/iProduct ${ro.product.model}
 
-# MTP
-on property:sys.usb.config=mtp
+on property:sys.usb.config=none && property:sys.usb.configfs=0
+    stop adbd
+    write /sys/class/android_usb/android0/enable 0
+    write /sys/class/android_usb/android0/functions ${sys.usb.config}
+    setprop sys.usb.state ${sys.usb.config}
+
+on property:sys.usb.config=adb && property:sys.usb.configfs=0
+    write /sys/class/android_usb/android0/enable 0
+    write /sys/class/android_usb/android0/idVendor 18D1
+    write /sys/class/android_usb/android0/idProduct 4EE7
+    write /sys/class/android_usb/android0/bDeviceClass 0
+    write /sys/class/android_usb/android0/bDeviceSubClass 0
+    write /sys/class/android_usb/android0/bDeviceProtocol 0
+    write /sys/class/android_usb/android0/functions adb
+    write /sys/class/android_usb/android0/enable 1
+    start adbd
+    setprop sys.usb.state ${sys.usb.config}
+
+on property:sys.usb.config=mtp && property:sys.usb.configfs=0
     stop adbd
     write /sys/class/android_usb/android0/enable 0
     write /sys/class/android_usb/android0/idVendor 18D1
@@ -55,7 +85,7 @@ on property:sys.usb.config=mtp
     write /sys/class/android_usb/android0/enable 1
     setprop sys.usb.state ${sys.usb.config}
 
-on property:sys.usb.config=mtp,adb
+on property:sys.usb.config=mtp,adb && property:sys.usb.configfs=0
     write /sys/class/android_usb/android0/enable 0
     write /sys/class/android_usb/android0/idVendor 18D1
     write /sys/class/android_usb/android0/idProduct 4EE2
@@ -67,8 +97,7 @@ on property:sys.usb.config=mtp,adb
     start adbd
     setprop sys.usb.state ${sys.usb.config}
 
-# rndis
-on property:sys.usb.config=rndis
+on property:sys.usb.config=rndis && property:sys.usb.configfs=0
     stop adbd
     write /sys/class/android_usb/android0/enable 0
     write /sys/class/android_usb/android0/idVendor 18D1
@@ -80,7 +109,7 @@ on property:sys.usb.config=rndis
     write /sys/class/android_usb/android0/enable 1
     setprop sys.usb.state ${sys.usb.config}
 
-on property:sys.usb.config=rndis,adb
+on property:sys.usb.config=rndis,adb && property:sys.usb.configfs=0
     write /sys/class/android_usb/android0/enable 0
     write /sys/class/android_usb/android0/idVendor 18D1
     write /sys/class/android_usb/android0/idProduct 4EE4
@@ -92,8 +121,7 @@ on property:sys.usb.config=rndis,adb
     start adbd
     setprop sys.usb.state ${sys.usb.config}
 
-# PTP
-on property:sys.usb.config=ptp
+on property:sys.usb.config=ptp && property:sys.usb.configfs=0
     stop adbd
     write /sys/class/android_usb/android0/enable 0
     write /sys/class/android_usb/android0/idVendor 18D1
@@ -105,7 +133,7 @@ on property:sys.usb.config=ptp
     write /sys/class/android_usb/android0/enable 1
     setprop sys.usb.state ${sys.usb.config}
 
-on property:sys.usb.config=ptp,adb
+on property:sys.usb.config=ptp,adb && property:sys.usb.configfs=0
     write /sys/class/android_usb/android0/enable 0
     write /sys/class/android_usb/android0/idVendor 18D1
     write /sys/class/android_usb/android0/idProduct 4EE6
@@ -117,8 +145,7 @@ on property:sys.usb.config=ptp,adb
     start adbd
     setprop sys.usb.state ${sys.usb.config}
 
-# diag
-on property:sys.usb.config=diag
+on property:sys.usb.config=diag && property:sys.usb.configfs=0
     stop adbd
     write /sys/class/android_usb/android0/enable 0
     write /sys/class/android_usb/android0/idVendor 05C6
@@ -134,7 +161,7 @@ on property:sys.usb.config=diag
     start adbd
     setprop sys.usb.state ${sys.usb.config}
 
-on property:sys.usb.config=diag,adb
+on property:sys.usb.config=diag,adb && property:sys.usb.configfs=0
     stop adbd
     write /sys/class/android_usb/android0/enable 0
     write /sys/class/android_usb/android0/idVendor 05C6
@@ -150,8 +177,7 @@ on property:sys.usb.config=diag,adb
     start adbd
     setprop sys.usb.state ${sys.usb.config}
 
-# USB midi configuration
-on property:sys.usb.config=midi
+on property:sys.usb.config=midi && property:sys.usb.configfs=0
     stop adbd
     write /sys/class/android_usb/android0/enable 0
     write /sys/class/android_usb/android0/idVendor 18D1
@@ -160,8 +186,7 @@ on property:sys.usb.config=midi
     write /sys/class/android_usb/android0/enable 1
     setprop sys.usb.state ${sys.usb.config}
 
-# USB midi configuration, with adb
-on property:sys.usb.config=midi,adb
+on property:sys.usb.config=midi,adb && property:sys.usb.configfs=0
     write /sys/class/android_usb/android0/enable 0
     write /sys/class/android_usb/android0/idVendor 18D1
     write /sys/class/android_usb/android0/idProduct 4EE9

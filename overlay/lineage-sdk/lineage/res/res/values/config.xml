@@ -52,6 +52,15 @@
          LIGHTS_ADJUSTABLE_BATTERY_LED_BRIGHTNESS = 128
          For example, a device with notification and battery lights that supports
          pulsating and RGB control would set this config to 75. -->
-    <integer name="config_deviceLightCapabilities">0</integer>
+    <!-- RGB notification (1) + RGB battery (2) + battery LED (64). PMI8994 RGB. -->
+    <integer name="config_deviceLightCapabilities">67</integer>
+
+    <!--
+         QPDS-T900 exists. Timeout is lineage-sdk default; not a measured
+         sub-300ms claim. Off until the user enables it.
+    -->
+    <bool name="config_proximityCheckOnWake">true</bool>
+    <integer name="config_proximityCheckTimeout">250</integer>
+    <bool name="config_proximityCheckOnWakeEnabledByDefault">false</bool>
 
 </resources>

@@ -22,4 +22,14 @@
     <!-- Enable color temperature setting. -->
     <bool name="config_enableColorTemperature">true</bool>
 
+    <!--
+         qpnp-fg sysfs (bms). charge_full / charge_full_design are µAh.
+         cycle_count is the FG SRAM counter. Not a 50 % overlay stub.
+         Health 2.1-impl still walks /sys/class/power_supply (battery + bms).
+    -->
+    <bool name="config_supportBatteryHealth">true</bool>
+    <string name="config_batteryCalculatedCapacity" translatable="false">/sys/class/power_supply/bms/charge_full</string>
+    <string name="config_batteryDesignCapacity" translatable="false">/sys/class/power_supply/bms/charge_full_design</string>
+    <string name="config_batteryChargeCycles" translatable="false">/sys/class/power_supply/bms/cycle_count</string>
+
 </resources>

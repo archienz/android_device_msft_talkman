@@ -1,0 +1,82 @@
+# dumpstate sysfs for qpnp-fg (bms) + qpnp-smbcharger (battery, dc) + USB gadget (usb).
+# Attr names match drivers/power/qpnp-fg.c fg_power_props, qpnp-smbcharger.c
+# smbchg_battery_properties / smbchg_dc_properties, and power_supply_sysfs.c.
+# talkman-cci-scan is read-only here.
+
+on boot
+    chmod 0755 /sys/class/power_supply/battery
+    chmod 0755 /sys/class/power_supply/bms
+    chmod 0755 /sys/class/power_supply/usb
+    chmod 0755 /sys/class/power_supply/dc
+
+    # smbcharger battery
+    chmod 0644 /sys/class/power_supply/battery/uevent
+    chmod 0644 /sys/class/power_supply/battery/status
+    chmod 0644 /sys/class/power_supply/battery/present
+    chmod 0644 /sys/class/power_supply/battery/battery_charging_enabled
+    chmod 0644 /sys/class/power_supply/battery/charging_enabled
+    chmod 0644 /sys/class/power_supply/battery/charge_type
+    chmod 0644 /sys/class/power_supply/battery/capacity
+    chmod 0644 /sys/class/power_supply/battery/health
+    chmod 0644 /sys/class/power_supply/battery/technology
+    chmod 0644 /sys/class/power_supply/battery/system_temp_level
+    chmod 0644 /sys/class/power_supply/battery/flash_current_max
+    chmod 0644 /sys/class/power_supply/battery/constant_charge_current_max
+    chmod 0644 /sys/class/power_supply/battery/voltage_max
+    chmod 0644 /sys/class/power_supply/battery/voltage_max_design
+    chmod 0644 /sys/class/power_supply/battery/current_now
+    chmod 0644 /sys/class/power_supply/battery/charge_counter
+    chmod 0644 /sys/class/power_supply/battery/temp
+    chmod 0644 /sys/class/power_supply/battery/voltage_now
+    chmod 0644 /sys/class/power_supply/battery/safety_timer_enable
+    chmod 0644 /sys/class/power_supply/battery/input_current_max
+    chmod 0644 /sys/class/power_supply/battery/input_current_settled
+    chmod 0644 /sys/class/power_supply/battery/flash_active
+    chmod 0644 /sys/class/power_supply/battery/type
+    chmod 0644 /sys/class/power_supply/battery/charge_full
+    chmod 0644 /sys/class/power_supply/battery/charge_full_design
+    chmod 0644 /sys/class/power_supply/battery/cycle_count
+
+    # qpnp-fg bms
+    chmod 0644 /sys/class/power_supply/bms/uevent
+    chmod 0644 /sys/class/power_supply/bms/type
+    chmod 0644 /sys/class/power_supply/bms/capacity
+    chmod 0644 /sys/class/power_supply/bms/capacity_raw
+    chmod 0644 /sys/class/power_supply/bms/current_now
+    chmod 0644 /sys/class/power_supply/bms/voltage_now
+    chmod 0644 /sys/class/power_supply/bms/voltage_ocv
+    chmod 0644 /sys/class/power_supply/bms/voltage_max_design
+    chmod 0644 /sys/class/power_supply/bms/voltage_min
+    chmod 0644 /sys/class/power_supply/bms/charge_now
+    chmod 0644 /sys/class/power_supply/bms/charge_now_raw
+    chmod 0644 /sys/class/power_supply/bms/charge_now_error
+    chmod 0644 /sys/class/power_supply/bms/charge_full
+    chmod 0644 /sys/class/power_supply/bms/charge_full_design
+    chmod 0644 /sys/class/power_supply/bms/temp
+    chmod 0644 /sys/class/power_supply/bms/cool_temp
+    chmod 0644 /sys/class/power_supply/bms/warm_temp
+    chmod 0644 /sys/class/power_supply/bms/resistance
+    chmod 0644 /sys/class/power_supply/bms/resistance_id
+    chmod 0644 /sys/class/power_supply/bms/battery_type
+    chmod 0644 /sys/class/power_supply/bms/esr_count
+    chmod 0644 /sys/class/power_supply/bms/cycle_count
+    chmod 0644 /sys/class/power_supply/bms/cycle_count_id
+
+    # USB gadget psy (dwc3/msm)
+    chmod 0644 /sys/class/power_supply/usb/uevent
+    chmod 0644 /sys/class/power_supply/usb/online
+    chmod 0644 /sys/class/power_supply/usb/present
+    chmod 0644 /sys/class/power_supply/usb/type
+    chmod 0644 /sys/class/power_supply/usb/health
+    chmod 0644 /sys/class/power_supply/usb/current_max
+    chmod 0644 /sys/class/power_supply/usb/voltage_now
+    chmod 0644 /sys/class/power_supply/usb/voltage_max
+    chmod 0644 /sys/class/power_supply/usb/scope
+
+    # smbcharger dc (Qi / Wireless)
+    chmod 0644 /sys/class/power_supply/dc/uevent
+    chmod 0644 /sys/class/power_supply/dc/present
+    chmod 0644 /sys/class/power_supply/dc/online
+    chmod 0644 /sys/class/power_supply/dc/charging_enabled
+    chmod 0644 /sys/class/power_supply/dc/current_max
+    chmod 0644 /sys/class/power_supply/dc/type

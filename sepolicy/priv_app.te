@@ -9,6 +9,8 @@ allow priv_app sysfs_devices_block:dir { search open };
 allow priv_app sysfs_devices_block:file { read write open getattr setattr };
 allow priv_app sysfs:file { open read getattr };
 allow priv_app sysfs:dir open;
+# Settings battery-health overlay: qpnp-fg bms charge_full / cycle_count.
+r_dir_file(priv_app, sysfs_batteryinfo)
 allow priv_app proc:file open;
 allow priv_app proc_interrupts:file open;
 allow priv_app device:dir open;

@@ -1,0 +1,29 @@
+# PMI8994 RGB leds-qpnp (red/green/blue) + mdss lcd-backlight + GPIO torch.
+# Types come from platform public/file.te (also labels /sys/class/leds).
+# lights.talkman writes:
+#   /sys/class/leds/lcd-backlight/brightness
+#   /sys/class/leds/{red,green,blue}/brightness
+#   /sys/class/leds/{red,green,blue}/trigger
+# init.talkman.rc chown/chmod camera flash:
+#   /sys/class/leds/led:flash_{0,1,torch}/brightness
+# torch.dtsi gpio-leds label is led::flash_torch.
+
+# init.talkman.rc flash chmod + ueventd.talkman.rc RGB/backlight/torch
+allow init sysfs_leds:dir r_dir_perms;
+allow init sysfs_leds:file { getattr setattr open read write };
+allow init sysfs_leds:lnk_file r_file_perms;
+allow ueventd sysfs_leds:dir r_dir_perms;
+allow ueventd sysfs_leds:file { getattr setattr };
+allow ueventd sysfs_leds:lnk_file r_file_perms;
+
+allow hal_light_default sysfs_leds:dir r_dir_perms;
+allow hal_light_default sysfs_leds:file rw_file_perms;
+allow hal_light_default sysfs_leds:lnk_file r_file_perms;
+
+r_dir_file(dumpstate, sysfs_leds)
+r_dir_file(hal_dumpstate_impl, sysfs_leds)
+
+userdebug_or_eng(`
+  r_dir_file(shell, sysfs_leds)
+  r_dir_file(su, sysfs_leds)
+')

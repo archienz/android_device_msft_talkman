@@ -1,0 +1,9 @@
+# Health 2.1 server = hal_health_default + healthd (LOS 18.1 charger mode).
+# AOSP public/hal_health.te already r_dir_file(hal_health_server, sysfs_batteryinfo)
+# and sysfs:dir. Vendor leftover labels after symlink follow:
+#   sysfs_battery  — pre-sysfs_batteryinfo qpnp nodes
+#   sysfs_usb      — f9200000.ssusb tree (USB psy until power_supply prefix wins)
+#   sysfs_wakeup   — /class/wakeup and per-psy wakeupN (AOSP genfs)
+r_dir_file(hal_health_server, sysfs_battery)
+r_dir_file(hal_health_server, sysfs_usb)
+r_dir_file(hal_health_server, sysfs_wakeup)

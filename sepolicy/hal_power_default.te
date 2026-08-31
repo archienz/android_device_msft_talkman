@@ -1,2 +1,24 @@
 allow hal_power_default debugfs_rpm:file { open read getattr };
+allow hal_power_default debugfs:dir r_dir_perms;
 allow hal_power_default perfd_data_file:sock_file write;
+
+# /vendor/etc/powerhint.xml
+allow hal_power_default vendor_configs_file:dir search;
+allow hal_power_default vendor_configs_file:file r_file_perms;
+
+# Walk /sys/class /sys/module /sys/devices
+allow hal_power_default sysfs:dir r_dir_perms;
+
+# interactive / cpufreq / cpu_boost (genfs sysfs_devices_system_cpu)
+allow hal_power_default sysfs_devices_system_cpu:dir r_dir_perms;
+allow hal_power_default sysfs_devices_system_cpu:file rw_file_perms;
+
+# msm_performance cpu_max_freq
+allow hal_power_default sysfs_performance:dir r_dir_perms;
+allow hal_power_default sysfs_performance:file rw_file_perms;
+
+# KGSL pwrlevel (class path). default_pwrlevel on the device node is sysfs_thermal.
+allow hal_power_default sysfs_kgsl:dir r_dir_perms;
+allow hal_power_default sysfs_kgsl:file rw_file_perms;
+allow hal_power_default sysfs_thermal:dir search;
+allow hal_power_default sysfs_thermal:file rw_file_perms;
