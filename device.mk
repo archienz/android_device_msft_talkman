@@ -438,7 +438,7 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
     ro.oem_unlock_supported=1
 
 # Vibrator HAL — qpnp-haptic timed_output (/sys/class/timed_output/vibrator/enable)
-# HIDL 1.0 is the Wave 5 sysfs service (hwbinder). AOSP 1.0-impl is passthrough
+# HIDL 1.0 is the sysfs service (hwbinder). AOSP 1.0-impl is passthrough
 # and would collide with android.hardware.vibrator@1.0-service.talkman.
 PRODUCT_PACKAGES += \
     vibrator.talkman \

@@ -1,6 +1,6 @@
 # Talkman NFC — NXP PN547 (keep)
 
-Wave 3 packaging note. **Chipset stays PN547.** This file is the factory EEPROM
+**Chipset stays PN547.** This file is the factory EEPROM
 extract from WOA ACPI, plus the FeliCa/snfc and VZW checks. It is not a firmware
 blob and it is not a chipset swap.
 
