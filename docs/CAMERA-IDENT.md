@@ -32,7 +32,7 @@ NFC GPIOs **match** schematic and DT: IRQ **29**, VEN **30**, FW-download **94**
 | NFC GPIO | IRQ 29 / VEN 30 / DWL 94 | Same in `nfc.dtsi` | Match. Not Dual SIM. Not CCI. |
 | Dual SIM | RM-1118 / 4VM_08d | Ignored | Do not copy. |
 
-Source: EpicLPer `Lumia950-Camera-Bringup` `notes/handoff.md`; `docs/hardware/SCHEMATIC-RM-1104.md`; `docs/nfc-pn547.md`. Compare: `docs/EPICLPER-COMPARE.md`.
+Source: EpicLPer `Lumia950-Camera-Bringup` `notes/handoff.md`; `docs/nfc-pn547.md`. Compare: `docs/EPICLPER-COMPARE.md`.
 
 ## What this is not
 

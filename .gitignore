@@ -1,3 +1,7 @@
 qmihal/
 libqrtr/
 i2c-tools/
+
+# Microsoft service schematic: use locally, do not publish.
+docs/hardware/*.pdf
+docs/hardware/schematic-png/
