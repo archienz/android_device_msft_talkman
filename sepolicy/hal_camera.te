@@ -1,3 +1,6 @@
+# leftover MATCH: HIDL camera talks to mm-qcamera-daemon (mot_imx230).
+# Daemon dlopens vendor lib + XML. HAL does not invent qcom,slave-id.
+# No Dual SIM CameraId 1. init.te unchanged.
 allow hal_camera camera:unix_dgram_socket sendto;
 allow hal_camera camera_data_file:sock_file write;
 allow hal_camera perfd_data_file:dir search;

@@ -1,3 +1,6 @@
+# leftover MATCH: android.hardware.camera.provider@2.4-service (mot_imx230).
+# Sensor name + XML live in camera domain, not here. No slave-id. No Dual SIM.
+# init.te unchanged.
 allow hal_camera_default kernel:system module_request;
 allow hal_camera_default hal_graphics_mapper_hwservice:hwservice_manager find;
 allow hal_camera_default hal_graphics_composer_default:fd use;

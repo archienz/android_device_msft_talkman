@@ -1,4 +1,5 @@
-# Qualcomm MSM camera — mm-qcamera-daemon (init qcamerasvr)
+# leftover MATCH: mm-qcamera-daemon (init qcamerasvr) + clark mot_imx230
+# vendor lib + XML. No qcom,slave-id. No Dual SIM CameraId 1. init.te unchanged.
 type camera, domain;
 type camera_exec, exec_type, vendor_file_type, file_type;
 
@@ -69,11 +70,12 @@ allow camera mnt_vendor_file:dir search;
 
 r_dir_file(camera, firmware_file)
 
-# mot_imx230 /vendor/lib: libmmcamera_mot_imx230.so + libchromatix_mot_imx230_*.so
+# leftover MATCH: mot_imx230 /vendor/lib (libmmcamera_mot_imx230.so + chromatix)
 allow camera vendor_file:dir r_dir_perms;
 allow camera vendor_file:file { r_file_perms execute };
 allow camera vendor_file:lnk_file r_file_perms;
 
-# /vendor/etc/camera XML (msm8992_camera.xml, mot_imx230_chromatix.xml)
+# leftover MATCH: /vendor/etc/camera XML (msm8992_camera.xml, mot_imx230_chromatix.xml)
+# labeled camera_config_file. No slave-id in XML. init.te unchanged.
 allow camera vendor_configs_file:dir r_dir_perms;
 r_dir_file(camera, camera_config_file)
