@@ -88,31 +88,15 @@ Qi GPIOs match 4VM_08r: `wc-en` GPIO **2**, `wc-det` GPIO **14**.
 
 ## Progress (2026-08-31)
 
-Wave 25 **DONE** (source only, not a meter pass). Keep Wave 24 README `a02481f`. Keep Wave 23 README `49a987a`. Keep Wave 22 README `48aaa4c`. Keep Wave 21 README `12b2c3a`. Keep Wave 20 README. Keep Wave 19 README `0377054`. Keep Wave 18 README `6871f51`. Keep Wave 16 README `3c14b94`. Keep `1d143f5`. Keep `7c44330`. Do not restore `abeb48a`. Do not steal LIVE `extract-files.sh` or `proprietary-files.txt`. Do not steal LIVE `sensors.dtsi`. Do not add `docs/SCHEMATIC-RM-1104.md`. Do not publish the Microsoft service schematic.
+Source in Git is not a pass. A pass is a physical talkman log in `out/qa-*`.
 
-**Definition of done:** a physical talkman log in `out/qa-*`. Source in Git is not a pass. There is no LOS zip. There is no `out/qa-*` meter log. CCI scan never ran on the telephone. GPSTest never ran.
+There is no LineageOS zip. There is no `out/qa-*` meter log. CCI scan never ran on the telephone. GPSTest never ran.
 
-No P0 item is **Working**. Hardware facts: rear CCI **master 1**; LVS1 always-on (not cam-vreg); iris `qcom,camera@2` disabled; `androidboot.usbconfigfs=0`; fingerprint `Microsoft/talkman`; kernel FG leftover 3200/3500; TWRP capacity 3000; NFC IRQ 29 / VEN 30 / DWL 94. Dual SIM is not this product. No `qcom,slave-id`. No `CONFIG_MSM_OIS`. Mixer speaker is QUAT_MI2S (`66c7d50`). `extract-files.sh` dests match COPY_FILES (`6e4d4c2`) for 32-bit `mot_imx230` and bu24210 `.kar`. Lineage fingerprint is `Microsoft/talkman` (`44cb3c5`). Settings overlay leftover (`2fca2c7`: no `color_temp`, no Bell IPv4, no FPC). WCNSS QCA6174 `gNumRxAnt=2`. Location sepolicy `0c0a081`. USB `g_android` (`93506aa`). `androidboot.usbconfigfs=0` (`5d03a73`). Thermal HAL `thermal.talkman` (`9b6cd42` vendor julian). `privapp-permissions` dropped LGE (`ca9adee`). NFC GPIOs: IRQ 29, VEN 30, DWL 94. Rear camera is CCI1 (bus, not SID). LVS1 is always-on, not a cam vreg. `ueventd` jpeg0/jpeg3 (`e9b365a`). CAMERA-IDENT CCI1 (`63bed4c`). Dual SIM RM-1118 / 4VM_08d is not this product. No `qcom,slave-id`. Overlay telephony `config_msim` is false (`f1b93a2`).
+No P0 item is **Working**. Dual SIM RM-1118 is not this product. There is no `qcom,slave-id`. There is no `CONFIG_MSM_OIS`.
 
-Wave 25 source (not a pass): Wave 24 README (`a02481f`). GPS overlay (`732f280`). GNSS sepolicy (`5207baf`). Recents overlay (`5e74b0b`). Snap `mot_imx230` CameraId 0 (`f2c6722`). Power overlay 3000 (`e4cccfb`). Lights sepolicy (`a7b01ae`). Wifi overlay (`ecf0818`). Tethering empty (`6894898`). Telephony IMS false (`79ba90c`). Vendor camera xml (`9df9302`). Kernel `talkman-camera` include (`562bdfdf825`). Kernel BLSP I2C (`ebc1438ce0a`). Kernel ORIGA2 skip (`241ab902cdc`). Hardware: CCI1. NFC 29/30/94. iris@2 disabled. `usbconfigfs=0`. `Microsoft/talkman`. FG 3200/3500. P0 Not Working. No Dual SIM. No slave-id. No `CONFIG_MSM_OIS`. CCI scan never ran on the telephone.
+The Microsoft service schematic is for implementation only. It is not published.
 
-Wave 24 source (not a pass): Wave 23 README (`49a987a`). Bluetooth sepolicy (`7c6b09a`). USB rc leftover (`0cb8d2a`). dumpstate overlay (`db6bee3`). Vendor adsp/venus/cpe (`42d03b8`). Kernel LVS1 always-on (`92f7911a0e4`). Kernel SDHC GPIO8 (`d13f0f5de1d`). Kernel haptic ERM (`d6150de8857`). Kernel TAS2553 QUAT (`46859a0399b`). Kernel pa_therm (`5abd1d8a985`). Kernel HDMI MPP4 (`cb8846d3e72`). Kernel reserved-memory (`62ad4b68af2`). Kernel Si4705 (`ac4b8a99d9b`). Kernel sidekeys (`524be3dd6b4`). Kernel sensors ICM (`410105bf03c`). Kernel CCI scan (`8ae9c029b7f`). Hardware: CCI1. NFC 29/30/94. iris@2 disabled. `usbconfigfs=0`. `Microsoft/talkman`. FG 3200/3500. P0 Not Working. No Dual SIM. No slave-id. No `CONFIG_MSM_OIS`. CCI scan never ran on the telephone.
-
-Wave 23 source (not a pass): telephony leftover (`2d8e68c`). Wave 22 README (`48aaa4c`). Bluetooth overlay QCA6174 (`115fada`). NFC sepolicy (`e74046f`). Hardware keys leftover (`da9e012`). Kernel CCI scan `CONFIG_TALKMAN_CCI_SCAN` (`8ae9c029b7f`). Kernel GPIOs (`9bd974d5edf`). Kernel OCV (`231cb9353ae`). Kernel touch GPIO 77/38 (`6918f31b79a`). Kernel thermal TSENS (`07cb9560939`). Kernel PIL adsp/venus (`4f083d1a0bd`). Kernel BV-T5E 3000 (`00d647ea19e`). Kernel mdss TE/reset LAB/IBB (`719ffc9afe6`). Kernel QCA6174 wlan no MAC (`9eda26b4582`). TWRP leftover (`b48f427`). Hardware: CCI1. NFC 29/30/94. iris@2 disabled. `usbconfigfs=0`. `Microsoft/talkman`. FG 3200/3500. P0 Not Working. No Dual SIM. No slave-id. No `CONFIG_MSM_OIS`. CCI scan never ran on the telephone.
-
-Wave 22 source (not a pass): thermal chmod tsens type (`6695ac1`). CarrierConfig IMS false (`6fff7a9`). thermal sepolicy (`cc897d8`). Wave 21 README (`12b2c3a`). NFC overlay PN547 not FeliCa (`54afc57`). Updater talkman-only (`d59e4b8`). `bt.sh` QCA OTP (`0d7a854`). dumpstate sepolicy (`1e6c838`). ACDB 14 (`5a798ff`). extract no IMX377 (`0aa749a`). Vendor four `.kar` not loaded (`aea1bdf`). Kernel USB_MMO_USBC (`bd703d731a0`). Kernel pinctrl CCI1 / torch / TE / NFC (`2772a249328`). Kernel NFC dtsi (`821b8718304`). TWRP GPT fstab (`85f1ca5`). No `CONFIG_MSM_OIS`.
-
-Wave 21 source (not a pass): rild sepolicy unused (`125a191`). VINTF framework compatibility matrix leftover (`d3239a8`). `libshims` leftover (`fe790fe`). `power.sh` A57 leftover; VZW/Bell mcc overlays gone (`d2c43fb`). `media_codecs` 4K30 no HEVC (`6420f62`). VoLTE false (`c397b7e`). FPC bools leftover (`b045cc4`). dataservices rmnet leftover; no rild (`8a6a665`). thermal TSENS leftover (`4060ea7`). GNSS leftover (`903abd6`). Kernel smbcharger 5 V / Qi; no PD (`1bda09d0638`). Kernel NFC GPIOs IRQ 29 / VEN 30 / DWL 94 (`821b8718304`). Kernel RGB leds leftover (`af0291a59cd`). Updater overlay leftover: `julian-ota` talkman.json + changelog.txt (no download.lineageos.org bullhead/angler).
-
-Wave 20 source (not a pass): sepolicy lights torch `led:flash_torch` / `led:torch_0` (`6a8f621`; no leftover `led::flash_torch`). GNSS leftover has no stock AOSP impl VINTF on the HIDL package (`903abd6`). `BoardConfig` leftover QCA BT (no BCM), `BOARD_USB_CONFIGFS` false, no FPC (`5f1d786`). time_genoff MATCH MSM8992 ATS_DRM / ATS_TOD_MODEM (`565f425`). Fluence voice_processing leftover is mic AEC/NS (`43b6f35`). `config.fs` camera/nfc/gps AID (`a83a092`). VINTF leftover GNSS + vibrator + camera.provider, no radio, no FPC (`55b29f2`). Kernel USB-C UFP mux iCE5LP2K + HD3SS460, no PD (`2c5bf855dfd`). Kernel Duke WQHD dual-DSI cmd panel leftover TE GPIO 10 / reset GPIO 78 (`7fcefef793f`). TWRP overlay `power_profile` battery.capacity 3000 (`cea7f03`). Kernel FG cutoff/low leftover 3200/3500 (`91c0c0317c3`).
-
-Wave 19 source (not a pass): lights HIDL torch on `led:flash_torch` and `led:torch_0` (`d92e6c3`; no leftover `led::flash_torch`). QCA6174 `hostapd` / `wpa` overlays (`e4b23cf`: WPA2-PSK 11n, no SAE / 6 GHz / VHT AP). Overlay wifi leftover (`004a8fb`: QCA6174, no LGE strings). lineage-sdk overlay leftover (`ef27b11`: no prox-on-wake, no `color_temp` LiveDisplay, no FPC). `libpn547_fw.so` installs at HAL path `/system/vendor/firmware` (`749c1c0`). PN547 download image is WOA `nxppn547fw.dat`; Sony 8.1 dump is leftover. Kernel GPIO12 (`3068a345c0e`) and FG 3200/3500 (`91c0c0317c3`) live in `android_kernel_mmo_msm8994`. Installer packed `modem.img` (`dc847d5`).
-
-Wave 18 source (not a pass): `bluetooth/bt_vendor.conf` QCA6174 leftover (`988ad95`: persist/OTP, `USE_CONTROLLER_BDADDR=TRUE`, no sample MAC). Dumpstate lists torch/flash LED sysfs and `/dev/video*` (`bf43f49`; no open, no CCI write). Vendor `sap.conf` (`e65e4b2`) NDK names ICM-206xx / AK09912 / ZPA2326, `SENSOR_PROVIDER=2`. MATCH: TWRP `mmo_defconfig`, `media_profiles` IMX230 4K30 H.264, `audio_platform_info` QUAT_MI2S, NFC sepolicy PN547 `/dev/pn547`, kernel `msm8992-chi.dtsi` includes `talkman-camera.dtsi`, `powerhint.xml` MSM8992, lk2nd board-id `0x1a` (`<26 0>`; not CCI `0x19`), `gps.conf` committed (`PRODUCT_COPY_FILES` system+vendor). Workspace `tools/cci_scan/Android.mk` installs `/system/bin/cci_scan` (`TARGET_OUT_EXECUTABLES`). No extra forks.
-
-Wave 16 source (not a pass): iris `qcom,camera@2` disabled (CSI2 / CCI0 GPIO 14 / 102, no slave-id); Qi GPIOs match; CAMERA-IDENT CCI1 is bus not slave-id; Fluence is mic AEC; `usbconfigfs=0`; ueventd jpeg0/jpeg3; camera sepolicy already vendor lib+XML. Wave 15 still in tree: mixer QUAT (`66c7d50`), WCNSS 2×2, g_android, thermal, extract `6e4d4c2`.
-
-Host blockers: no WSL Ubuntu 22.04. About 23 GB free on C:. CCI scan never ran. No GPSTest log.
+Host blockers: no WSL Ubuntu 22.04. About 23 GB free on C:. You need 250 GB or more of ext4.
 
 | ID | Subsystem | Status | What is in source | What is still missing |
 |---|---|---|---|---|
@@ -127,9 +111,9 @@ Keep QCamera2 MSMB `mot_imx230`. EpicLPer HAL1 “preview” is CSID test-genera
 
 ---
 
-## Changes in this tree (summary)
+## Changes
 
-Do this list as a description of files, not as a procedure.
+This section is a description of the tree. It is not a procedure.
 
 ### Battery and charge
 
@@ -200,11 +184,15 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - Kernel USB-C leftover is iCE5LP2K + HD3SS460 UFP mux. No PD (`2c5bf855dfd`).
 - Kernel Duke WQHD leftover is dual-DSI command panel. TE is GPIO 10. Reset is GPIO 78 (`7fcefef793f`).
 - TWRP overlay battery.capacity is 3000 (`cea7f03`). Kernel FG leftover cutoff/low is 3200/3500 (`91c0c0317c3`).
-- Wave 21 leftover: rild sepolicy unused (`125a191`). VINTF matrix (`d3239a8`). `libshims` (`fe790fe`). `power.sh` A57; VZW/Bell mcc gone (`d2c43fb`). `media_codecs` 4K30 no HEVC (`6420f62`). VoLTE false (`c397b7e`). FPC bools (`b045cc4`). dataservices rmnet; no rild (`8a6a665`). thermal TSENS (`4060ea7`). GNSS (`903abd6`). Kernel smbcharger 5 V / Qi; no PD (`1bda09d0638`). Kernel NFC GPIOs 29/30/94 (`821b8718304`). Kernel RGB leds (`af0291a59cd`).
-- Wave 22 leftover: thermal chmod tsens type (`6695ac1`). CarrierConfig IMS false (`6fff7a9`). thermal sepolicy (`cc897d8`). NFC overlay PN547 not FeliCa (`54afc57`). Updater talkman-only (`d59e4b8`). `bt.sh` QCA OTP (`0d7a854`). dumpstate sepolicy (`1e6c838`). ACDB 14 (`5a798ff`). extract no IMX377 (`0aa749a`). Vendor four `.kar` not loaded (`aea1bdf`). Kernel USB_MMO_USBC (`bd703d731a0`). Kernel pinctrl CCI1 / torch / TE / NFC (`2772a249328`). Kernel NFC dtsi (`821b8718304`). TWRP GPT fstab (`85f1ca5`). No `CONFIG_MSM_OIS`.
-- Wave 23 leftover: telephony (`2d8e68c`). Wave 22 README (`48aaa4c`). Bluetooth overlay QCA6174 (`115fada`). NFC sepolicy (`e74046f`). Hardware keys (`da9e012`). Kernel CCI scan `CONFIG_TALKMAN_CCI_SCAN` (`8ae9c029b7f`). Kernel GPIOs (`9bd974d5edf`). Kernel OCV (`231cb9353ae`). Kernel touch GPIO 77/38 (`6918f31b79a`). Kernel thermal TSENS (`07cb9560939`). Kernel PIL adsp/venus (`4f083d1a0bd`). Kernel BV-T5E 3000 (`00d647ea19e`). Kernel mdss TE/reset LAB/IBB (`719ffc9afe6`). Kernel QCA6174 wlan no MAC (`9eda26b4582`). TWRP leftover (`b48f427`). No Dual SIM. No slave-id. No `CONFIG_MSM_OIS`. Do not steal LIVE `sensors.dtsi`.
-- Wave 24 leftover: Wave 23 README (`49a987a`). Bluetooth sepolicy (`7c6b09a`). USB rc leftover (`0cb8d2a`). dumpstate overlay (`db6bee3`). Vendor adsp/venus/cpe (`42d03b8`). Kernel LVS1 always-on (`92f7911a0e4`). Kernel SDHC GPIO8 (`d13f0f5de1d`). Kernel haptic ERM (`d6150de8857`). Kernel TAS2553 QUAT (`46859a0399b`). Kernel pa_therm (`5abd1d8a985`). Kernel HDMI MPP4 (`cb8846d3e72`). Kernel reserved-memory (`62ad4b68af2`). Kernel Si4705 (`ac4b8a99d9b`). Kernel sidekeys (`524be3dd6b4`). Kernel sensors ICM (`410105bf03c`). Kernel CCI scan (`8ae9c029b7f`). No Dual SIM. No slave-id. No `CONFIG_MSM_OIS`. CCI scan never ran on the telephone.
-- Wave 25 leftover: Wave 24 README (`a02481f`). GPS overlay (`732f280`). GNSS sepolicy (`5207baf`). Recents overlay (`5e74b0b`). Snap `mot_imx230` CameraId 0 (`f2c6722`). Power overlay 3000 (`e4cccfb`). Lights sepolicy (`a7b01ae`). Wifi overlay (`ecf0818`). Tethering empty (`6894898`). Telephony IMS false (`79ba90c`). Vendor camera xml (`9df9302`). Kernel `talkman-camera` include (`562bdfdf825`). Kernel BLSP I2C (`ebc1438ce0a`). Kernel ORIGA2 skip (`241ab902cdc`). No Dual SIM. No slave-id. No `CONFIG_MSM_OIS`. CCI scan never ran on the telephone.
+- VoLTE, VT, and WFC overlays are false. There is no rild package.
+- `media_codecs.xml` is Venus VFE44, 3840x2160 at 30 fps. There is no HEVC encode.
+- `libshims` keeps `libcutils_shim`. Bullhead audio and empty sensor shims are gone.
+- NFC overlay is PN547. It is not FeliCa.
+- Bluetooth overlay is QCA6174. There is no generated MAC.
+- Thermal HAL uses MSM8992 TSENS type names. Init chmod uses thermal_zone type and temp.
+- Vendor COPY_FILES for PIL use adsp, venus, and cpe. They do not use qcadsp8992.
+- Kernel SD card detect is PM8994 GPIO 8. Haptic is PMI8994 ERM. HDMI 5 V enable is PM MPP4.
+- There is no ORIGA2 Linux driver. Unknown pack charge uses OCV.
 - `ueventd.talkman.rc` labels jpeg0 / jpeg3, video/media, flash_0/1 torch_0/1 flash_torch, pn547. No jpeg1/jpeg2.
 - Camera sepolicy already covers vendor lib + XML. Init does not write CCI scan. SELinux stays permissive.
 - Wi-Fi MAC comes from factory DPP. The image does not contain a MAC address.
