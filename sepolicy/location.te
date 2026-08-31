@@ -1,4 +1,7 @@
-# loc_launcher service
+# Talkman location leftover MATCH 0c0a081 (location*.te).
+# loc_launcher domain: IZat location-mq / lowi-server / slim_daemon.
+# gps.conf is gps_conf_file under vendor_configs_file (search + read).
+# XTRA/SUPL over wlan0. No IMSI. No rild. SELinux stays permissive.
 type location, domain;
 type location_exec, exec_type, vendor_file_type, file_type;
 
@@ -35,7 +38,7 @@ unix_socket_connect(location, dnsproxyd, netd)
 unix_socket_connect(location, fwmarkd, netd)
 allowxperm location self:tcp_socket ioctl { SIOCGIFINDEX SIOCGIFHWADDR SIOCGIFCONF SIOCGIFFLAGS SIOCGIFADDR };
 
-# wlan0 + /proc/net for XTRA/SUPL path selection (RIL is P2).
+# wlan0 + /proc/net for XTRA/SUPL path selection. RIL is P2. No rild.
 r_dir_file(location, sysfs_wlan0)
 r_dir_file(location, sysfs_net)
 allow location proc_net:dir r_dir_perms;
