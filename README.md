@@ -188,6 +188,8 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - Overlay leftover also sets `config_device_respects_hold_carrier_config` false. Camera leftover sets `config_camera_sound_forced` false. Launch and lift gesture sensor types are **-1**. Double-tap power for camera is true. There is no ToF / LDAF. There is no Dual SIM CameraId.
 - Overlay leftover also sets rounded window corners false. Sustained Performance Mode is true. System navigation keys are true. HWC `setColorTransform` is accelerated. Auto power modes are true. Nearby GMS Messages and Discovery are in `config_deviceDisabledComponents`. Wi-Fi Display is true. Protected WFD buffers stay false. SD card accessibility is true.
 - Overlay leftover also sets `config_showNavigationBar` true, `config_hasRecents` true, `config_navBarInteractionMode` 0, and `config_swipe_up_gesture_setting_available` true. That is software 3-button. There is no capacitive APP_SWITCH.
+- Overlay leftover also sets `config_cellBroadcastAppLinks` true. Intrusive notification LED is true. Default LED color is white. LED on is 1000 ms. LED off is 4000 ms. Intrusive battery LED is true. Multi-color battery LED is true. Safe media volume index is 5.
+- Overlay leftover also sets BLE peripheral true. Max scan filters is 1. Max advertisers is 4. Bluetooth operating voltage is 3300 mV. HFP inband ringing is true. Headset jack uses `/dev/input/event` (`config_useDevInputEventForAudioJack`). There is no generated MAC.
 - Vendor COPY_FILES has no IMX377.
 - lk2nd talkman DTS: `qcom,board-id = <26 0>` and `qcom,msm-id` `0x0001001a`. That is not a CCI slave-id.
 - Workspace `tools/cci_scan/Android.mk` builds `/system/bin/cci_scan`. The binary does not contain slave addresses.
