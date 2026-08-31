@@ -121,7 +121,7 @@ This section is a description of the tree. It is not a procedure.
 - Overlay warning levels are 15 percent and 5 percent.
 - Charge UI strings are 5 V 1.8 A and Qi 900 mA. The UI does not say PD or Quick Charge. Qi `wc-en` GPIO 2 and `wc-det` GPIO 14 match 4VM_08r.
 - Settings Battery Health reads `bms/charge_full`, `charge_full_design`, and `cycle_count`.
-- Dumpstate reads `battery`, `bms`, `usb`, and `dc`. Dumpstate lists torch/flash LED sysfs and `/dev/video*` (`bf43f49`). Dumpstate does not write CCI scan.
+- Dumpstate reads `battery`, `bms`, `usb`, and `dc`. Dumpstate lists torch/flash LED sysfs and `/dev/video*` (`bf43f49`). Dumpstate `getattr` on torch LED sysfs. Dumpstate does not write CCI scan.
 - `sepolicy/dumpstate.te` lets `dumpstate` read `sysfs_batteryinfo`. SELinux stays permissive.
 
 Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not in this repository.
@@ -151,7 +151,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 ### Display and lights
 
 - Duke AMOLED is command-mode. Always-on display is false. Pickup pulse is false.
-- Light HIDL 2.0 writes lcd-backlight and RGB sysfs. Torch writes `led:flash_torch` and `led:torch_0` (`d92e6c3`). sepolicy `hal_light` sysfs_leds matches those names (`6a8f621`). There is no leftover `led::flash_torch`.
+- Light HIDL 2.0 writes lcd-backlight and RGB sysfs. Torch writes `led:flash_torch` and `led:torch_0` (`d92e6c3`). Torch GPIO is **12**. sepolicy `hal_light` sysfs_leds matches those names (`6a8f621`). There is no leftover `led::flash_torch`.
 
 ### Other
 
