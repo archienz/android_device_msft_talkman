@@ -62,6 +62,7 @@ Push personal work to **archienz**. Do not open pull requests on the community o
 | NFC | NXP PN547 `/dev/pn547`. Kernel `nq-nci`: 250 ms I2C timeout, no `read_mutex` across IRQ, VEN without eSE |
 | WLAN | QCA6174 |
 | USB-C | HD3SS460 + iCE5LP2K. No USB Power Delivery |
+| Side keys | FOCUS GPIO 5, SHOT GPIO 4, VOL_UP GPIO 3. Power and volume-down are PON |
 
 CCI 7-bit slave IDs are **not** in this tree. Do not invent `qcom,slave-id`.
 
@@ -69,7 +70,11 @@ Rear camera I2C is **CCI master 1** (RM-1104 schematic 4VM_08r page 2, plus Epic
 
 LVS1 is always-on. LVS1 is not a camera vreg.
 
-Schematic PDF pages are rendered as PNG in workspace `docs/hardware/schematic-png/`. Notes: `docs/hardware/SCHEMATIC-RM-1104.md`.
+Side keys FOCUS / SHOT / VOL_UP match 4VM_08r (PM8994 GPIO 5 / 4 / 3).
+
+NFC GPIO vs schematic (IRQ / DWL / VEN) is still in compare. Do not treat that compare as done.
+
+Schematic PDF pages are rendered as PNG in workspace `docs/hardware/schematic-png/`. Notes: `docs/hardware/SCHEMATIC-RM-1104.md`. Dual SIM RM-1118 / **4VM_08d** is ignored.
 
 Hill ident candidates **0x20** / **0x7c** / **0x22** are lab notes in `CAMERA-IDENT.md`. They are not DT.
 
