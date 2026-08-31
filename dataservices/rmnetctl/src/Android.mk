@@ -1,5 +1,5 @@
-# librmnetctl: vendor netlink to msm8992 rmnet_data. Leftover bullhead QMI.
-# Not rild.
+# leftover MATCH 8a6a665: librmnetctl vendor netlink to msm8992 rmnet_data.
+# Leftover bullhead QMI. Not rild. Dual SIM no.
 
 LOCAL_PATH := $(call my-dir)
 

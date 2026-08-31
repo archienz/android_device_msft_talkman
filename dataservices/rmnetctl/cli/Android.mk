@@ -1,4 +1,5 @@
-# rmnetcli: leftover bullhead QMI debug CLI for msm8992 rmnet_data. Not rild.
+# leftover MATCH 8a6a665: rmnetcli bullhead QMI debug CLI for msm8992
+# rmnet_data. Not rild. Dual SIM no.
 
 LOCAL_PATH := $(call my-dir)
 

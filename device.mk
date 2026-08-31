@@ -378,7 +378,8 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     android.hardware.renderscript@1.0-impl
 
-# Ril
+# leftover MATCH 8a6a665: librmnetctl/rmnetcli vendor rmnet_data QMI.
+# Not rild. Dual SIM no. Do not PRODUCT_PACKAGES rild.
 PRODUCT_PACKAGES += \
     telephony-ext \
     qti-telephony-hidl-wrapper \
