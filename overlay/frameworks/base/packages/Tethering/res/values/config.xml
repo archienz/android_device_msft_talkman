@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+     Talkman leftover Tethering overlay. No LGE Entitlement.apk
+     (com.lge.entitlement). MATCH leftover: hotspot provision arrays
+     empty. Dual SIM is not talkman (RM-1104 4VM_08r). CAF 3.10 has no
+     tether BPF offload.
+-->
 <!-- Copyright (C) 2020 The Android Open Source Project
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
