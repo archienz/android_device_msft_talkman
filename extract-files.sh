@@ -8,7 +8,8 @@
 #   ./extract-files.sh                 # adb pull
 #
 # Dump layout: system/, vendor/, product/ as on-device (or AOSP out).
-# Refuses imx377 / ov5693 / nanohub / OMADM dests even if the dump has them.
+# Refuses imx377 / ov5693 / nanohub / OMADM / LGE entitlement dests even if
+# the dump has them. mot_imx230 dests are vendor/lib only (32-bit).
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -30,7 +31,7 @@ LIST="${MY_DIR}/proprietary-files.txt"
 
 SRC="${1:-}"
 
-BANNED='imx377|ov5693|nanohub|activity\.napp|double_twist\.napp|pickup_gesture\.napp|sig_motion\.napp|napp_list\.cfg|fpctzappfingerprint|fingerprint\.bullhead|lib_fpc_tac_shared|context_hub\.default|omadm|OMADM|DCMO|DMConfigUpdate|com\.android\.omadm|whitelist_com\.android\.omadm'
+BANNED='imx377|ov5693|nanohub|activity\.napp|double_twist\.napp|pickup_gesture\.napp|sig_motion\.napp|napp_list\.cfg|fpctzappfingerprint|fingerprint\.bullhead|lib_fpc_tac_shared|context_hub\.default|omadm|OMADM|DCMO|DMConfigUpdate|com\.android\.omadm|whitelist_com\.android\.omadm|entitlement|com\.lge\.entitlement|LifeTimer|lib64/libmmcamera_mot_imx230|lib64/libchromatix_mot_imx230'
 
 if [[ ! -f "${LIST}" ]]; then
   echo "missing ${LIST}" >&2
@@ -82,6 +83,9 @@ copy_one() {
       ;;
     system/etc/camera/*)
       out="${OUT_BASE}/etc/camera/${dest#system/etc/camera/}"
+      ;;
+    vendor/etc/thermal-engine-8992.conf)
+      out="${OUT_BASE}/etc/thermal-engine-8992.conf"
       ;;
     vendor/*) out="${OUT_BASE}/${dest}" ;;
     product/*) out="${OUT_BASE}/${dest}" ;;
