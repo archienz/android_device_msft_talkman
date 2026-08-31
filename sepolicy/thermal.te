@@ -1,0 +1,11 @@
+# thermal.talkman (4060ea7): MSM8992 TSENS by sysfs type, not bullhead zone index.
+# HAL (libhardware, system_server) opens:
+#   /sys/class/thermal/thermal_zoneN/type
+#   /sys/class/thermal/thermal_zoneN/temp
+# Types: tsens_tz_sensor{7,9,10,12,13,14}, battery, quiet_therm (skin).
+# No leftover /sys/class/hwmon/hwmon2/device/xo_therm (sysfs_hwmon).
+# No leftover thermal_zone8 as CPU sensor (bullhead CPU_SENSORS[]).
+# Labels: genfs_contexts sysfs /class/thermal + /devices/virtual/thermal.
+
+r_dir_file(system_server, sysfs_thermal)
+allow system_server sysfs_thermal:lnk_file r_file_perms;
