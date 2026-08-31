@@ -1,18 +1,25 @@
 # NXP PN547 on I2C6 (WOA ACPI PNP0547). Kernel nq-nci node is /dev/pn547.
+# IRQ/VEN/FWDN are TLMM 29/30/94 in nfc.dtsi — do not export them from init.
 # nfc_nci.msm8992.so defaults to /dev/pn54x if NXP_NFC_DEV_NODE is rejected.
 # Talkman has no eSE. Do not swap the chipset.
 
 on boot
     chmod 0660 /dev/pn547
     chown nfc nfc /dev/pn547
+    restorecon /dev/pn547
     symlink /dev/pn547 /dev/pn54x
+    chmod 0660 /dev/pn54x
+    chown nfc nfc /dev/pn54x
     setprop debug.nfc.fw_download true
     setprop debug.nfc.fw_boot_download false
 
 on device-added-/dev/pn547
     chmod 0660 /dev/pn547
     chown nfc nfc /dev/pn547
+    restorecon /dev/pn547
     symlink /dev/pn547 /dev/pn54x
+    chmod 0660 /dev/pn54x
+    chown nfc nfc /dev/pn54x
 
 on post-fs-data
     mkdir /data/nfc 0770 nfc nfc
