@@ -31,8 +31,10 @@
     <bool name="doze_display_state_supported">false</bool>
     <bool name="doze_suspend_display_state_supported">false</bool>
 
-    <!-- No nanohub TYPE_SIGNIFICANT_MOTION / TYPE_PICK_UP_GESTURE. -->
+    <!-- No nanohub TYPE_SIGNIFICANT_MOTION / TYPE_PICK_UP_GESTURE.
+         leftover MATCH config_dozePulsePickup: pulse-on-pickup false. -->
     <bool name="doze_pulse_on_significant_motion">false</bool>
+    <bool name="doze_pulse_on_pick_up">false</bool>
     <bool name="doze_pickup_performs_proximity_check">false</bool>
 
     <!-- QPDS-T900 TYPE_PROXIMITY is on the AP. Pulse is software screen-on, not AOD. -->
