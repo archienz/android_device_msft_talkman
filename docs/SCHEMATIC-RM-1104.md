@@ -90,14 +90,15 @@ NXP NFC (`N600` class, interconnect `NFC_CTRL`):
 
 | Function | Schematic net | GPIO / clock |
 |---|---|---|
-| IRQ | `NFC_IRQ` | GPIO **94** |
-| FW download / DWL | `NFC_DWL_REQ` | GPIO **30** |
-| I2C | `NFC_I2C_SCL` / `NFC_I2C_SDA` | BLSP I2C |
+| IRQ | `NFC_IRQ` | GPIO **29** |
+| VEN / enable | `NFC_VEN` / `POON` | GPIO **30** |
+| FW download / DWL | `NFC_DWL_REQ` | GPIO **94** |
+| I2C | `NFC_I2C_SCL` / `NFC_I2C_SDA` | BLSP I2C (WOA I2C6 @ 0x28) |
 | Clock | `BB_CLK2` | BBCLK2 |
 
 Do **not** take a second-SIM UART or UIM2 pin as NFC. `X2701` on sheet 3 is Dual SIM only.
 
-WOA ACPI names VEN vs DWL vs IRQ differently than some Linux nq-nci properties. Schematic nets for talkman 4VM_08r are the three above plus I2C + BBCLK2.
+An earlier OCR of this sheet swapped IRQ and DWL (94 vs 30). **Correct 4VM_08r / ACPI mapping is IRQ 29, VEN 30, DWL 94.** Matches WOA `NFC1` (`PNP0547`).
 
 ---
 
