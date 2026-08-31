@@ -256,15 +256,11 @@ on boot
     chmod 0644 /system/etc/thermal-engine-8992.conf
     chmod 0644 /vendor/etc/thermal-engine-8992.conf
 
-    # thermal HAL reads zone 1/8-10/12-14 + xo_therm.
-    chmod 0644 /sys/class/thermal/thermal_zone1/temp
-    chmod 0644 /sys/class/thermal/thermal_zone8/temp
-    chmod 0644 /sys/class/thermal/thermal_zone9/temp
-    chmod 0644 /sys/class/thermal/thermal_zone10/temp
-    chmod 0644 /sys/class/thermal/thermal_zone12/temp
-    chmod 0644 /sys/class/thermal/thermal_zone13/temp
-    chmod 0644 /sys/class/thermal/thermal_zone14/temp
-    chmod 0644 /sys/class/hwmon/hwmon2/device/xo_therm
+    # Thermal HAL (4060ea7 thermal.c) opens zone temp after matching
+    # type tsens_tz_sensor{7,9,10,12,13,14} / battery / quiet_therm.
+    # Indices are not bullhead zone 8; xo_therm is not a HAL path.
+    chmod 0644 /sys/class/thermal/thermal_zone*/type
+    chmod 0644 /sys/class/thermal/thermal_zone*/temp
     chmod 0644 /sys/class/hwmon/hwmon2/device/emmc_therm
     chmod 0644 /sys/class/hwmon/hwmon2/device/msm_therm
     chmod 0644 /sys/class/hwmon/hwmon2/device/pa_therm0
