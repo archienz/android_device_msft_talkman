@@ -1,3 +1,8 @@
+# Talkman QCA6174 Rome leftover. UART ttyHS0, wcnss_filter
+# (start_hci_filter), wc_transport.start_hci. Firmware is
+# /vendor/firmware rampatch_tlv_3.2.tlv / nvm_tlv_3.2.bin via
+# /bt_firmware/image. BD_ADDR is persist or OTP. Do not generate a MAC.
+
 allow hal_bluetooth sysfs:file rw_file_perms;
 allow hal_bluetooth sysfs_usb:file w_file_perms;
 
@@ -6,6 +11,13 @@ allow hal_bluetooth start_hci_filter:unix_stream_socket connectto;
 
 set_prop(hal_bluetooth, wc_transport_prop)
 
-# read /persist/bdaddr.txt
+# read /persist/bdaddr.txt (ro.bt.bdaddr_path). No sample MAC file.
 allow hal_bluetooth persist_file:dir search;
 allow hal_bluetooth persist_file:file r_file_perms;
+
+# Rome 3.2 btfw32.tlv / btnv32.bin on vendor firmware (symlink).
+allow hal_bluetooth vendor_firmware_file:dir r_dir_perms;
+allow hal_bluetooth vendor_firmware_file:file r_file_perms;
+allow hal_bluetooth vendor_file:dir r_dir_perms;
+allow hal_bluetooth vendor_file:file r_file_perms;
+

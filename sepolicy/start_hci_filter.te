@@ -1,4 +1,5 @@
-#Policy for start_hci_filter
+# Talkman QCA6174 leftover: /vendor/bin/wcnss_filter as start_hci_filter
+# on ttyHS0. Not leftover bullhead BCM HCI. Do not generate a MAC.
 type start_hci_filter, domain;
 type start_hci_filter_exec, exec_type, vendor_file_type, file_type;
 

@@ -1,2 +1,9 @@
-allow bluetooth debugfs_kgsl:dir { search read open };
-allow bluetooth debugfs_kgsl:file { read write getattr setattr };
+# Talkman QCA6174 Rome UART leftover (MATCH bluetooth*.te).
+# Userspace stack is HIDL android.hardware.bluetooth@1.0-impl + CAF
+# libbt-vendor. UART is /dev/ttyHS0 (hal_bluetooth + start_hci_filter /
+# wcnss_filter). BD_ADDR is persist /persist/bdaddr.txt or QCA OTP
+# (USE_CONTROLLER_BDADDR, init.talkman.bt.sh zeros tag 2). Do not
+# generate a MAC here. Leftover bullhead BCM4358 / btnvtool / kgsl
+# debugfs is not this SoC — bluetooth domain does not walk GPU.
+
+# persist read for BD_ADDR is hal_bluetooth (not this domain).
