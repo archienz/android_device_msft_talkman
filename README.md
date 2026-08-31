@@ -183,7 +183,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - lk2nd talkman DTS: `qcom,board-id = <26 0>` and `qcom,msm-id` `0x0001001a`. That is not a CCI slave-id.
 - Workspace `tools/cci_scan/Android.mk` builds `/system/bin/cci_scan`. The binary does not contain slave addresses.
 - Lineage `BUILD_FINGERPRINT` is `Microsoft/talkman/talkman:11/RQ3A.211001.001/1:user/release-keys` (`44cb3c5`).
-- Settings overlay leftover (`2fca2c7`): no `color_temp`, no Bell IPv4, no FPC. `config_show_mobile_plan` is false. Camera laser overlay is false.
+- Settings overlay leftover (`2fca2c7`): no `color_temp`, no Bell IPv4, no FPC. `config_show_mobile_plan` is false. Camera laser overlay is false. `config_face_enroll` is empty.
 - There is no CellBroadcast Bell MCC overlay (`values-mcc302-mnc610`). Talkman is not a Bell SKU.
 - Framework overlay leftover (`b045cc4`): no `android.hardware.fingerprint` permission XML. No FPC HAL.
 - `sepolicy/rild.te` leftover is unused. There is no rild package.
@@ -214,6 +214,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - Telephony overlay IMS packages are empty (`config_ims_mmtel_package`, `config_ims_rcs_package`). Video-calling fallback is false. RTT is false. 5G DSDS is false (`49762ef`).
 - Telephony leftover also sets `config_allow_hfa_outside_of_setup_wizard` false, `config_requestNetworkScan_disable` true, and an empty `config_simless_emergency_rtt_supported_countries` list. HFA is not SprintDM. Talkman is not a Sprint SKU. There is no Dual SIM.
 - Telephony leftover also sets `config_enabled_lte` true, `config_support_simless_emergency_rtt` false, and empty `config_volte_provision_error_on_publish_response` / `config_rcs_provision_error_on_publish_response` arrays. There is no rild.
+- Telephony leftover also sets `send_mic_mute_to_AudioManager` true and `hac_enabled` true. There is no rild.
 - Telephony leftover Sprint MCC `values-mcc310-mnc120` still names SprintDM carrier settings. `support_swap_after_merge` is false. Talkman is not a Sprint SKU. There is no rild.
 - ContactsCommon leftover (`f3b8ec1`) sets `config_allow_sim_import` false for Sprint MCC 310-120 / 311-490 / 311-870 / 312-530. That is not Dual SIM import.
 - `media_codecs.xml` is Venus VFE44, 3840x2160 at 30 fps. There is no HEVC encode.
