@@ -64,6 +64,8 @@ Push personal work to **archienz**. Do not open pull requests on the community o
 
 CCI 7-bit slave IDs are **not** in this tree. Do not invent `qcom,slave-id`.
 
+Hill ident candidates **0x20** / **0x7c** / **0x22** are lab notes in `CAMERA-IDENT.md`. They are not DT.
+
 ---
 
 ## Progress (2026-08-31)
@@ -72,7 +74,7 @@ CCI 7-bit slave IDs are **not** in this tree. Do not invent `qcom,slave-id`.
 
 No P0 item is **Working**.
 
-Waves 2–11 closed in trees. Wave 12/13 leftover still live. Wave 14 live: LVS1 hold (not cam vreg), leftover init/overlay/BT/media, Hill ident notes only.
+Waves 2–11 closed in trees. Wave 12/13 leftover still live. Wave 14 **DONE** in trees: LVS1 always-on (not a cam vreg), leftover init/overlay/BT/media, Hill ident notes only.
 
 Host blockers: no WSL Ubuntu 22.04. About 23 GB free on C:. CCI scan never ran. No GPSTest log.
 
@@ -82,7 +84,7 @@ Host blockers: no WSL Ubuntu 22.04. About 23 GB free on C:. CCI scan never ran. 
 | P0.1 | Battery UI | Not Working | Fuel-gauge OCV+CC if pack ID does not match. Overlay capacity 3000 mAh. Warning levels 15 / 5. Settings health reads `bms/charge_full*`. Dumpstate walks psy. No hardcoded 50% | `dumpsys battery` and USB-meter log on the telephone |
 | P0.2 | Charge | Not Working | Kernel driver sets cable 1800 mA and Qi 900 mA. Overlay strings say 5 V 1.8 A and Qi 900 mA. USB-C mux driver `mmo-usbc.c`. No PD. No HVDCP | USB-meter proof that SoC increases |
 | P0.3 | GPS | Not Working | GNSS HIDL `impl.talkman`. SUPL 2.0. NTP `pool.ntp.org`. Packed installer `modem.img` 70 MiB with MBA/MPSS. 0-SV locations are dropped | GPSTest log with `numSvs` more than 0 |
-| P0.4 | Camera | Not Working | DT name `mot_imx230`. XML CameraId 0. Clark 32-bit sensor libraries. Flash/torch PMI nodes. HAL1 props. LVS1 always-on, not a cam vreg. OIS `.kar` staged, not loaded | CCI scan on the telephone, JPEG still, OIS `.so` |
+| P0.4 | Camera | Not Working | DT name `mot_imx230`. XML CameraId 0. Clark 32-bit sensor libraries. Flash/torch PMI nodes. HAL1 props. LVS1 always-on, not a cam vreg. `cam_vio` is not in rear/front `qcom,cam-vreg-name`. OIS `.kar` staged, not loaded | CCI scan on the telephone, JPEG still, OIS `.so` |
 | P2 | RIL | Deferred | Research notes only | Modem SMD |
 
 ### EpicLPer compare (camera / NFC / audio)
@@ -128,6 +130,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - `BOARD_QTI_CAMERA_32BIT_ONLY` is true. `USE_CAMERA_STUB` is false.
 - `system.prop` forces HAL1: `persist.camera.HAL3.enabled=0`.
 - Media profiles: rear 3840×2160 at 30 fps, H.264. No HEVC encode. No 4K60.
+- LVS1 is always-on. `cam_vio` is not in rear or front cam-vreg / power-seq.
 - OIS `.kar` files can be in vendor firmware. There is no `libmmcamera_ois_bu24210.so` in the dumps. Do not make a stub library.
 
 ### Display and lights
@@ -137,10 +140,12 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 
 ### Other
 
-- NFC node is `/dev/pn547`. Firmware matches WOA `nxppn547fw.dat`.
+- NFC node is `/dev/pn547`. Firmware matches WOA `nxppn547fw.dat`. Kernel `nq-nci` already has 250 ms timeout and VEN without eSE.
+- `init.talkman.rc` imports camera/nfc/gps. There is no duplicate `qcamerasvr` start. There is no CCI echo.
+- Tethering hotspot provision arrays are empty (no LGE entitlement URL). `privapp-permissions` still lists `com.lge.entitlement` leftover.
 - Wi-Fi MAC comes from factory DPP. The image does not contain a MAC address.
 - Sensors HAL is `sensors.talkman.so`. No BMI160. No nanohub.
-- Speaker volume curves are AOSP defaults for TAS2553. Bullhead WCD DRC curves are gone.
+- Speaker volume curves are AOSP defaults for TAS2553. Bullhead WCD DRC curves are gone. TAS PGA default is **11 dB**.
 - TWRP kernel path is `kernel/mmo/msm8994`.
 - OTA assert is `talkman` only (no bullhead, no angler).
 - SELinux stays permissive for bring-up.
