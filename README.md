@@ -188,6 +188,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - Kernel Duke WQHD leftover is dual-DSI command panel. TE is GPIO 10. Reset is GPIO 78 (`7fcefef793f`).
 - TWRP overlay battery.capacity is 3000 (`cea7f03`). Kernel FG leftover cutoff/low is 3200/3500 (`91c0c0317c3`).
 - VoLTE, VT, and WFC overlays are false. There is no rild package.
+- Telephony overlay IMS packages are empty (`config_ims_mmtel_package`, `config_ims_rcs_package`). Video-calling fallback is false. RTT is false.
 - `media_codecs.xml` is Venus VFE44, 3840x2160 at 30 fps. There is no HEVC encode.
 - `libshims` keeps `libcutils_shim`. Bullhead audio and empty sensor shims are gone.
 - NFC overlay is PN547. It is not FeliCa.
