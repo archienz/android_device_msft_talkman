@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Talkman NFC is NXP PN547 on I2C6 (/dev/pn547). Not Sony FeliCa / snfc UART.
+     NfcService looks up enable_nfc_provisioning (optional). Overlay false so
+     leftover FeliCa/factory provisioning bools are dropped. Do not overlay
+     Sony/KDDI FeliCa SKU flags. HCE-F is FEATURE_NFC_HOST_CARD_EMULATION_NFCF
+     (permission xml), not this overlay. GPIOs are kernel nfc.dtsi (IRQ 29 /
+     VEN 30 / DWL 94), not overlay. libnfc-nci.conf is LIVE — do not ghost it.
+-->
+<resources>
+    <bool name="enable_nfc_provisioning">false</bool>
+</resources>
