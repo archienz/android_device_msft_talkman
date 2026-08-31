@@ -90,9 +90,9 @@ Wave 16 **DONE** (source only, not a meter pass). Keep `1d143f5`. Do not restore
 
 **Definition of done:** a physical talkman log in `out/qa-*`. Source in Git is not a pass.
 
-No P0 item is **Working**. Mixer speaker is QUAT_MI2S (`66c7d50`). `extract-files.sh` dests match COPY_FILES (`6e4d4c2`). WCNSS QCA6174 `gNumRxAnt=2`. Location sepolicy `0c0a081`. USB `g_android` (`93506aa`). `androidboot.usbconfigfs=0` (`5d03a73`). Thermal HAL `thermal.talkman` (`9b6cd42` vendor julian). `privapp-permissions` dropped LGE (`ca9adee`). NFC GPIOs match schematic DT (IRQ 29, VEN 30, DWL 94). Rear camera is CCI1 (bus, not SID). LVS1 is always-on. `ueventd` jpeg0/jpeg3 (`e9b365a`). CAMERA-IDENT CCI1 (`63bed4c`).
+No P0 item is **Working**. Mixer speaker is QUAT_MI2S (`66c7d50`). `extract-files.sh` dests match COPY_FILES (`6e4d4c2`) for 32-bit `mot_imx230` and bu24210 `.kar`. Lineage fingerprint is `Microsoft/talkman` (`44cb3c5`). Settings overlay leftover (`2fca2c7`: no `color_temp`, no Bell IPv4, no FPC). WCNSS QCA6174 `gNumRxAnt=2`. Location sepolicy `0c0a081`. USB `g_android` (`93506aa`). `androidboot.usbconfigfs=0` (`5d03a73`). Thermal HAL `thermal.talkman` (`9b6cd42` vendor julian). `privapp-permissions` dropped LGE (`ca9adee`). NFC GPIOs match schematic PNG crop (IRQ 29, VEN 30, DWL 94). Rear camera is CCI1 (bus, not SID). LVS1 is always-on, not a cam vreg. `ueventd` jpeg0/jpeg3 (`e9b365a`). CAMERA-IDENT CCI1 (`63bed4c`).
 
-Wave 16 source (not a pass): iris `camera@2` disabled; Qi GPIOs match; CAMERA-IDENT CCI1 is bus not slave-id; Fluence is mic AEC; `usbconfigfs=0`; ueventd jpeg0/jpeg3; camera sepolicy already vendor lib+XML. Wave 15 still in tree: mixer QUAT, WCNSS 2×2, g_android, thermal, extract-files.
+Wave 16 source (not a pass): iris `qcom,camera@2` disabled (CSI2 / CCI0 GPIO 14 / 102, no slave-id); Qi GPIOs match; CAMERA-IDENT CCI1 is bus not slave-id; Fluence is mic AEC; `usbconfigfs=0`; ueventd jpeg0/jpeg3; camera sepolicy already vendor lib+XML. Wave 15 still in tree: mixer QUAT (`66c7d50`), WCNSS 2×2, g_android, thermal, extract `6e4d4c2`.
 
 Host blockers: no WSL Ubuntu 22.04. About 23 GB free on C:. CCI scan never ran. No GPSTest log.
 
@@ -102,7 +102,7 @@ Host blockers: no WSL Ubuntu 22.04. About 23 GB free on C:. CCI scan never ran. 
 | P0.1 | Battery UI | Not Working | Fuel-gauge OCV+CC if pack ID does not match. Overlay capacity 3000 mAh. Warning levels 15 / 5. Settings health reads `bms/charge_full*`. Dumpstate walks psy. No hardcoded 50% | `dumpsys battery` and USB-meter log on the telephone |
 | P0.2 | Charge | Not Working | Kernel driver sets cable 1800 mA and Qi 900 mA. Overlay strings say 5 V 1.8 A and Qi 900 mA. USB-C mux driver `mmo-usbc.c`. No PD. No HVDCP | USB-meter proof that SoC increases |
 | P0.3 | GPS | Not Working | GNSS HIDL `impl.talkman`. SUPL 2.0. NTP `pool.ntp.org`. Packed installer `modem.img` 70 MiB with MBA/MPSS. 0-SV locations are dropped | GPSTest log with `numSvs` more than 0 |
-| P0.4 | Camera | Not Working | DT name `mot_imx230`. XML CameraId 0. Clark 32-bit sensor libraries. Flash/torch PMI nodes. HAL1 props. LVS1 always-on, not a cam vreg. `cam_vio` is not in rear/front `qcom,cam-vreg-name`. OIS `.kar` staged, not loaded | CCI scan on the telephone, JPEG still, OIS `.so` |
+| P0.4 | Camera | Not Working | DT name `mot_imx230`. XML CameraId 0. Clark 32-bit sensor libraries. Flash/torch PMI nodes. HAL1 props. LVS1 always-on, not a cam vreg. `cam_vio` is not in rear/front `qcom,cam-vreg-name`. Iris `camera@2` disabled. OIS `.kar` in COPY_FILES; `msm_ois` does not `request_firmware` | CCI scan on the telephone, JPEG still, OIS `.so` |
 | P2 | RIL | Deferred | Research notes only | Modem SMD |
 
 Keep QCamera2 MSMB `mot_imx230`. EpicLPer HAL1 “preview” is CSID test-generator, not live CSI. Do not ship TG.
@@ -141,7 +141,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - `system.prop` and `vendor.prop` force HAL1: `persist.camera.HAL3.enabled=0`. `vendor.prop` also sets IS type 4, TNR off, EIS enable (unused while HAL3 is off).
 - Media profiles: rear 3840×2160 at 30 fps, H.264. No HEVC encode. No 4K60.
 - LVS1 is always-on. `cam_vio` is not in rear or front cam-vreg / power-seq.
-- OIS `.kar` files can be in vendor firmware. There is no `libmmcamera_ois_bu24210.so` in the dumps. Do not make a stub library.
+- OIS `.kar` files are in COPY_FILES (`6e4d4c2`). CAF `msm_ois` does not `request_firmware` those `.kar` files. There is no `libmmcamera_ois_bu24210.so` in the dumps. Do not make a stub library.
 
 ### Display and lights
 
@@ -150,7 +150,9 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 
 ### Other
 
-- NFC node is `/dev/pn547`. Firmware matches WOA `nxppn547fw.dat`. Kernel `nq-nci` already has 250 ms timeout and VEN without eSE.
+- NFC node is `/dev/pn547`. Firmware matches WOA `nxppn547fw.dat`. Kernel `nq-nci` already has 250 ms timeout and VEN without eSE. GPIOs match schematic PNG crop: IRQ 29, VEN 30, DWL 94.
+- Lineage `BUILD_FINGERPRINT` is `Microsoft/talkman/talkman:11/RQ3A.211001.001/1:user/release-keys` (`44cb3c5`).
+- Settings overlay leftover (`2fca2c7`): no `color_temp`, no Bell IPv4, no FPC.
 - `init.talkman.rc` imports camera/nfc/gps. There is no duplicate `qcamerasvr` start. There is no CCI echo.
 - Tethering hotspot provision arrays are empty (no LGE entitlement URL). `privapp-permissions-talkman.xml` dropped `com.lge.entitlement`.
 - Mixer speaker path is QUAT_MI2S (TAS2553). WCD SPK DRV is not wired.
