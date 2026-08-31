@@ -66,13 +66,13 @@ Push personal work to **archienz**. Do not open pull requests on the community o
 
 CCI 7-bit slave IDs are **not** in this tree. Do not invent `qcom,slave-id`.
 
-Rear camera I2C is **CCI master 1** (RM-1104 schematic 4VM_08r page 2, plus EpicLPer lab). Front and iris stay on CCI0.
+Rear camera I2C is **CCI master 1** (RM-1104 schematic 4VM_08r page 2, plus EpicLPer lab). Front and iris stay on CCI0. CCI1 pinctrl is GPIO 19 / 20 on `&cci`.
 
 LVS1 is always-on. LVS1 is not a camera vreg.
 
 Side keys FOCUS / SHOT / VOL_UP match 4VM_08r (PM8994 GPIO 5 / 4 / 3).
 
-NFC GPIO vs schematic (IRQ / DWL / VEN) is still in compare. Do not treat that compare as done.
+NFC GPIOs match DT: IRQ 29, VEN 30, DWL 94. Schematic OCR was wrong.
 
 Schematic PDF pages are rendered as PNG in workspace `docs/hardware/schematic-png/`. Notes: `docs/hardware/SCHEMATIC-RM-1104.md`. Dual SIM RM-1118 / **4VM_08d** is ignored.
 
