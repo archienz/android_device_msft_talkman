@@ -86,11 +86,13 @@ Qi GPIOs match 4VM_08r: `wc-en` GPIO **2**, `wc-det` GPIO **14**.
 
 ## Progress (2026-08-31)
 
-Wave 16 **DONE** (source only, not a meter pass). Keep `1d143f5`. Do not restore `abeb48a`.
+Wave 18 **DONE** (source only, not a meter pass). Keep Wave 16 README `3c14b94`. Keep `1d143f5`. Do not restore `abeb48a`.
 
 **Definition of done:** a physical talkman log in `out/qa-*`. Source in Git is not a pass.
 
 No P0 item is **Working**. Mixer speaker is QUAT_MI2S (`66c7d50`). `extract-files.sh` dests match COPY_FILES (`6e4d4c2`) for 32-bit `mot_imx230` and bu24210 `.kar`. Lineage fingerprint is `Microsoft/talkman` (`44cb3c5`). Settings overlay leftover (`2fca2c7`: no `color_temp`, no Bell IPv4, no FPC). WCNSS QCA6174 `gNumRxAnt=2`. Location sepolicy `0c0a081`. USB `g_android` (`93506aa`). `androidboot.usbconfigfs=0` (`5d03a73`). Thermal HAL `thermal.talkman` (`9b6cd42` vendor julian). `privapp-permissions` dropped LGE (`ca9adee`). NFC GPIOs match schematic PNG crop (IRQ 29, VEN 30, DWL 94). Rear camera is CCI1 (bus, not SID). LVS1 is always-on, not a cam vreg. `ueventd` jpeg0/jpeg3 (`e9b365a`). CAMERA-IDENT CCI1 (`63bed4c`).
+
+Wave 18 source (not a pass): `bluetooth/bt_vendor.conf` QCA6174 leftover (`988ad95`: persist/OTP, `USE_CONTROLLER_BDADDR=TRUE`, no sample MAC). Dumpstate lists torch/flash LED sysfs and `/dev/video*` (`bf43f49`; no open, no CCI write). Vendor `sap.conf` (`e65e4b2`) NDK names ICM-206xx / AK09912 / ZPA2326, `SENSOR_PROVIDER=2`. TWRP kernel config is `mmo_defconfig` (same `BoardConfig`). `media_profiles` IMX230 4K30 H.264. `audio_platform_info` QUAT_MI2S. NFC sepolicy is PN547 `/dev/pn547`. Kernel `msm8992-chi.dtsi` includes `talkman-camera.dtsi`. `powerhint.xml` is MSM8992. Frameworks overlay `config.xml` is in this tree. Vendor COPY_FILES has no IMX377. lk2nd talkman DTS `qcom,board-id = <26 0>` (`0x1a`; not CCI `0x19`). `gps.conf` is committed (`PRODUCT_COPY_FILES` system+vendor). Workspace `tools/cci_scan/Android.mk` installs `/system/bin/cci_scan` (`TARGET_OUT_EXECUTABLES`). No extra forks.
 
 Wave 16 source (not a pass): iris `qcom,camera@2` disabled (CSI2 / CCI0 GPIO 14 / 102, no slave-id); Qi GPIOs match; CAMERA-IDENT CCI1 is bus not slave-id; Fluence is mic AEC; `usbconfigfs=0`; ueventd jpeg0/jpeg3; camera sepolicy already vendor lib+XML. Wave 15 still in tree: mixer QUAT (`66c7d50`), WCNSS 2×2, g_android, thermal, extract `6e4d4c2`.
 
@@ -119,7 +121,7 @@ Do this list as a description of files, not as a procedure.
 - Overlay warning levels are 15 percent and 5 percent.
 - Charge UI strings are 5 V 1.8 A and Qi 900 mA. The UI does not say PD or Quick Charge. Qi `wc-en` GPIO 2 and `wc-det` GPIO 14 match 4VM_08r.
 - Settings Battery Health reads `bms/charge_full`, `charge_full_design`, and `cycle_count`.
-- Dumpstate reads `battery`, `bms`, `usb`, and `dc`. Dumpstate does not write CCI scan.
+- Dumpstate reads `battery`, `bms`, `usb`, and `dc`. Dumpstate lists torch/flash LED sysfs and `/dev/video*` (`bf43f49`). Dumpstate does not write CCI scan.
 - `sepolicy/dumpstate.te` lets `dumpstate` read `sysfs_batteryinfo`. SELinux stays permissive.
 
 Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not in this repository.
@@ -131,6 +133,8 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - Locations with 0 satellites or position (0,0) are dropped.
 - SUPL uses `wlan0`. The tree does not send IMSI.
 - `sepolicy/gps_conf.te` and `location.te` let `location` (`loc_launcher`) and `hal_gnss_default` search `vendor_configs_file` and read `gps_conf_file`. SELinux stays permissive. No IMSI. No rild.
+- `gps.conf` is in this tree (`gps/gps.conf` copied to system and vendor).
+- Vendor `sap.conf` (`e65e4b2`) uses NDK names ICM-206xx Accelerometer / Gyroscope, AK09912 Magnetometer, ZPA2326 Pressure / Temperature. `SENSOR_PROVIDER=2`. Not nanohub. Not SSC.
 
 ### Camera
 
@@ -139,7 +143,8 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - CAMERA-IDENT: CCI master 1 is a bus index. It is not `qcom,slave-id`.
 - `BOARD_QTI_CAMERA_32BIT_ONLY` is true. `USE_CAMERA_STUB` is false.
 - `system.prop` and `vendor.prop` force HAL1: `persist.camera.HAL3.enabled=0`. `vendor.prop` also sets IS type 4, TNR off, EIS enable (unused while HAL3 is off).
-- Media profiles: rear 3840×2160 at 30 fps, H.264. No HEVC encode. No 4K60.
+- Media profiles: rear 3840×2160 at 30 fps, H.264 (IMX230). No HEVC encode. No 4K60.
+- Kernel DT `msm8992-chi.dtsi` includes `talkman-camera.dtsi`.
 - LVS1 is always-on. `cam_vio` is not in rear or front cam-vreg / power-seq.
 - OIS `.kar` files are in COPY_FILES (`6e4d4c2`). CAF `msm_ois` does not `request_firmware` those `.kar` files. There is no `libmmcamera_ois_bu24210.so` in the dumps. Do not make a stub library.
 
@@ -150,7 +155,15 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 
 ### Other
 
-- NFC node is `/dev/pn547`. Firmware matches WOA `nxppn547fw.dat`. Kernel `nq-nci` already has 250 ms timeout and VEN without eSE. GPIOs match schematic PNG crop: IRQ 29, VEN 30, DWL 94.
+- NFC node is `/dev/pn547`. Firmware matches WOA `nxppn547fw.dat`. Kernel `nq-nci` already has 250 ms timeout and VEN without eSE. GPIOs match schematic PNG crop: IRQ 29, VEN 30, DWL 94. `sepolicy/nfc.te` is PN547 (no FeliCa).
+- `bluetooth/bt_vendor.conf` is QCA6174 leftover (`988ad95`): UART `/dev/ttyHS0`, `USE_CONTROLLER_BDADDR=TRUE`. BD_ADDR is persist `/persist/bdaddr.txt` or QCA OTP. No sample MAC in this file.
+- TWRP and `BoardConfig` use `TARGET_KERNEL_CONFIG := mmo_defconfig`.
+- `audio_platform_info.xml` is QUAT_MI2S (TAS2553).
+- `configs/powerhint.xml` is MSM8992 (`platform="msm8992"`, A57 ceiling 1824000 kHz).
+- Frameworks overlay is `overlay/frameworks/base/core/res/res/values/config.xml`.
+- Vendor COPY_FILES has no IMX377.
+- lk2nd talkman DTS: `qcom,board-id = <26 0>` and `qcom,msm-id` `0x0001001a`. That is not a CCI slave-id.
+- Workspace `tools/cci_scan/Android.mk` builds `/system/bin/cci_scan`. The binary does not contain slave addresses.
 - Lineage `BUILD_FINGERPRINT` is `Microsoft/talkman/talkman:11/RQ3A.211001.001/1:user/release-keys` (`44cb3c5`).
 - Settings overlay leftover (`2fca2c7`): no `color_temp`, no Bell IPv4, no FPC.
 - `init.talkman.rc` imports camera/nfc/gps. There is no duplicate `qcamerasvr` start. There is no CCI echo.
@@ -164,9 +177,9 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - `ueventd.talkman.rc` labels jpeg0 / jpeg3, video/media, flash_0/1 torch_0/1 flash_torch, pn547. No jpeg1/jpeg2.
 - Camera sepolicy already covers vendor lib + XML. Init does not write CCI scan. SELinux stays permissive.
 - Wi-Fi MAC comes from factory DPP. The image does not contain a MAC address.
-- Sensors HAL is `sensors.talkman.so`. No BMI160. No nanohub.
+- Sensors HAL is `sensors.talkman.so`. No BMI160. No nanohub. SAP names match ICM-206xx / AK09912 / ZPA2326.
 - Speaker volume curves are AOSP defaults for TAS2553. Bullhead WCD DRC curves are gone. TAS PGA default is **11 dB**.
-- TWRP kernel path is `kernel/mmo/msm8994`.
+- TWRP kernel path is `kernel/mmo/msm8994`. TWRP config is `mmo_defconfig`.
 - OTA assert is `talkman` only (no bullhead, no angler).
 - SELinux stays permissive for bring-up.
 - Protected Wi-Fi Display buffers are off.
