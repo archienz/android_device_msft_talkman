@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+     Talkman Bluetooth is QCA6174 Rome UART (ttyHS0), not leftover bullhead
+     Broadcom BCM4358 / BOARD_HAVE_BLUETOOTH_BCM. This overlay is the leftover
+     packages/apps/Bluetooth SAP bool only — MATCH leftover
+     profile_supported_sap=true. BD_ADDR is persist /persist/bdaddr.txt or
+     QCA OTP (bt_vendor.conf USE_CONTROLLER_BDADDR). Do not generate a MAC
+     in overlay XML.
+-->
 <resources>
     <bool name="profile_supported_sap">true</bool>
 </resources>
