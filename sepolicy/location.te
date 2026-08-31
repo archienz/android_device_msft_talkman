@@ -61,7 +61,8 @@ allow location self:socket create_socket_perms;
 
 allow location vendor_file:dir r_dir_perms;
 
-# loc_launcher (and children in this domain) read /vendor/etc/gps.conf.
+# leftover MATCH 0c0a081: loc_launcher (and children) read /vendor/etc/gps.conf.
+# No rild. No RIL SUPL PDN.
 allow location vendor_configs_file:dir search;
 allow location gps_conf_file:file r_file_perms;
 

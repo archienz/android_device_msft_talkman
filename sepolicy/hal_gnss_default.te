@@ -8,6 +8,8 @@ allow hal_gnss_default location_data_file:dir { search read open write add_name 
 allow hal_gnss_default location_data_file:file { read write getattr setattr open };
 allow hal_gnss_default location_data_file:fifo_file create_file_perms;
 allow hal_gnss_default location_data_file:fifo_file { create unlink setattr };
+# leftover MATCH 0c0a081: GNSS HIDL opens /vendor/etc/gps.conf. No rild.
+allow hal_gnss_default vendor_configs_file:dir search;
 allow hal_gnss_default gps_conf_file:file r_file_perms;
 allow hal_gnss_default self:socket ioctl;
 allow hal_gnss_default self:netlink_socket create_socket_perms_no_ioctl;

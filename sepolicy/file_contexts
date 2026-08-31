@@ -173,6 +173,7 @@
 /vendor/bin/lowi-server            u:object_r:location_exec:s0
 /vendor/bin/slim_daemon            u:object_r:location_exec:s0
 
+# leftover MATCH gps.conf read: vendor copy is gps_conf_file (not rild).
 /(vendor|system/vendor)/etc/gps\.conf  u:object_r:gps_conf_file:s0
 
 /vendor/bin/hw/android\.hardware\.dumpstate@1\.0-service.talkman  u:object_r:hal_dumpstate_impl_exec:s0

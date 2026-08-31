@@ -1,5 +1,6 @@
-# loc_launcher + GNSS HIDL read /vendor/etc/gps.conf (gps_conf_file).
+# leftover MATCH 0c0a081: loc_launcher + GNSS HIDL read /vendor/etc/gps.conf.
 # Dir search is vendor_configs_file. File read is gps_conf_file.
+# SUPL/XTRA over wlan0. No IMSI. Do not add rild.
 
 allow location vendor_configs_file:dir search;
 allow location gps_conf_file:file r_file_perms;
