@@ -156,6 +156,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 
 - Duke AMOLED is command-mode. LAB/IBB mode is amoled at 4.6 V. Always-on display is false. Pickup pulse is false.
 - Recents is SystemUI `OverviewProxyRecentsImpl` on the software 3-button navbar. There is no capacitive APP_SWITCH.
+- Overlay `config_deviceHardwareKeys` is 96 (CAMERA plus VOLUME). Wake keys are the same. There is no APP_SWITCH key.
 - Light HIDL 2.0 writes lcd-backlight and RGB sysfs. Torch writes `led:flash_torch` and `led:torch_0` (`d92e6c3`). Torch GPIO is **12**. Kernel `flash.dtsi` is PMI8994 qpnp-flash-led with that GPIO. sepolicy `hal_light` sysfs_leds matches those names (`6a8f621`). There is no leftover `led::flash_torch`.
 
 ### Other
