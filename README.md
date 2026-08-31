@@ -151,6 +151,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 ### Display and lights
 
 - Duke AMOLED is command-mode. LAB/IBB mode is amoled at 4.6 V. Always-on display is false. Pickup pulse is false.
+- Recents is SystemUI `OverviewProxyRecentsImpl` on the software 3-button navbar. There is no capacitive APP_SWITCH.
 - Light HIDL 2.0 writes lcd-backlight and RGB sysfs. Torch writes `led:flash_torch` and `led:torch_0` (`d92e6c3`). Torch GPIO is **12**. sepolicy `hal_light` sysfs_leds matches those names (`6a8f621`). There is no leftover `led::flash_torch`.
 
 ### Other
@@ -178,6 +179,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - Fluence UUIDs in `audio_effects.xml` are mic AEC/NS. They are not the TAS speaker path. `voice_processing` leftover is the same Fluence AEC/NS (`43b6f35`).
 - `config.fs` assigns camera / nfc / gps AIDs (`a83a092`). Leftover bullhead caps stay.
 - Overlay telephony `config_msim` is false (`f1b93a2`). Single SIM. No rild. Dual SIM is not this product.
+- `dataservices` leftover is `librmnetctl` / `rmnetcli` for MSM8992 `rmnet_data`. It is not rild.
 - `BoardConfig` leftover is QCA BT (no BCM). `BOARD_USB_CONFIGFS` is false. No FPC (`5f1d786`).
 - GNSS leftover does not put a stock AOSP impl VINTF on the HIDL package (`903abd6`). VINTF leftover lists GNSS + vibrator + camera.provider. No radio. No FPC (`55b29f2`).
 - QCOM `time_genoff` MATCH MSM8992 (`565f425`: ATS_DRM, ATS_TOD_MODEM).
