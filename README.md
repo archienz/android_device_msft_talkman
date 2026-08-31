@@ -82,11 +82,13 @@ Hill ident candidates **0x20** / **0x7c** / **0x22** are lab notes in `CAMERA-ID
 
 ## Progress (2026-08-31)
 
-Wave 15 start.
+Wave 15 running.
 
 **Definition of done:** a physical talkman log in `out/qa-*`. Source in Git is not a pass.
 
-No P0 item is **Working**. Mixer speaker is QUAT_MI2S. `privapp-permissions` dropped LGE. NFC GPIOs match schematic DT.
+No P0 item is **Working**. Mixer speaker is QUAT_MI2S. `privapp-permissions` dropped LGE (`ca9adee`). NFC GPIOs match schematic DT (IRQ 29, VEN 30, DWL 94). Rear camera is CCI1. LVS1 is always-on.
+
+Wave 15 source (not a pass): `extract-files.sh` dests match COPY_FILES; WCNSS QCA6174 `gNumRxAnt=2`; location sepolicy lets `loc_launcher` and GNSS HIDL read `gps.conf`; `init.talkman.usb.rc` is g_android (no configfs); thermal HAL `thermal.talkman`; `vendor.prop` HAL1 persist.
 
 Host blockers: no WSL Ubuntu 22.04. About 23 GB free on C:. CCI scan never ran. No GPSTest log.
 
@@ -124,13 +126,14 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - NMEA callback copies data to an owned buffer. CAF length must not go to HIDL `setToExternal` (that path caused SIGABRT).
 - Locations with 0 satellites or position (0,0) are dropped.
 - SUPL uses `wlan0`. The tree does not send IMSI.
+- `sepolicy/gps_conf.te` and `location.te` let `location` (`loc_launcher`) and `hal_gnss_default` search `vendor_configs_file` and read `gps_conf_file`. SELinux stays permissive. No IMSI. No rild.
 
 ### Camera
 
 - XML `SensorName` is `mot_imx230` for CameraId 0.
 - There is no CameraId 1. Front sensor name is not known.
 - `BOARD_QTI_CAMERA_32BIT_ONLY` is true. `USE_CAMERA_STUB` is false.
-- `system.prop` forces HAL1: `persist.camera.HAL3.enabled=0`.
+- `system.prop` and `vendor.prop` force HAL1: `persist.camera.HAL3.enabled=0`. `vendor.prop` also sets IS type 4, TNR off, EIS enable (unused while HAL3 is off).
 - Media profiles: rear 3840×2160 at 30 fps, H.264. No HEVC encode. No 4K60.
 - LVS1 is always-on. `cam_vio` is not in rear or front cam-vreg / power-seq.
 - OIS `.kar` files can be in vendor firmware. There is no `libmmcamera_ois_bu24210.so` in the dumps. Do not make a stub library.
@@ -146,6 +149,10 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - `init.talkman.rc` imports camera/nfc/gps. There is no duplicate `qcamerasvr` start. There is no CCI echo.
 - Tethering hotspot provision arrays are empty (no LGE entitlement URL). `privapp-permissions-talkman.xml` dropped `com.lge.entitlement`.
 - Mixer speaker path is QUAT_MI2S (TAS2553). WCD SPK DRV is not wired.
+- `extract-files.sh` dests match COPY_FILES. 32-bit `mot_imx230` and bu24210 `.kar` only. Banned dests: IMX377, OV5693, nanohub, OMADM, LGE entitlement, LifeTimer.
+- WCNSS `wifi/WCNSS_qcom_cfg.ini` is QCA6174 2×2 (`gEnable2x2=1`, `gNumRxAnt=2`). No 11ax, no 6 GHz, no WPA3/SAE ini keys. MAC is not in this ini.
+- `init.talkman.usb.rc` is `g_android` sysfs. `sys.usb.configfs=0`. No `/config/usb_gadget`. Default `persist.sys.usb.config=adb`.
+- Thermal HAL package is `thermal.talkman` (`thermal/thermal.c`, vendor partition). Not a P0 meter pass.
 - Wi-Fi MAC comes from factory DPP. The image does not contain a MAC address.
 - Sensors HAL is `sensors.talkman.so`. No BMI160. No nanohub.
 - Speaker volume curves are AOSP defaults for TAS2553. Bullhead WCD DRC curves are gone. TAS PGA default is **11 dB**.
