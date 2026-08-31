@@ -86,13 +86,15 @@ Qi GPIOs match 4VM_08r: `wc-en` GPIO **2**, `wc-det` GPIO **14**.
 
 ## Progress (2026-08-31)
 
-Wave 18 **DONE** (source only, not a meter pass). Keep Wave 16 README `3c14b94`. Keep `1d143f5`. Do not restore `abeb48a`.
+Wave 19 **DONE** (source only, not a meter pass). Keep Wave 18 README `6871f51`. Keep Wave 16 README `3c14b94`. Keep `1d143f5`. Do not restore `abeb48a`. VINTF leftover `55b29f2` stays **LIVE** on `manifest.xml`. Do not steal that leftover.
 
-**Definition of done:** a physical talkman log in `out/qa-*`. Source in Git is not a pass.
+**Definition of done:** a physical talkman log in `out/qa-*`. Source in Git is not a pass. There is no LOS zip. There is no `out/qa-*` meter log. CCI scan never ran on the telephone. GPSTest never ran.
 
-No P0 item is **Working**. Mixer speaker is QUAT_MI2S (`66c7d50`). `extract-files.sh` dests match COPY_FILES (`6e4d4c2`) for 32-bit `mot_imx230` and bu24210 `.kar`. Lineage fingerprint is `Microsoft/talkman` (`44cb3c5`). Settings overlay leftover (`2fca2c7`: no `color_temp`, no Bell IPv4, no FPC). WCNSS QCA6174 `gNumRxAnt=2`. Location sepolicy `0c0a081`. USB `g_android` (`93506aa`). `androidboot.usbconfigfs=0` (`5d03a73`). Thermal HAL `thermal.talkman` (`9b6cd42` vendor julian). `privapp-permissions` dropped LGE (`ca9adee`). NFC GPIOs match schematic PNG crop (IRQ 29, VEN 30, DWL 94). Rear camera is CCI1 (bus, not SID). LVS1 is always-on, not a cam vreg. `ueventd` jpeg0/jpeg3 (`e9b365a`). CAMERA-IDENT CCI1 (`63bed4c`).
+No P0 item is **Working**. Mixer speaker is QUAT_MI2S (`66c7d50`). `extract-files.sh` dests match COPY_FILES (`6e4d4c2`) for 32-bit `mot_imx230` and bu24210 `.kar`. Lineage fingerprint is `Microsoft/talkman` (`44cb3c5`). Settings overlay leftover (`2fca2c7`: no `color_temp`, no Bell IPv4, no FPC). WCNSS QCA6174 `gNumRxAnt=2`. Location sepolicy `0c0a081`. USB `g_android` (`93506aa`). `androidboot.usbconfigfs=0` (`5d03a73`). Thermal HAL `thermal.talkman` (`9b6cd42` vendor julian). `privapp-permissions` dropped LGE (`ca9adee`). NFC GPIOs match schematic PNG crop (IRQ 29, VEN 30, DWL 94). Rear camera is CCI1 (bus, not SID). LVS1 is always-on, not a cam vreg. `ueventd` jpeg0/jpeg3 (`e9b365a`). CAMERA-IDENT CCI1 (`63bed4c`). Dual SIM RM-1118 / 4VM_08d is not this product. No `qcom,slave-id`.
 
-Wave 18 source (not a pass): `bluetooth/bt_vendor.conf` QCA6174 leftover (`988ad95`: persist/OTP, `USE_CONTROLLER_BDADDR=TRUE`, no sample MAC). Dumpstate lists torch/flash LED sysfs and `/dev/video*` (`bf43f49`; no open, no CCI write). Vendor `sap.conf` (`e65e4b2`) NDK names ICM-206xx / AK09912 / ZPA2326, `SENSOR_PROVIDER=2`. TWRP kernel config is `mmo_defconfig` (same `BoardConfig`). `media_profiles` IMX230 4K30 H.264. `audio_platform_info` QUAT_MI2S. NFC sepolicy is PN547 `/dev/pn547`. Kernel `msm8992-chi.dtsi` includes `talkman-camera.dtsi`. `powerhint.xml` is MSM8992. Frameworks overlay `config.xml` is in this tree. Vendor COPY_FILES has no IMX377. lk2nd talkman DTS `qcom,board-id = <26 0>` (`0x1a`; not CCI `0x19`). `gps.conf` is committed (`PRODUCT_COPY_FILES` system+vendor). Workspace `tools/cci_scan/Android.mk` installs `/system/bin/cci_scan` (`TARGET_OUT_EXECUTABLES`). No extra forks.
+Wave 19 source (not a pass): lights HIDL torch on `led:flash_torch` and `led:torch_0` (`d92e6c3`; no leftover `led::flash_torch`). QCA6174 `hostapd` / `wpa` overlays (`e4b23cf`: WPA2-PSK 11n, no SAE / 6 GHz / VHT AP). Overlay wifi leftover (`004a8fb`: QCA6174, no LGE strings). lineage-sdk overlay leftover (`ef27b11`: no prox-on-wake, no `color_temp` LiveDisplay, no FPC). `libpn547_fw.so` installs at HAL path `/system/vendor/firmware` (`749c1c0`). PN547 download image is WOA `nxppn547fw.dat`; Sony 8.1 dump is leftover. Kernel GPIO12 (`3068a345c0e`) and FG 3200/3500 (`91c0c0317c3`) live in `android_kernel_mmo_msm8994`. Installer packed `modem.img` (`dc847d5`).
+
+Wave 18 source (not a pass): `bluetooth/bt_vendor.conf` QCA6174 leftover (`988ad95`: persist/OTP, `USE_CONTROLLER_BDADDR=TRUE`, no sample MAC). Dumpstate lists torch/flash LED sysfs and `/dev/video*` (`bf43f49`; no open, no CCI write). Vendor `sap.conf` (`e65e4b2`) NDK names ICM-206xx / AK09912 / ZPA2326, `SENSOR_PROVIDER=2`. MATCH: TWRP `mmo_defconfig`, `media_profiles` IMX230 4K30 H.264, `audio_platform_info` QUAT_MI2S, NFC sepolicy PN547 `/dev/pn547`, kernel `msm8992-chi.dtsi` includes `talkman-camera.dtsi`, `powerhint.xml` MSM8992, lk2nd board-id `0x1a` (`<26 0>`; not CCI `0x19`), `gps.conf` committed (`PRODUCT_COPY_FILES` system+vendor). Workspace `tools/cci_scan/Android.mk` installs `/system/bin/cci_scan` (`TARGET_OUT_EXECUTABLES`). No extra forks.
 
 Wave 16 source (not a pass): iris `qcom,camera@2` disabled (CSI2 / CCI0 GPIO 14 / 102, no slave-id); Qi GPIOs match; CAMERA-IDENT CCI1 is bus not slave-id; Fluence is mic AEC; `usbconfigfs=0`; ueventd jpeg0/jpeg3; camera sepolicy already vendor lib+XML. Wave 15 still in tree: mixer QUAT (`66c7d50`), WCNSS 2×2, g_android, thermal, extract `6e4d4c2`.
 
@@ -101,9 +103,9 @@ Host blockers: no WSL Ubuntu 22.04. About 23 GB free on C:. CCI scan never ran. 
 | ID | Subsystem | Status | What is in source | What is still missing |
 |---|---|---|---|---|
 | P0.0 | Rebuild LOS 18.1 | Not done | Manifest and `README-BUILD.md` | WSL Ubuntu 22.04, 250–400 GB ext4, `mka bacon` |
-| P0.1 | Battery UI | Not Working | Fuel-gauge OCV+CC if pack ID does not match. Overlay capacity 3000 mAh. Warning levels 15 / 5. Settings health reads `bms/charge_full*`. Dumpstate walks psy. No hardcoded 50% | `dumpsys battery` and USB-meter log on the telephone |
-| P0.2 | Charge | Not Working | Kernel driver sets cable 1800 mA and Qi 900 mA. Overlay strings say 5 V 1.8 A and Qi 900 mA. USB-C mux driver `mmo-usbc.c`. No PD. No HVDCP | USB-meter proof that SoC increases |
-| P0.3 | GPS | Not Working | GNSS HIDL `impl.talkman`. SUPL 2.0. NTP `pool.ntp.org`. Packed installer `modem.img` 70 MiB with MBA/MPSS. 0-SV locations are dropped | GPSTest log with `numSvs` more than 0 |
+| P0.1 | Battery UI | Not Working | Fuel-gauge OCV+CC if pack ID does not match. Overlay capacity 3000 mAh. Kernel FG 3200/3500 (`91c0c0317c3`). Warning levels 15 / 5. Settings health reads `bms/charge_full*`. Dumpstate walks psy. No hardcoded 50% | `dumpsys battery` and USB-meter log on the telephone |
+| P0.2 | Charge | Not Working | Kernel driver sets cable 1800 mA and Qi 900 mA. Overlay strings say 5 V 1.8 A and Qi 900 mA. USB-C mux driver `mmo-usbc.c`. Kernel GPIO12 (`3068a345c0e`). No PD. No HVDCP | USB-meter proof that SoC increases |
+| P0.3 | GPS | Not Working | GNSS HIDL `impl.talkman`. SUPL 2.0. NTP `pool.ntp.org`. Packed installer `modem.img` (`dc847d5`) 70 MiB with MBA/MPSS. 0-SV locations are dropped | GPSTest log with `numSvs` more than 0 |
 | P0.4 | Camera | Not Working | DT name `mot_imx230`. XML CameraId 0. Clark 32-bit sensor libraries. Flash/torch PMI nodes. HAL1 props. LVS1 always-on, not a cam vreg. `cam_vio` is not in rear/front `qcom,cam-vreg-name`. Iris `camera@2` disabled. OIS `.kar` in COPY_FILES; `msm_ois` does not `request_firmware` | CCI scan on the telephone, JPEG still, OIS `.so` |
 | P2 | RIL | Deferred | Research notes only | Modem SMD |
 
@@ -151,16 +153,18 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 ### Display and lights
 
 - Duke AMOLED is command-mode. Always-on display is false.
-- Light HIDL 2.0 writes lcd-backlight and RGB sysfs.
+- Light HIDL 2.0 writes lcd-backlight and RGB sysfs. Torch writes `led:flash_torch` and `led:torch_0` (`d92e6c3`). There is no leftover `led::flash_torch`.
 
 ### Other
 
-- NFC node is `/dev/pn547`. Firmware matches WOA `nxppn547fw.dat`. Kernel `nq-nci` already has 250 ms timeout and VEN without eSE. GPIOs match schematic PNG crop: IRQ 29, VEN 30, DWL 94. `sepolicy/nfc.te` is PN547 (no FeliCa).
+- NFC node is `/dev/pn547`. Firmware matches WOA `nxppn547fw.dat`. Sony 8.1 dump is leftover. `libpn547_fw.so` path is `/system/vendor/firmware` (`749c1c0`). Kernel `nq-nci` already has 250 ms timeout and VEN without eSE. GPIOs match schematic PNG crop: IRQ 29, VEN 30, DWL 94. `sepolicy/nfc.te` is PN547 (no FeliCa).
 - `bluetooth/bt_vendor.conf` is QCA6174 leftover (`988ad95`): UART `/dev/ttyHS0`, `USE_CONTROLLER_BDADDR=TRUE`. BD_ADDR is persist `/persist/bdaddr.txt` or QCA OTP. No sample MAC in this file.
 - TWRP and `BoardConfig` use `TARGET_KERNEL_CONFIG := mmo_defconfig`.
 - `audio_platform_info.xml` is QUAT_MI2S (TAS2553).
 - `configs/powerhint.xml` is MSM8992 (`platform="msm8992"`, A57 ceiling 1824000 kHz).
 - Frameworks overlay is `overlay/frameworks/base/core/res/res/values/config.xml`.
+- lineage-sdk overlay leftover (`ef27b11`): no prox-on-wake, no `color_temp` LiveDisplay, no FPC.
+- Wi-Fi overlay leftover (`004a8fb`): QCA6174, no LGE strings. `hostapd` / `wpa` overlays (`e4b23cf`) stay WPA2-PSK 11n.
 - Vendor COPY_FILES has no IMX377.
 - lk2nd talkman DTS: `qcom,board-id = <26 0>` and `qcom,msm-id` `0x0001001a`. That is not a CCI slave-id.
 - Workspace `tools/cci_scan/Android.mk` builds `/system/bin/cci_scan`. The binary does not contain slave addresses.
