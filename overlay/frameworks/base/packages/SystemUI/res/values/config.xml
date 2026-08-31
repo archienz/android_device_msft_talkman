@@ -49,8 +49,14 @@
     <!-- Should "4G" be shown instead of "LTE" when the network is NETWORK_TYPE_LTE? -->
     <bool name="config_show4GForLTE">false</bool>
 
-    <!-- leftover MATCH bullhead: recents is SystemUI overview on software
-         navbar (config_hasRecents). No capacitive APP_SWITCH. No Dual SIM. -->
+    <!-- leftover MATCH 5e74b0b: recents is SystemUI overview on software
+         navbar (frameworks config_hasRecents). No capacitive APP_SWITCH.
+         gpio-keys is VOLUME_UP/CAMERA/FOCUS only. No Dual SIM. -->
+    <string name="config_recentsComponent" translatable="false">com.android.systemui.recents.OverviewProxyRecentsImpl</string>
+    <string name="config_navBarLayout" translatable="false">left[.5W],back[1WC];home;recent[1WC],right[.5W]</string>
+    <bool name="recents_grow_in_multiwindow">true</bool>
+    <!-- Duke AMOLED: dim static 3-button recents/home/back when wallpaper is gone. -->
+    <bool name="config_navigation_bar_enable_auto_dim_no_visible_wallpaper">true</bool>
 
     <!-- leftover MATCH b045cc4: no FPC. Do not overlay
          config_fingerprintWakeAndUnlock (lineage-sdk / SystemUI default).
