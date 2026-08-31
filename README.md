@@ -212,6 +212,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - VoLTE, VT, and WFC overlays are false. There is no rild package.
 - CarrierConfig overlay sets IMS, VoLTE, WFC, and VT false. There is no Dual SIM.
 - Telephony overlay IMS packages are empty (`config_ims_mmtel_package`, `config_ims_rcs_package`). Video-calling fallback is false. RTT is false. 5G DSDS is false (`49762ef`).
+- Telephony leftover also sets `config_allow_hfa_outside_of_setup_wizard` false, `config_requestNetworkScan_disable` true, and an empty `config_simless_emergency_rtt_supported_countries` list. HFA is not SprintDM. Talkman is not a Sprint SKU. There is no Dual SIM.
 - Telephony leftover Sprint MCC `values-mcc310-mnc120` still names SprintDM carrier settings. Talkman is not a Sprint SKU. There is no rild.
 - ContactsCommon leftover (`f3b8ec1`) sets `config_allow_sim_import` false for Sprint MCC 310-120 / 311-490 / 311-870 / 312-530. That is not Dual SIM import.
 - `media_codecs.xml` is Venus VFE44, 3840x2160 at 30 fps. There is no HEVC encode.
