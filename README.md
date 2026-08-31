@@ -174,6 +174,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - Workspace `tools/cci_scan/Android.mk` builds `/system/bin/cci_scan`. The binary does not contain slave addresses.
 - Lineage `BUILD_FINGERPRINT` is `Microsoft/talkman/talkman:11/RQ3A.211001.001/1:user/release-keys` (`44cb3c5`).
 - Settings overlay leftover (`2fca2c7`): no `color_temp`, no Bell IPv4, no FPC. `config_show_mobile_plan` is false. Camera laser overlay is false.
+- There is no CellBroadcast Bell MCC overlay (`values-mcc302-mnc610`). Talkman is not a Bell SKU.
 - Framework overlay leftover (`b045cc4`): no `android.hardware.fingerprint` permission XML. No FPC HAL.
 - `sepolicy/rild.te` leftover is unused. There is no rild package.
 - Bluetooth overlay leftover: `profile_supported_sap` is true. There is no generated MAC.
