@@ -64,6 +64,8 @@ Push personal work to **archienz**. Do not open pull requests on the community o
 
 CCI 7-bit slave IDs are **not** in this tree. Do not invent `qcom,slave-id`.
 
+Rear camera I2C is **CCI master 1** (RM-1104 schematic 4VM_08r page 2, plus EpicLPer lab). Front/iris stay on CCI0. Dual SIM RM-1118 is not this product.
+
 Hill ident candidates **0x20** / **0x7c** / **0x22** are lab notes in `CAMERA-IDENT.md`. They are not DT.
 
 ---
