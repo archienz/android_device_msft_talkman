@@ -80,3 +80,15 @@ on boot
     chmod 0644 /sys/class/power_supply/dc/charging_enabled
     chmod 0644 /sys/class/power_supply/dc/current_max
     chmod 0644 /sys/class/power_supply/dc/type
+
+    # qpnp-flash-led / gpio-leds torch (read-only dump). brightness stays ueventd.
+    chmod 0755 /sys/class/leds/led:torch_0
+    chmod 0755 /sys/class/leds/led:torch_1
+    chmod 0755 /sys/class/leds/led:flash_torch
+    chmod 0755 /sys/class/leds/led:flash_0
+    chmod 0755 /sys/class/leds/led:flash_1
+    chmod 0644 /sys/class/leds/led:torch_0/max_brightness
+    chmod 0644 /sys/class/leds/led:torch_1/max_brightness
+    chmod 0644 /sys/class/leds/led:flash_torch/max_brightness
+    chmod 0644 /sys/class/leds/led:flash_0/max_brightness
+    chmod 0644 /sys/class/leds/led:flash_1/max_brightness

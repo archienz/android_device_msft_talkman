@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <sys/sysmacros.h>
 #include <unistd.h>
 
 #include <log/log.h>
@@ -239,6 +240,14 @@ static void DumpGlobListing(int fd, const char* title, const char* dirpath,
             dprintf(fd, "%s: %s\n", path, strerror(errno));
             continue;
         }
+
+        /* Listing: regular files or char devices (/dev/video*). Never cat devices. */
+        if (S_ISCHR(st.st_mode)) {
+            dprintf(fd, "%s  char %d:%d\n", path, major(st.st_rdev),
+                    minor(st.st_rdev));
+            hits++;
+            continue;
+        }
         if (!S_ISREG(st.st_mode)) {
             continue;
         }
@@ -271,6 +280,32 @@ static void DumpTalkmanCameraCciUsbc(int fd) {
 
     DumpGlobListing(fd, "OIS firmware", "/vendor/firmware", "bu24210*.kar", false);
     DumpGlobListing(fd, "camera XML", "/vendor/etc/camera", "*.xml", true);
+
+    /* qpnp-flash-led + gpio-leds torch (ueventd.talkman.rc). Missing = ENOENT. */
+    {
+        DIR* leds = opendir("/sys/class/leds");
+        if (leds == nullptr) {
+            dprintf(fd, "------ /sys/class/leds: %s ------\n", strerror(errno));
+        } else {
+            struct dirent* de;
+            while ((de = readdir(leds)) != nullptr) {
+                if (de->d_name[0] == '.') {
+                    continue;
+                }
+                if (strstr(de->d_name, "torch") == nullptr &&
+                    strstr(de->d_name, "flash") == nullptr) {
+                    continue;
+                }
+                char ledpath[192];
+                snprintf(ledpath, sizeof(ledpath), "/sys/class/leds/%s", de->d_name);
+                DumpReadableDir(fd, "torch/flash LED", ledpath);
+            }
+            closedir(leds);
+        }
+    }
+
+    /* Node listing only — does not open V4L2 or imply a working camera. */
+    DumpGlobListing(fd, "/dev/video*", "/dev", "video*", false);
 }
 
 }  // namespace

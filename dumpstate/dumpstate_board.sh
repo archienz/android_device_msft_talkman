@@ -78,3 +78,29 @@ for p in \
 do
     dump_file "$p"
 done
+
+# Torch/flash LED sysfs that is present. Skip unreadable brightness.
+if [ -d /sys/class/leds ]; then
+    echo "------ /sys/class/leds (torch/flash) ------"
+    ls -l /sys/class/leds
+    for d in /sys/class/leds/*; do
+        [ -d "$d" ] || continue
+        base="${d##*/}"
+        case "$base" in
+            *torch*|*flash*) ;;
+            *) continue ;;
+        esac
+        echo "------ LED $base ------"
+        ls -l "$d"
+        for f in "$d"/*; do
+            [ -e "$f" ] || continue
+            [ -d "$f" ] && continue
+            [ -L "$f" ] && continue
+            dump_file "$f"
+        done
+    done
+fi
+
+# V4L2 node listing only (no open, no fake camera).
+echo "------ /dev/video* ------"
+ls -l /dev/video* 2>/dev/null || echo "/dev/video*: missing"
