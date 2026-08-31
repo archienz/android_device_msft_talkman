@@ -1,4 +1,9 @@
 #!/vendor/bin/sh
+# Talkman MSM8992 (4x A53 + 2x A57). CAF/bullhead leftover: take A57s
+# offline while msm_thermal core_control is off so interactive can bind
+# on cpu4, then plugin cpu4/cpu5 again. Permanent offline is charger-only
+# (init.talkman.rc on charger). There is no init.qcom.sh.
+# Never write talkman-cci-scan/scan.
 
 ################################################################################
 # helper functions to allow Android init like script
@@ -20,7 +25,7 @@ function get-set-forall() {
 
 ################################################################################
 
-# take the A57s offline when thermal hotplug is disabled
+# leftover bullhead: A57 offline while thermal hotplug is disabled
 write /sys/devices/system/cpu/cpu4/online 0
 write /sys/devices/system/cpu/cpu5/online 0
 
@@ -69,7 +74,7 @@ write /sys/devices/system/cpu/cpu0/cpufreq/interactive/min_sample_time 40000
 write /sys/devices/system/cpu/cpu0/cpufreq/interactive/max_freq_hysteresis 80000
 write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 384000
 
-# online CPU4
+# leftover: bring CPU4 back (not charger-only)
 write /sys/devices/system/cpu/cpu4/online 1
 
 # configure governor settings for big cluster
@@ -90,7 +95,7 @@ write /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq 384000
 # restore A57's max
 copy /sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq /sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq
 
-# plugin remaining A57s
+# leftover: plugin remaining A57 (cpu5)
 write /sys/devices/system/cpu/cpu5/online 1
 
 # Restore CPU 4 max freq from msm_performance
