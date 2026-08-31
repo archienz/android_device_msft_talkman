@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2014, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2010-2014, 2016 The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -42,7 +42,7 @@ typedef enum time_bases {
 	ATS_TOD,
 	ATS_USER,
 	ATS_SECURE,
-	ATS_RESERVED_1,
+	ATS_DRM,
 	ATS_RESERVED_2,
 	ATS_RESERVED_3,
 	ATS_GPS,
@@ -53,6 +53,7 @@ typedef enum time_bases {
 	ATS_UTC,
 	ATS_MODEM,
 	ATS_MFLO,
+	ATS_TOD_MODEM,
 	ATS_INVALID
 } time_bases_type;
 
