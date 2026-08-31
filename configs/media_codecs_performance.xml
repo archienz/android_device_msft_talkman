@@ -15,9 +15,9 @@
 -->
 
 <!--
-     MSM8992 Venus. Encoder ceiling is IMX230 4K30 in media_profiles (3840x2160@30).
-     No 4K60. No measured-frame-rate-3840x2160 on encode (1080p is the top sample).
-     HEVC decode 3840x2160@43 is 4K30, not Spectra 4K60.
+     MSM8992 Venus leftover (VFE44). Encoder ceiling 3840x2160@30. No 4K60.
+     No measured-frame-rate-3840x2160 on encode (1080p is the top sample).
+     HEVC decode 3840x2160@43 is 4K30, not Spectra 4K60. No HEVC encode samples.
 -->
 <MediaCodecs>
     <Encoders>

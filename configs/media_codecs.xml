@@ -78,10 +78,10 @@ Only the three quirks included above are recognized at this point:
 -->
 
 <!--
-     MSM8992 Venus. Camcorder max is IMX230 4K30 (3840x2160@30) in media_profiles.
-     CAF 8992/8994 table: h264/hevc/vp8 3840x2160 30 fps 972000 MB/s (16x16).
+     MSM8992 Venus leftover (VFE44, not Spectra 8996 4K60).
+     CAF 8992/8994: h264/hevc/vp8 3840x2160@30 = 972000 MB/s (16x16).
      Parenthetical 4096x2160 is 24 fps at the same load, not 4K60.
-     ISP is VFE44, not Spectra (8996 4K60). No HEVC encode on this Venus.
+     No OMX.qcom.video.encoder.hevc on this Venus.
 -->
 
 <MediaCodecs>
@@ -200,6 +200,7 @@ Only the three quirks included above are recognized at this point:
         <MediaCodec name="OMX.qcom.video.decoder.hevc" type="video/hevc" >
             <Quirk name="requires-allocate-on-input-ports" />
             <Quirk name="requires-allocate-on-output-ports" />
+            <Quirk name="defers-output-buffer-allocation" />
             <Limit name="size" min="64x64" max="3840x2160" />
             <Limit name="alignment" value="2x2" />
             <Limit name="block-size" value="16x16" />
@@ -212,6 +213,7 @@ Only the three quirks included above are recognized at this point:
         <MediaCodec name="OMX.qcom.video.decoder.hevc.secure" type="video/hevc" >
             <Quirk name="requires-allocate-on-input-ports" />
             <Quirk name="requires-allocate-on-output-ports" />
+            <Quirk name="defers-output-buffer-allocation" />
             <Limit name="size" min="64x64" max="2048x2048" />
             <Limit name="alignment" value="2x2" />
             <Limit name="block-size" value="16x16" />
