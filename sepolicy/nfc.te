@@ -1,17 +1,24 @@
-# Talkman NXP PN547 (nq-nci). Node is /dev/pn547, labeled nfc_device.
+# leftover MATCH e74046f: NXP PN547 nq-nci /dev/pn547 (nfc_device).
 # nfc_nci.msm8992.so dlopens /vendor/firmware/libpn547_fw.so
-# (WOA nxppn547fw.dat). init.talkman.nfc.rc already chowns the node
-# and symlinks /dev/pn54x. No FeliCa / snfc / Sony FW.
-# nfc_hal_pn54x is leftover bullhead/FeliCa HAL binary — not packaged.
+# (WOA nxppn547fw.dat FirmwareMap 5/8). init.talkman.nfc.rc chowns
+# the node and symlinks /dev/pn54x. No FeliCa / snfc UART / Sony FW.
+# nfc_hal_pn54x leftover bullhead binary is not packaged (dropped).
+# No Dual SIM. libnfc-nci.conf untouched.
 
 allow nfc nfc_device:chr_file rw_file_perms;
 
-# libpn547_fw.so lives under /vendor/firmware (vendor_firmware_file).
-# POST_INSTALL also links /system/vendor/firmware/libpn547_fw.so.
+# leftover MATCH: libpn547_fw.so under /vendor/firmware
+# (vendor_firmware_file). POST_INSTALL also links
+# /system/vendor/firmware/libpn547_fw.so.
 allow nfc vendor_firmware_file:dir r_dir_perms;
 allow nfc vendor_firmware_file:file { read open getattr map execute };
 allow nfc vendor_file:dir r_dir_perms;
 allow nfc vendor_file:file { read open getattr map execute };
+
+# leftover MATCH: /vendor/etc/libnfc-nxp.conf (PN547C2, BBCLK2).
+# Do not edit libnfc-nci.conf from sepolicy.
+allow nfc vendor_configs_file:dir r_dir_perms;
+allow nfc vendor_configs_file:file r_file_perms;
 
 allow nfc nfc_data_file:dir create_dir_perms;
 allow nfc nfc_data_file:{ file lnk_file fifo_file } create_file_perms;
