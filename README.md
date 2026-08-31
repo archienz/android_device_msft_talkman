@@ -178,7 +178,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - `configs/powerhint.xml` is MSM8992 (`platform="msm8992"`, A57 ceiling 1824000 kHz).
 - Frameworks overlay is `overlay/frameworks/base/core/res/res/values/config.xml`.
 - lineage-sdk overlay leftover (`ef27b11`): no prox-on-wake, no `color_temp` LiveDisplay, no FPC.
-- Wi-Fi overlay leftover (`004a8fb`): QCA6174, no LGE strings. `hostapd` / `wpa` overlays (`e4b23cf`) stay WPA2-PSK 11n.
+- Wi-Fi overlay leftover (`004a8fb`): QCA6174, no LGE strings. `hostapd` / `wpa` overlays leftover (`81aff9c` MATCH `e4b23cf`) stay WPA2-PSK 11n. No SAE, no 6 GHz AP, no VHT AP.
 - Vendor COPY_FILES has no IMX377.
 - lk2nd talkman DTS: `qcom,board-id = <26 0>` and `qcom,msm-id` `0x0001001a`. That is not a CCI slave-id.
 - Workspace `tools/cci_scan/Android.mk` builds `/system/bin/cci_scan`. The binary does not contain slave addresses.
