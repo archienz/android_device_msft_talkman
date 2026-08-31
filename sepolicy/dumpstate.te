@@ -1,0 +1,3 @@
+# dumpstate_board.sh is dumpstate_exec (file_contexts).
+# Walk /sys/class/power_supply labeled sysfs_batteryinfo (genfs + file_contexts).
+r_dir_file(dumpstate, sysfs_batteryinfo)
