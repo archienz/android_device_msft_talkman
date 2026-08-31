@@ -57,7 +57,12 @@ BOARD_KERNEL_CMDLINE := console=ttyHSL0,115200,n8 androidboot.hardware=talkman b
 BOARD_KERNEL_CMDLINE += lpm_levels.sleep_disabled=1 msm_poweroff.download_mode=0
 BOARD_KERNEL_CMDLINE += loop.max_part=7 androidboot.boot_devices=soc.0/f9824900.sdhci
 BOARD_KERNEL_CMDLINE += androidboot.selinux=permissive
+# CAF 3.10 g_android. init maps androidboot.usbconfigfs → sys.usb.configfs.
+# Force 0 so LOS init.usb.configfs.rc does not take the gadget.
+BOARD_KERNEL_CMDLINE += androidboot.usbconfigfs=0
 BOARD_KERNEL_CMDLINE += firmware_class.path=/vendor/firmware
+# No CONFIG_USB_CONFIGFS. Recovery/vold trees honor this name.
+TARGET_USES_USB_CONFIGFS := false
 BOARD_MKBOOTIMG_ARGS := --ramdisk_offset $(BOARD_RAMDISK_OFFSET) --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)
 #KERNEL_TOOLCHAIN := $(shell pwd)/prebuilts/arm64-gcc/bin
 #KERNEL_TOOLCHAIN_PREFIX := aarch64-elf-
