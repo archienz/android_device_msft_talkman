@@ -52,6 +52,10 @@
     <!-- leftover MATCH bullhead: recents is SystemUI overview on software
          navbar (config_hasRecents). No capacitive APP_SWITCH. No Dual SIM. -->
 
+    <!-- leftover MATCH b045cc4: no FPC. Do not overlay
+         config_fingerprintWakeAndUnlock (lineage-sdk / SystemUI default).
+         No udfps, no in-screen FP icon. Settings 2fca2c7 owns face enroll. -->
+
     <!-- The default tiles to display in QuickSettings -->
     <string name="quick_settings_tiles_default" translatable="false">
         wifi,bt,nfc,rotation,location,cell,dnd,airplane,flashlight

@@ -451,4 +451,12 @@
 
     <!-- SD card is hot-pluggable on this device -->
     <bool name="config_batterySdCardAccessibility">true</bool>
+
+    <!-- leftover MATCH b045cc4: no FPC. lineage-sdk / AOSP defaults are
+         already false for config_cleanupUnusedFingerprints and
+         config_fingerprintPostResetRunnableForAllClients. Do not overlay
+         those bools (bullhead leftover). Do not overlay
+         config_fingerprintMaxTemplatesPerUser. Settings 2fca2c7 owns
+         face enroll. No Dual SIM. Do not ship android.hardware.fingerprint
+         permission XML or an FPC HAL. -->
 </resources>

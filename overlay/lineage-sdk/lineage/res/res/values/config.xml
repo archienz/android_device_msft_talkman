@@ -74,11 +74,12 @@
     <bool name="config_defaultColorEnhancement">false</bool>
     <bool name="config_defaultCABC">false</bool>
 
-    <!--
-         No FPC on talkman. lineage-sdk defaults already false for
-         unused-fingerprint cleanup / post-reset runnable. Do not overlay
+    <!-- leftover MATCH b045cc4: no FPC on talkman. lineage-sdk defaults
+         already false for config_cleanupUnusedFingerprints and
+         config_fingerprintPostResetRunnableForAllClients. Do not overlay
          those bools (bullhead leftover). Settings 2fca2c7 owns face enroll.
-    -->
+         Frameworks overlay leftover MATCH does not add FPC bools either.
+         No Dual SIM. -->
 
     <!--
          Duke command-mode AMOLED: no MDSS doze/ULPS AOD. AOD bools live
