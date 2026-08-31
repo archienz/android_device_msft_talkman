@@ -1,20 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2020 The Android Open Source Project
-     Licensed under the Apache License, Version 2.0 (the "License");
-     you may not use this file except in compliance with the License.
-     You may obtain a copy of the License at
-          http://www.apache.org/licenses/LICENSE-2.0
-     Unless required by applicable law or agreed to in writing, software
-     distributed under the License is distributed on an "AS IS" BASIS,
-     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     See the License for the specific language governing permissions and
-     limitations under the License.
+<!--
+     Talkman Wi-Fi is QCA6174 2x2 PCIe (qwlan30.bin), not leftover LGE/bullhead
+     strings (no gsm.lge.com, no Nexus5X SSID, no com.lge.entitlement).
+     MATCH leftover 004a8fb. SoftAP SSID stays AOSP AndroidAP. Hotspot
+     provision is the Tethering overlay (already empty). MAC is persist
+     /wlan_mac.bin or QCA OTP. Do not put a MAC in overlay XML.
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-
-    <!-- Leftover: no LGE wifi strings here (no gsm.lge.com, no Nexus5X SSID,
-         no com.lge.entitlement). Hotspot provision is the Tethering overlay
-         (already empty). Default SoftAP SSID stays AOSP AndroidAP. QCA6174. -->
 
     <!-- Talkman QCA6174 802.11ac 2x2. No 6 GHz, no 11ax. -->
     <bool translatable="false" name="config_wifi5ghzSupport">true</bool>
