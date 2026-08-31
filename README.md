@@ -174,7 +174,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - `extract-files.sh` dests match COPY_FILES. 32-bit `mot_imx230` and bu24210 `.kar` only. Banned dests: IMX377, OV5693, nanohub, OMADM, LGE entitlement, LifeTimer.
 - WCNSS `wifi/WCNSS_qcom_cfg.ini` is QCA6174 2×2 (`gEnable2x2=1`, `gNumRxAnt=2`). No 11ax, no 6 GHz, no WPA3/SAE ini keys. MAC is not in this ini.
 - `init.talkman.usb.rc` is `g_android` sysfs. `sys.usb.configfs=0`. `BoardConfig` `androidboot.usbconfigfs=0`. No `/config/usb_gadget`. Default `persist.sys.usb.config=adb`.
-- Thermal HAL package is `thermal.talkman` (`thermal/thermal.c`, vendor partition). Not a P0 meter pass.
+- Thermal HAL package is `thermal.talkman` (`thermal/thermal.c`, vendor partition). `thermal-engine-8992.conf` copies to `/vendor/etc`. Not a P0 meter pass.
 - Fluence UUIDs in `audio_effects.xml` are mic AEC/NS. They are not the TAS speaker path. `voice_processing` leftover is the same Fluence AEC/NS (`43b6f35`).
 - `config.fs` assigns camera / nfc / gps AIDs (`a83a092`). Leftover bullhead caps stay.
 - Overlay telephony `config_msim` is false (`f1b93a2`). Single SIM. No rild. Dual SIM is not this product.
