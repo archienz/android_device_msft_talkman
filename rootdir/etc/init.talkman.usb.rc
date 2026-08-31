@@ -1,13 +1,15 @@
 # Talkman USB gadget — CAF 3.10 g_android (CONFIG_USB_G_ANDROID).
 # No CONFIG_USB_CONFIGFS. Do not mkdir /config/usb_gadget.
-# Dual-role DWC3 stays UFP/sink so USBIN charges. No PD PHY.
-# Composition is android_usb sysfs. persist.sys.usb.config=adb until /data.
+# TYPE_C connector + HD3SS460 SS mux (mmo-usbc). Dual-role DWC3 stays
+# UFP/sink so USBIN charges. No PD PHY / no PD sink UI.
 
 on early-init
     setprop sys.usb.configfs 0
+    setprop persist.sys.usb.configfs 0
 
 on init
     setprop sys.usb.configfs 0
+    setprop persist.sys.usb.configfs 0
     setprop persist.sys.usb.config adb
 
     write /sys/class/android_usb/android0/f_rndis/manufacturer Microsoft
@@ -24,6 +26,7 @@ on boot
     chown root system /sys/class/dual_role_usb/otg_default/mode
     chmod 664 /sys/class/dual_role_usb/otg_default/mode
     write /sys/class/dual_role_usb/otg_default/mode ufp
+    exec - root root -- /vendor/bin/init.talkman.usb.sh
 
 on charger
     write /sys/devices/soc.0/f9200000.ssusb/mode peripheral
@@ -55,10 +58,14 @@ on post-fs-data
     write /sys/class/android_usb/android0/iManufacturer ${ro.product.manufacturer}
     write /sys/class/android_usb/android0/iProduct ${ro.product.model}
 
+# LOS 18.1 may flip this; CAF 3.10 cannot use configfs gadgets.
+on property:sys.usb.configfs=1
+    setprop sys.usb.configfs 0
+
 on property:sys.usb.config=none && property:sys.usb.configfs=0
     stop adbd
     write /sys/class/android_usb/android0/enable 0
-    write /sys/class/android_usb/android0/functions ${sys.usb.config}
+    write /sys/class/android_usb/android0/functions none
     setprop sys.usb.state ${sys.usb.config}
 
 on property:sys.usb.config=adb && property:sys.usb.configfs=0
@@ -149,20 +156,18 @@ on property:sys.usb.config=diag && property:sys.usb.configfs=0
     stop adbd
     write /sys/class/android_usb/android0/enable 0
     write /sys/class/android_usb/android0/idVendor 05C6
-    write /sys/class/android_usb/android0/idProduct 903D
+    write /sys/class/android_usb/android0/idProduct 9025
     write /sys/class/android_usb/android0/bDeviceClass 0
     write /sys/class/android_usb/android0/bDeviceSubClass 0
     write /sys/class/android_usb/android0/bDeviceProtocol 0
     write /sys/class/android_usb/android0/f_diag/clients diag
     write /sys/class/android_usb/android0/f_acm/acm_transports smd,tty
     write /sys/class/android_usb/android0/f_rmnet/transports qti,bam2bam_ipa
-    write /sys/class/android_usb/android0/functions diag,adb,acm,rmnet
+    write /sys/class/android_usb/android0/functions diag,acm,rmnet
     write /sys/class/android_usb/android0/enable 1
-    start adbd
     setprop sys.usb.state ${sys.usb.config}
 
 on property:sys.usb.config=diag,adb && property:sys.usb.configfs=0
-    stop adbd
     write /sys/class/android_usb/android0/enable 0
     write /sys/class/android_usb/android0/idVendor 05C6
     write /sys/class/android_usb/android0/idProduct 903D
@@ -182,7 +187,7 @@ on property:sys.usb.config=midi && property:sys.usb.configfs=0
     write /sys/class/android_usb/android0/enable 0
     write /sys/class/android_usb/android0/idVendor 18D1
     write /sys/class/android_usb/android0/idProduct 4EE8
-    write /sys/class/android_usb/android0/functions ${sys.usb.config}
+    write /sys/class/android_usb/android0/functions midi
     write /sys/class/android_usb/android0/enable 1
     setprop sys.usb.state ${sys.usb.config}
 
@@ -190,7 +195,7 @@ on property:sys.usb.config=midi,adb && property:sys.usb.configfs=0
     write /sys/class/android_usb/android0/enable 0
     write /sys/class/android_usb/android0/idVendor 18D1
     write /sys/class/android_usb/android0/idProduct 4EE9
-    write /sys/class/android_usb/android0/functions ${sys.usb.config}
+    write /sys/class/android_usb/android0/functions midi,adb
     write /sys/class/android_usb/android0/enable 1
     start adbd
     setprop sys.usb.state ${sys.usb.config}
