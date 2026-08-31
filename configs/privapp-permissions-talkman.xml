@@ -16,15 +16,7 @@
   -->
 
 <permissions>
-    <privapp-permissions package="com.lge.entitlement">
-        <permission name="android.permission.CONNECTIVITY_INTERNAL"/>
-        <permission name="android.permission.READ_PRIVILEGED_PHONE_STATE"/>
-        <permission name="android.permission.WRITE_APN_SETTINGS"/>
-    </privapp-permissions>
-
-    <privapp-permissions package="com.lge.lifetimer">
-        <permission name="android.permission.READ_PRIVILEGED_PHONE_STATE"/>
-    </privapp-permissions>
+    <!-- Talkman has no LGE Entitlement.apk or LifeTimer. Do not grant those packages. -->
 
     <privapp-permissions package="com.qualcomm.atfwd">
         <permission name="android.permission.INTERACT_ACROSS_USERS"/>
