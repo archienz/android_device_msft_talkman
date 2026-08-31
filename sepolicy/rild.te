@@ -1,3 +1,7 @@
+# Leftover unused rild domain policy (bullhead). No PRODUCT_PACKAGES rild.
+# RIL is P2. Do not add rild. Do not flip enforcing.
+# radio_data_file allows commented: they pull radio neverallow.
+
 binder_call(rild, audioserver)
 binder_call(rild, mediaserver)
 binder_use(rild)
@@ -24,12 +28,13 @@ allow rild per_mgr_service:service_manager find;
 
 allow rild time_daemon:unix_stream_socket connectto;
 
-# rild reads qcril.db linked to /system/etc/qcril.db
-allow rild radio_data_file:lnk_file read;
+# leftover: rild reads qcril.db linked to /system/etc/qcril.db
+# neverallow pull radio — unused without PRODUCT_PACKAGES rild
+#allow rild radio_data_file:lnk_file read;
 
-# allow rild to access radio data file
-allow rild radio_data_file:dir rw_dir_perms;
-allow rild radio_data_file:file create_file_perms;
+# leftover: allow rild to access radio data file
+#allow rild radio_data_file:dir rw_dir_perms;
+#allow rild radio_data_file:file create_file_perms;
 
 userdebug_or_eng(`
   allow rild ssr_device:chr_file { open read };
