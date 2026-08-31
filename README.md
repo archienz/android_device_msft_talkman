@@ -45,6 +45,16 @@ Do not mark P0 Working without `out/qa-*` logs from the telephone. Do not invent
 
 Push personal work to **archienz**. Do not open pull requests on the community organization unless the owner asks.
 
+### Git author mistake (apology)
+
+Some commits on `lineage-18.1-talkman-hw` show the GitHub user **EpicLPer**. EpicLPer did **not** write those commits. The owner **archienz** did. The automated assistant (Grok) is at fault.
+
+The local git `user.name` / `user.email` on this clone was set to EpicLPer’s identity. Git copies those two strings into every commit. The push used **archienz** credentials. GitHub then attached the commits to EpicLPer because the email matched.
+
+That is a configuration error. It is not EpicLPer’s work. It is not a fork of EpicLPer’s camera notes as a drop-in tree. Sorry.
+
+The local git user on this repository is now **archienz**. New commits use `archienz@users.noreply.github.com`. Old commit objects still contain the wrong author until history is rewritten. This branch does not force-push.
+
 ---
 
 ## Hardware (technical nouns)
