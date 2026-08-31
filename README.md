@@ -7,8 +7,8 @@ The SoC is **MSM8992**. The kernel family is CAF 3.10 (`kernel/mmo/msm8994`).
 This is **not** an official LineageOS product. The telephone did not ship with Android.
 
 Vocabulary in this file follows **ASD-STE100** Simplified Technical English (Issue 9) style.
-Vocabulary was checked against known rulings and high-risk patterns only.
-This check is **not** a check against the official ASD-STE100 Part 2 dictionary.
+Vocabulary was checked against known rulings and high-risk patterns only, not against the official ASD-STE100 Part 2 dictionary.
+Full compliance needs a check against the official standard.
 
 ---
 
@@ -36,7 +36,7 @@ Cellular / RIL is **P2**. Do not stop P0 for modem SMD errors.
 | Item | Value |
 |---|---|
 | Personal GitHub | [archienz/android_device_msft_talkman](https://github.com/archienz/android_device_msft_talkman) (**private**) |
-| Branch | `lineage-18.1-talkman-hw` |
+| Branch | `lineage-18.1-talkman` |
 | Community source | [Android4Lumia950/android_device_msft_talkman](https://github.com/Android4Lumia950/android_device_msft_talkman) |
 | Lunch target | `lineage_talkman-userdebug` (use `lunch`, not `breakfast`) |
 
@@ -84,7 +84,7 @@ No P0 item is **Working**.
 
 ## Changes in this tree (summary)
 
-This list describes files. This list is not a procedure.
+Do this list as a description of files, not as a procedure.
 
 ### Battery and charge
 
@@ -107,7 +107,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - There is no CameraId 1. Front sensor name is not known.
 - `BOARD_QTI_CAMERA_32BIT_ONLY` is true. `USE_CAMERA_STUB` is false.
 - Media profiles: rear 3840×2160 at 30 fps, H.264. No HEVC encode. No 4K60.
-- Vendor firmware holds OIS `.kar` files. There is no `libmmcamera_ois_bu24210.so` in the dumps. Do not make a stub library.
+- OIS `.kar` files can be in vendor firmware. There is no `libmmcamera_ois_bu24210.so` in the dumps. Do not make a stub library.
 
 ### Display and lights
 
