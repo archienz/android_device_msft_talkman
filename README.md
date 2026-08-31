@@ -185,6 +185,8 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - Wi-Fi leftover also sets `config_wifi_batched_scan_supported` true. Idle receive current is 1 mA. Active Rx is 105 mA. Tx is 235 mA. Operating voltage is 3700 mV.
 - Overlay leftover also sets tethering upstream types 0 / 1 / 5 / 7 (mobile, Wi-Fi, HIPRI, Bluetooth). `skip_restoring_network_selection` is true. `config_hotswapCapable` is true leftover. That is not Dual SIM. There is no rild.
 - Overlay leftover also sets `networkAttributes` for wifi, mobile, MMS, SUPL, DUN, HIPRI, FOTA, IMS, CBS, IA, Bluetooth, ethernet, and mobile_emergency. `radioAttributes` are 1 / 0 / 7 / 9. `config_mobile_tcp_buffers` lists LTE through EVDO sizes. `config_switch_phone_on_voice_reg_state_change` is false. There is no rild. That is not Dual SIM.
+- Overlay leftover also sets `config_device_respects_hold_carrier_config` false. Camera leftover sets `config_camera_sound_forced` false. Launch and lift gesture sensor types are **-1**. Double-tap power for camera is true. There is no ToF / LDAF. There is no Dual SIM CameraId.
+- Overlay leftover also sets rounded window corners false. Sustained Performance Mode is true. System navigation keys are true. HWC `setColorTransform` is accelerated. Auto power modes are true. Nearby GMS Messages and Discovery are in `config_deviceDisabledComponents`. Wi-Fi Display is true. Protected WFD buffers stay false. SD card accessibility is true.
 - Vendor COPY_FILES has no IMX377.
 - lk2nd talkman DTS: `qcom,board-id = <26 0>` and `qcom,msm-id` `0x0001001a`. That is not a CCI slave-id.
 - Workspace `tools/cci_scan/Android.mk` builds `/system/bin/cci_scan`. The binary does not contain slave addresses.
