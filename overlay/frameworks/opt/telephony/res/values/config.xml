@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
      Talkman is single-SIM. Dual SIM stays off.
-     FeliCa NFC packaging is overlay/packages/apps/Nfc (PN547, not
-     FeliCa). This overlay does not add rild.
+     MATCH leftover: this overlay does not add rild Dual SIM.
 -->
 <resources>
     <bool name="config_msim">false</bool>
