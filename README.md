@@ -183,6 +183,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - Wi-Fi leftover also sets `config_wifiSaeUpgradeOffloadEnabled` false, `config_wifi_softap_acs_supported` false, `config_wifi_softap_ieee80211ac_supported` false, `config_wifiSoftapIeee80211axSupported` false, and `config_wifiSoftap6ghzSupported` false. Fast BSS transition and background scan stay true. SoftAP 2 GHz / 5 GHz / 6 GHz channel lists are empty.
 - Wi-Fi leftover also sets `config_wifi_revert_country_code_on_cellular_loss` true and `config_wifi_turn_off_during_emergency_call` true. Country is init SKU, not RIL MCC. `config_wifi_tcp_buffers` is 524288,6291456,8291456,524288,6291456,8291456.
 - Wi-Fi leftover also sets `config_wifi_batched_scan_supported` true. Idle receive current is 1 mA. Active Rx is 105 mA. Tx is 235 mA. Operating voltage is 3700 mV.
+- Overlay leftover also sets tethering upstream types 0 / 1 / 5 / 7 (mobile, Wi-Fi, HIPRI, Bluetooth). `skip_restoring_network_selection` is true. `config_hotswapCapable` is true leftover. That is not Dual SIM. There is no rild.
 - Vendor COPY_FILES has no IMX377.
 - lk2nd talkman DTS: `qcom,board-id = <26 0>` and `qcom,msm-id` `0x0001001a`. That is not a CCI slave-id.
 - Workspace `tools/cci_scan/Android.mk` builds `/system/bin/cci_scan`. The binary does not contain slave addresses.
