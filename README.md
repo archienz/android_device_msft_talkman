@@ -86,11 +86,13 @@ Qi GPIOs match 4VM_08r: `wc-en` GPIO **2**, `wc-det` GPIO **14**.
 
 ## Progress (2026-08-31)
 
-Wave 19 **DONE** (source only, not a meter pass). Keep Wave 18 README `6871f51`. Keep Wave 16 README `3c14b94`. Keep `1d143f5`. Do not restore `abeb48a`. VINTF leftover `55b29f2` stays **LIVE** on `manifest.xml`. Do not steal that leftover.
+Wave 20 **DONE** (source only, not a meter pass). Keep Wave 19 README `0377054`. Keep Wave 18 README `6871f51`. Keep Wave 16 README `3c14b94`. Keep `1d143f5`. Do not restore `abeb48a`. Do not steal LIVE `thermal/` or `gnss/` trees.
 
 **Definition of done:** a physical talkman log in `out/qa-*`. Source in Git is not a pass. There is no LOS zip. There is no `out/qa-*` meter log. CCI scan never ran on the telephone. GPSTest never ran.
 
-No P0 item is **Working**. Mixer speaker is QUAT_MI2S (`66c7d50`). `extract-files.sh` dests match COPY_FILES (`6e4d4c2`) for 32-bit `mot_imx230` and bu24210 `.kar`. Lineage fingerprint is `Microsoft/talkman` (`44cb3c5`). Settings overlay leftover (`2fca2c7`: no `color_temp`, no Bell IPv4, no FPC). WCNSS QCA6174 `gNumRxAnt=2`. Location sepolicy `0c0a081`. USB `g_android` (`93506aa`). `androidboot.usbconfigfs=0` (`5d03a73`). Thermal HAL `thermal.talkman` (`9b6cd42` vendor julian). `privapp-permissions` dropped LGE (`ca9adee`). NFC GPIOs match schematic PNG crop (IRQ 29, VEN 30, DWL 94). Rear camera is CCI1 (bus, not SID). LVS1 is always-on, not a cam vreg. `ueventd` jpeg0/jpeg3 (`e9b365a`). CAMERA-IDENT CCI1 (`63bed4c`). Dual SIM RM-1118 / 4VM_08d is not this product. No `qcom,slave-id`.
+No P0 item is **Working**. Mixer speaker is QUAT_MI2S (`66c7d50`). `extract-files.sh` dests match COPY_FILES (`6e4d4c2`) for 32-bit `mot_imx230` and bu24210 `.kar`. Lineage fingerprint is `Microsoft/talkman` (`44cb3c5`). Settings overlay leftover (`2fca2c7`: no `color_temp`, no Bell IPv4, no FPC). WCNSS QCA6174 `gNumRxAnt=2`. Location sepolicy `0c0a081`. USB `g_android` (`93506aa`). `androidboot.usbconfigfs=0` (`5d03a73`). Thermal HAL `thermal.talkman` (`9b6cd42` vendor julian). `privapp-permissions` dropped LGE (`ca9adee`). NFC GPIOs match schematic PNG crop (IRQ 29, VEN 30, DWL 94). Rear camera is CCI1 (bus, not SID). LVS1 is always-on, not a cam vreg. `ueventd` jpeg0/jpeg3 (`e9b365a`). CAMERA-IDENT CCI1 (`63bed4c`). Dual SIM RM-1118 / 4VM_08d is not this product. No `qcom,slave-id`. Overlay telephony `config_msim` is false (`f1b93a2`).
+
+Wave 20 source (not a pass): sepolicy lights torch `led:flash_torch` / `led:torch_0` (`6a8f621`; no leftover `led::flash_torch`). GNSS leftover has no stock AOSP impl VINTF on the HIDL package (`903abd6`). `BoardConfig` leftover QCA BT (no BCM), `BOARD_USB_CONFIGFS` false, no FPC (`5f1d786`). time_genoff MATCH MSM8992 ATS_DRM / ATS_TOD_MODEM (`565f425`). Fluence voice_processing leftover is mic AEC/NS (`43b6f35`). `config.fs` camera/nfc/gps AID (`a83a092`). VINTF leftover GNSS + vibrator + camera.provider, no radio, no FPC (`55b29f2`). Kernel USB-C UFP mux iCE5LP2K + HD3SS460, no PD (`2c5bf855dfd`). Kernel Duke WQHD dual-DSI cmd panel leftover TE GPIO 10 / reset GPIO 78 (`7fcefef793f`). TWRP overlay `power_profile` battery.capacity 3000 (`cea7f03`). Kernel FG cutoff/low leftover 3200/3500 (`91c0c0317c3`).
 
 Wave 19 source (not a pass): lights HIDL torch on `led:flash_torch` and `led:torch_0` (`d92e6c3`; no leftover `led::flash_torch`). QCA6174 `hostapd` / `wpa` overlays (`e4b23cf`: WPA2-PSK 11n, no SAE / 6 GHz / VHT AP). Overlay wifi leftover (`004a8fb`: QCA6174, no LGE strings). lineage-sdk overlay leftover (`ef27b11`: no prox-on-wake, no `color_temp` LiveDisplay, no FPC). `libpn547_fw.so` installs at HAL path `/system/vendor/firmware` (`749c1c0`). PN547 download image is WOA `nxppn547fw.dat`; Sony 8.1 dump is leftover. Kernel GPIO12 (`3068a345c0e`) and FG 3200/3500 (`91c0c0317c3`) live in `android_kernel_mmo_msm8994`. Installer packed `modem.img` (`dc847d5`).
 
@@ -153,7 +155,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 ### Display and lights
 
 - Duke AMOLED is command-mode. Always-on display is false.
-- Light HIDL 2.0 writes lcd-backlight and RGB sysfs. Torch writes `led:flash_torch` and `led:torch_0` (`d92e6c3`). There is no leftover `led::flash_torch`.
+- Light HIDL 2.0 writes lcd-backlight and RGB sysfs. Torch writes `led:flash_torch` and `led:torch_0` (`d92e6c3`). sepolicy `hal_light` sysfs_leds matches those names (`6a8f621`). There is no leftover `led::flash_torch`.
 
 ### Other
 
@@ -177,7 +179,15 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - WCNSS `wifi/WCNSS_qcom_cfg.ini` is QCA6174 2×2 (`gEnable2x2=1`, `gNumRxAnt=2`). No 11ax, no 6 GHz, no WPA3/SAE ini keys. MAC is not in this ini.
 - `init.talkman.usb.rc` is `g_android` sysfs. `sys.usb.configfs=0`. `BoardConfig` `androidboot.usbconfigfs=0`. No `/config/usb_gadget`. Default `persist.sys.usb.config=adb`.
 - Thermal HAL package is `thermal.talkman` (`thermal/thermal.c`, vendor partition). Not a P0 meter pass.
-- Fluence UUIDs in `audio_effects.xml` are mic AEC/NS. They are not the TAS speaker path.
+- Fluence UUIDs in `audio_effects.xml` are mic AEC/NS. They are not the TAS speaker path. `voice_processing` leftover is the same Fluence AEC/NS (`43b6f35`).
+- `config.fs` assigns camera / nfc / gps AIDs (`a83a092`). Leftover bullhead caps stay.
+- Overlay telephony `config_msim` is false (`f1b93a2`). Single SIM. No rild. Dual SIM is not this product.
+- `BoardConfig` leftover is QCA BT (no BCM). `BOARD_USB_CONFIGFS` is false. No FPC (`5f1d786`).
+- GNSS leftover does not put a stock AOSP impl VINTF on the HIDL package (`903abd6`). VINTF leftover lists GNSS + vibrator + camera.provider. No radio. No FPC (`55b29f2`).
+- QCOM `time_genoff` MATCH MSM8992 (`565f425`: ATS_DRM, ATS_TOD_MODEM).
+- Kernel USB-C leftover is iCE5LP2K + HD3SS460 UFP mux. No PD (`2c5bf855dfd`).
+- Kernel Duke WQHD leftover is dual-DSI command panel. TE is GPIO 10. Reset is GPIO 78 (`7fcefef793f`).
+- TWRP overlay battery.capacity is 3000 (`cea7f03`). Kernel FG leftover cutoff/low is 3200/3500 (`91c0c0317c3`).
 - `ueventd.talkman.rc` labels jpeg0 / jpeg3, video/media, flash_0/1 torch_0/1 flash_torch, pn547. No jpeg1/jpeg2.
 - Camera sepolicy already covers vendor lib + XML. Init does not write CCI scan. SELinux stays permissive.
 - Wi-Fi MAC comes from factory DPP. The image does not contain a MAC address.
