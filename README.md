@@ -140,6 +140,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 ### Camera
 
 - XML `SensorName` is `mot_imx230` for CameraId 0.
+- Snap overlay is CameraId 0 `mot_imx230` HAL1. `support_camera_api_v2` is false. There is no Dual SIM CameraId 1.
 - There is no CameraId 1. Front sensor name is not known. Iris `qcom,camera@2` is disabled. No iris XML.
 - CAMERA-IDENT: CCI master 1 is a bus index. It is not `qcom,slave-id`.
 - `BOARD_QTI_CAMERA_32BIT_ONLY` is true. `USE_CAMERA_STUB` is false.
