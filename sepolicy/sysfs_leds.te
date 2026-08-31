@@ -1,7 +1,7 @@
-# PMI8994 RGB leds-qpnp (red/green/blue) + mdss lcd-backlight + GPIO torch.
+# leftover MATCH 6a8f621: PMI8994 RGB leds-qpnp + mdss lcd-backlight + GPIO torch.
 # Types come from platform public/file.te (also labels /sys/class/leds).
-# HIDL torch nodes (hal_light_default.te): led:flash_torch + led:torch_0.
-# No leftover led::flash_torch.
+# HIDL torch nodes (hal_light_default.te): led:flash_torch + led:torch_0 (one colon).
+# No leftover led::flash_torch. init.te unchanged (init sysfs_leds stays here).
 # init.talkman.rc chown/chmod camera flash:
 #   /sys/class/leds/led:flash_{0,1}/brightness
 #   /sys/class/leds/led:flash_torch/brightness

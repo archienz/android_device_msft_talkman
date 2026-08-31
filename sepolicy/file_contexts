@@ -125,7 +125,7 @@
 /sys/class/leds/blue(/.*)?                                                 u:object_r:sysfs_leds:s0
 /sys/class/leds/wled(/.*)?                                                 u:object_r:sysfs_leds:s0
 /sys/class/leds/led:flash_[0-9]+(/.*)?                                     u:object_r:sysfs_leds:s0
-# gpio-leds torch.dtsi label (one colon). No leftover led::flash_torch.
+# leftover MATCH 6a8f621: gpio-leds torch.dtsi label (one colon). No leftover led::flash_torch.
 /sys/class/leds/led:flash_torch(/.*)?                                      u:object_r:sysfs_leds:s0
 /sys/class/leds/led:torch_[0-9]+(/.*)?                                     u:object_r:sysfs_leds:s0
 /sys/class/timed_output(/.*)?                                              u:object_r:sysfs_vibrator:s0

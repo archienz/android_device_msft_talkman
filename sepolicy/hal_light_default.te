@@ -1,11 +1,11 @@
-# android.hardware.light@2.0-service.talkman (d92e6c3).
+# leftover MATCH 6a8f621: android.hardware.light@2.0-service.talkman (d92e6c3).
 # HIDL writes:
 #   /sys/class/leds/lcd-backlight/brightness
 #   /sys/class/leds/{red,green,blue}/brightness + trigger
 #   /sys/class/leds/led:flash_torch/brightness  (gpio-leds torch.dtsi, one colon)
 #   /sys/class/leds/led:torch_0/brightness      (qpnp-flash-led)
 # No leftover /sys/class/leds/led::flash_torch (bullhead double-colon).
-# Labels: file_contexts + genfs_contexts sysfs_leds.
+# Labels: file_contexts + genfs_contexts sysfs_leds. init.te unchanged.
 
 allow hal_light_default sysfs_leds:dir r_dir_perms;
 allow hal_light_default sysfs_leds:file rw_file_perms;

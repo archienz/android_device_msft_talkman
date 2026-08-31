@@ -94,8 +94,9 @@ genfscon sysfs /bus/spmi/devices/qpnp-smbcharger                         u:objec
 genfscon sysfs /bus/spmi/devices/qpnp-fg                                 u:object_r:sysfs_batteryinfo:s0
 
 
-# RGB qcom,leds-qpnp; GPIO torch (mmo torch.dtsi); qpnp-flash-led; camera-flash
-# Platform already labels /class/leds. Device paths are the symlink targets.
+# leftover MATCH 6a8f621: RGB qcom,leds-qpnp; GPIO torch (mmo torch.dtsi one colon);
+# qpnp-flash-led; camera-flash. Platform already labels /class/leds. Device paths
+# are the symlink targets. No leftover led::flash_torch. init.te unchanged.
 genfscon sysfs /devices/soc.0/leds                                       u:object_r:sysfs_leds:s0
 genfscon sysfs /devices/platform/leds                                    u:object_r:sysfs_leds:s0
 genfscon sysfs /devices/leds                                             u:object_r:sysfs_leds:s0
