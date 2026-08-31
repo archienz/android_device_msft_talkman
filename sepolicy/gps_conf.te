@@ -1,8 +1,12 @@
 # leftover MATCH 5207baf: loc_launcher + GNSS HIDL read /vendor/etc/gps.conf.
 # Dir search is vendor_configs_file. File read is gps_conf_file.
+# izat.conf sap.conf flp.conf lowi.conf stay vendor_configs_file (read).
 # SUPL/XTRA over wlan0. No IMSI. Do not add rild. Dual SIM no.
+# init.te chmod gps_conf_file unchanged.
 
 allow location vendor_configs_file:dir search;
+allow location vendor_configs_file:file r_file_perms;
 allow location gps_conf_file:file r_file_perms;
 allow hal_gnss_default vendor_configs_file:dir search;
+allow hal_gnss_default vendor_configs_file:file r_file_perms;
 allow hal_gnss_default gps_conf_file:file r_file_perms;
