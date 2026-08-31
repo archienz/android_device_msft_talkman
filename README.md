@@ -180,7 +180,8 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - lineage-sdk overlay leftover (`ef27b11`): no prox-on-wake, no `color_temp` LiveDisplay, no FPC.
 - Wi-Fi overlay leftover (`004a8fb`): QCA6174, no LGE strings. `hostapd` / `wpa` overlays leftover (`81aff9c` MATCH `e4b23cf`) stay WPA2-PSK 11n. No SAE, no 6 GHz AP, no VHT AP.
 - Wi-Fi leftover also (`ecf0818`) sets `config_wifi5ghzSupport` true. `config_wifi6ghzSupport` and `config_wifi11axSupportOverride` are false. SAE upgrade and SoftAP SAE are false. Connected, P2P, and AP MAC randomization are false. Spatial streams are 2. There is no generated MAC.
-- Wi-Fi leftover also sets `config_wifiSaeUpgradeOffloadEnabled` false, `config_wifi_softap_acs_supported` false, `config_wifiSoftapIeee80211axSupported` false, and `config_wifiSoftap6ghzSupported` false. Fast BSS transition and background scan stay true. SoftAP 2 GHz / 5 GHz / 6 GHz channel lists are empty.
+- Wi-Fi leftover also sets `config_wifiSaeUpgradeOffloadEnabled` false, `config_wifi_softap_acs_supported` false, `config_wifi_softap_ieee80211ac_supported` false, `config_wifiSoftapIeee80211axSupported` false, and `config_wifiSoftap6ghzSupported` false. Fast BSS transition and background scan stay true. SoftAP 2 GHz / 5 GHz / 6 GHz channel lists are empty.
+- Wi-Fi leftover also sets `config_wifi_revert_country_code_on_cellular_loss` true and `config_wifi_turn_off_during_emergency_call` true. Country is init SKU, not RIL MCC. `config_wifi_tcp_buffers` is 524288,6291456,8291456,524288,6291456,8291456.
 - Vendor COPY_FILES has no IMX377.
 - lk2nd talkman DTS: `qcom,board-id = <26 0>` and `qcom,msm-id` `0x0001001a`. That is not a CCI slave-id.
 - Workspace `tools/cci_scan/Android.mk` builds `/system/bin/cci_scan`. The binary does not contain slave addresses.
