@@ -82,11 +82,11 @@ Hill ident candidates **0x20** / **0x7c** / **0x22** are lab notes in `CAMERA-ID
 
 ## Progress (2026-08-31)
 
-Wave 15 running.
+Wave 15 **DONE** (source only, not a meter pass). Keep `1d143f5`. Do not restore `abeb48a`.
 
 **Definition of done:** a physical talkman log in `out/qa-*`. Source in Git is not a pass.
 
-No P0 item is **Working**. Mixer speaker is QUAT_MI2S. `privapp-permissions` dropped LGE (`ca9adee`). NFC GPIOs match schematic DT (IRQ 29, VEN 30, DWL 94). Rear camera is CCI1. LVS1 is always-on.
+No P0 item is **Working**. Mixer speaker is QUAT_MI2S (`66c7d50`). `extract-files.sh` dests match COPY_FILES (`6e4d4c2`). WCNSS QCA6174 `gNumRxAnt=2`. Location sepolicy `0c0a081`. USB `g_android` (`93506aa`). Thermal HAL `thermal.talkman` (`9b6cd42` vendor julian). `privapp-permissions` dropped LGE (`ca9adee`). NFC GPIOs match schematic DT (IRQ 29, VEN 30, DWL 94). Rear camera is CCI1. LVS1 is always-on.
 
 Wave 15 source (not a pass): `extract-files.sh` dests match COPY_FILES; WCNSS QCA6174 `gNumRxAnt=2`; location sepolicy lets `loc_launcher` and GNSS HIDL read `gps.conf`; `init.talkman.usb.rc` is g_android (no configfs); thermal HAL `thermal.talkman`; `vendor.prop` HAL1 persist.
 
