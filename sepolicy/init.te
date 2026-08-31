@@ -50,9 +50,25 @@ allow init persist_file:dir mounton;
 allow init persist_file:dir { search write add_name relabelfrom };
 allow init persist_camera_file:dir create_dir_perms;
 
-# chmod /vendor/etc/gps.conf (on boot + post-fs-data)
+# chmod /vendor/etc/gps.conf izat.conf (on boot + post-fs-data)
 allow init gps_conf_file:file { getattr setattr };
 allow init firmware_file:dir mounton;
+
+# mkdir /data/misc/camera, /data/vendor/camera (qcamerasvr)
+allow init camera_data_file:dir create_dir_perms;
+allow init vendor_data_file:dir { search write add_name relabelfrom };
+allow init vendor_camera_data_file:dir create_dir_perms;
+
+# mkdir /data/misc/location* and /data/vendor/location (loc_launcher + GNSS HIDL)
+allow init location_data_file:dir create_dir_perms;
+
+# chown/chmod mm-qcamera char nodes (ueventd also labels these)
+allow init camera_device:chr_file { getattr setattr };
+allow init video_device:chr_file { getattr setattr };
+
+# chmod debugfs talkman-cci-scan (perms only). Never write scan.
+allow init debugfs_cci_scan:dir { getattr setattr search };
+allow init debugfs_cci_scan:file { getattr setattr };
 
 allow init sysfs_rndis:file rw_file_perms;
 
