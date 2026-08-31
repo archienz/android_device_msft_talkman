@@ -14,4 +14,8 @@
 
 LOCAL_PATH := $(call my-dir)
 
-# libcutils_shim is Soong: libcutils/Android.bp. No Make modules here.
+# Leftover unused bullhead Make shims are gone:
+#   libaudioclient_shim (AudioSystem::setErrorCallback) — no talkman audio blob
+#   slim_shim empty SensorEventQueue stubs — never-sim; slim_daemon uses NDK SAP
+# Camera (QCamera2) and GNSS HIDL are rebuilt in-tree — no camera/gps .so shims.
+# Real shim is Soong libcutils/Android.bp (strdup16to8 / strdup8to16).

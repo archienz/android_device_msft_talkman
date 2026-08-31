@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Real leftover: MSM8992 ATFWD/cnd/libcne still call libcutils
+// strndup16to8 / strdup8to16. Not a camera or GPS shim.
 cc_library {
     name: "libcutils_shim",
     srcs: [
