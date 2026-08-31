@@ -23,3 +23,9 @@ r_dir_file(hal_dumpstate_impl, sysfs_hwmon)
 r_dir_file(hal_dumpstate_impl, sysfs_thermal)
 allow hal_dumpstate_impl proc_interrupts:file r_file_perms;
 allow hal_dumpstate_impl pstorefs:dir r_dir_perms;
+
+# leftover MATCH 1e6c838: dumpstateBoard lists torch/flash LED sysfs and /dev/video*.
+# HIDL service is this domain (file_contexts). Same listing-only getattr as dumpstate.te.
+# No open, no V4L2, no CCI write. init.te unchanged.
+allow hal_dumpstate_impl video_device:dir r_dir_perms;
+allow hal_dumpstate_impl video_device:chr_file getattr;
