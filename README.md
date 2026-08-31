@@ -121,6 +121,8 @@ This section is a description of the tree. It is not a procedure.
 - Overlay warning levels are 15 percent and 5 percent.
 - Charge UI strings are 5 V 1.8 A and Qi 900 mA. The UI does not say PD or Quick Charge. Qi `wc-en` GPIO 2 and `wc-det` GPIO 14 match 4VM_08r.
 - Settings Battery Health reads `bms/charge_full`, `charge_full_design`, and `cycle_count`.
+- Health is generic `android.hardware.health@2.1-impl`. There is no talkman Health HAL constant.
+- Overlay `config_chargingFastThreshold` is 15 W. Charge UI does not say Fast Charge or PD.
 - Dumpstate reads `battery`, `bms`, `usb`, and `dc`. Dumpstate lists torch/flash LED sysfs and `/dev/video*` (`bf43f49`). Dumpstate `getattr` on torch LED sysfs. Dumpstate does not write CCI scan.
 - `sepolicy/dumpstate.te` lets `dumpstate` read `sysfs_batteryinfo`. SELinux stays permissive.
 
@@ -170,7 +172,10 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - lk2nd talkman DTS: `qcom,board-id = <26 0>` and `qcom,msm-id` `0x0001001a`. That is not a CCI slave-id.
 - Workspace `tools/cci_scan/Android.mk` builds `/system/bin/cci_scan`. The binary does not contain slave addresses.
 - Lineage `BUILD_FINGERPRINT` is `Microsoft/talkman/talkman:11/RQ3A.211001.001/1:user/release-keys` (`44cb3c5`).
-- Settings overlay leftover (`2fca2c7`): no `color_temp`, no Bell IPv4, no FPC.
+- Settings overlay leftover (`2fca2c7`): no `color_temp`, no Bell IPv4, no FPC. `config_show_mobile_plan` is false. Camera laser overlay is false.
+- Framework overlay leftover (`b045cc4`): no `android.hardware.fingerprint` permission XML. No FPC HAL.
+- `sepolicy/rild.te` leftover is unused. There is no rild package.
+- Bluetooth overlay leftover: `profile_supported_sap` is true. There is no generated MAC.
 - `init.talkman.rc` imports camera/nfc/gps. There is no duplicate `qcamerasvr` start. There is no CCI echo.
 - Tethering hotspot provision arrays are empty (no LGE entitlement URL). `privapp-permissions-talkman.xml` dropped `com.lge.entitlement`.
 - Mixer speaker path is QUAT_MI2S (TAS2553). WCD SPK DRV is not wired.
