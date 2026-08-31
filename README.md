@@ -190,6 +190,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - `dataservices` leftover is `librmnetctl` / `rmnetcli` for MSM8992 `rmnet_data`. It is not rild.
 - `BoardConfig` leftover is QCA BT (no BCM). `BOARD_USB_CONFIGFS` is false. No FPC (`5f1d786`).
 - GNSS leftover does not put a stock AOSP impl VINTF on the HIDL package (`903abd6`). VINTF leftover lists GNSS + vibrator + camera.provider. No radio. No FPC (`55b29f2`).
+- Vibrator HIDL 1.0 `android.hardware.vibrator@1.0-service.talkman` writes qpnp-haptic `timed_output`. It is not the AOSP passthrough impl.
 - QCOM `time_genoff` MATCH MSM8992 (`565f425`: ATS_DRM, ATS_TOD_MODEM).
 - Kernel USB-C leftover is iCE5LP2K + HD3SS460 UFP mux. No PD (`2c5bf855dfd`).
 - Kernel Duke WQHD leftover is dual-DSI command panel. TE is GPIO 10. Reset is GPIO 78 (`7fcefef793f`).
