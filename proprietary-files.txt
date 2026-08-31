@@ -15,8 +15,10 @@
 # Destinations of PRODUCT_COPY_FILES in talkman-vendor.mk + talkman-dsp.mk +
 # talkman-ois.mk + talkman-camera-xml.mk. Paths are installed locations.
 # Consumed by extract-files.sh. Same dests as proprietary-blobs.txt.
-# Not copied: imx377 / ov5693 / nanohub / FPC / OMADM dests / leftover LGE
-# acdb / LGE entitlement. mot_imx230 is vendor/lib (32-bit CAMSS) only.
+# Leftover blob names dropped (not listed, extract-files.sh refuses dump):
+# imx377 / ov5693 chromatix, nanohub napp, FPC, OMADM dests, leftover LGE
+# acdb / entitlement / LifeTimer / libsensor_lge_cal, lc898212xd, VL6180,
+# bullhead privapp source. mot_imx230 is vendor/lib (32-bit CAMSS) only.
 
 # Rear IMX230 — Motorola clark MSM8992 donor (CAMSS VFE44, mot_imx230).
 vendor/lib/libmmcamera_mot_imx230.so

@@ -8,8 +8,9 @@
 #   ./extract-files.sh                 # adb pull
 #
 # Dump layout: system/, vendor/, product/ as on-device (or AOSP out).
-# Refuses imx377 / ov5693 / nanohub / OMADM / LGE entitlement dests even if
-# the dump has them. mot_imx230 dests are vendor/lib only (32-bit).
+# Refuses leftover dump dests even if the dump has them: imx377 / ov5693 /
+# nanohub / FPC / OMADM / LGE entitlement / libsensor_lge_cal / lc898212xd /
+# bullhead privapp. mot_imx230 dests are vendor/lib only (32-bit).
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -31,7 +32,7 @@ LIST="${MY_DIR}/proprietary-files.txt"
 
 SRC="${1:-}"
 
-BANNED='imx377|ov5693|nanohub|activity\.napp|double_twist\.napp|pickup_gesture\.napp|sig_motion\.napp|napp_list\.cfg|fpctzappfingerprint|fingerprint\.bullhead|lib_fpc_tac_shared|context_hub\.default|omadm|OMADM|DCMO|DMConfigUpdate|com\.android\.omadm|whitelist_com\.android\.omadm|entitlement|com\.lge\.entitlement|LifeTimer|lib64/libmmcamera_mot_imx230|lib64/libchromatix_mot_imx230'
+BANNED='imx377|ov5693|nanohub|activity\.napp|double_twist\.napp|pickup_gesture\.napp|sig_motion\.napp|napp_list\.cfg|fpctzappfingerprint|fingerprint\.bullhead|lib_fpc_tac_shared|context_hub\.default|omadm|OMADM|DCMO|DMConfigUpdate|com\.android\.omadm|whitelist_com\.android\.omadm|entitlement|com\.lge\.entitlement|LifeTimer|lib64/libmmcamera_mot_imx230|lib64/libchromatix_mot_imx230|libsensor_lge_cal|sensors\.qcom|sensors\.ssc|lc898212xd|brcb032gwz|m24c64s|libgoog_eis|libgoog_rownr|experimental2016|tof\.vl6180|activity_recognition|privapp-permissions-bullhead'
 
 if [[ ! -f "${LIST}" ]]; then
   echo "missing ${LIST}" >&2
@@ -44,7 +45,13 @@ copy_one() {
   local dest="$1"
   dest="${dest#/}"
   if echo "${dest}" | grep -Eqi "${BANNED}"; then
-    echo "skip banned dest ${dest}" >&2
+    echo "skip leftover dest ${dest}" >&2
+    return 0
+  fi
+  # device.mk ships configs/privapp-permissions-talkman.xml (no LGE).
+  # Dump dest would restore leftover bullhead LGE entitlement grants.
+  if echo "${dest}" | grep -Eqi 'privapp-permissions-talkman'; then
+    echo "skip leftover dest ${dest}" >&2
     return 0
   fi
 

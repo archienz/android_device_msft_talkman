@@ -1,3 +1,5 @@
+# rmnetcli: leftover bullhead QMI debug CLI for msm8992 rmnet_data. Not rild.
+
 LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
@@ -11,6 +13,8 @@ LOCAL_C_INCLUDES += $(LOCAL_PATH)
 
 LOCAL_MODULE := rmnetcli
 LOCAL_MODULE_TAGS := optional
+LOCAL_VENDOR_MODULE := true
 
 LOCAL_SHARED_LIBRARIES := librmnetctl
 include $(BUILD_EXECUTABLE)
+
