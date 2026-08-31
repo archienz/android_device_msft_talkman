@@ -85,4 +85,16 @@
          in frameworks/base overlay (already false). Not overlaid here.
     -->
 
+    <!--
+         Hardware keys bit field (not gpio-keys.kl; that file already MATCH):
+         1 Home, 2 Back, 4 Menu, 8 Assist, 16 App switch, 32 Camera, 64 Volume.
+         Talkman: no capacitive Home/Back/Menu. SHOT GPIO4 = CAMERA (32).
+         VOL_UP GPIO3 + PON RESIN VOL_DOWN = Volume (64). Sum 96.
+         FOCUS GPIO5 is KEY_FOCUS 528 in gpio-keys.kl; lineage-sdk has no
+         FOCUS mask — do not invent a bit.
+    -->
+    <integer name="config_deviceHardwareKeys">96</integer>
+    <!-- SHOT + volume can wake; power is PON, not this mask. No nav keys. -->
+    <integer name="config_deviceHardwareWakeKeys">96</integer>
+
 </resources>
