@@ -17,12 +17,20 @@
 */
 -->
 <device name="Android">
+    <!--
+         leftover MATCH TWRP cea7f03 overlay power_profile (not powerhint.xml).
+         BatteryStats estimate only. BV-T5E stock pack 3000 mAh; 2700 was
+         bullhead leftover. Cluster OPPs MATCH MSM8992 (A53×4 + A57×2,
+         A57 ceiling 1824000 kHz). Do not copy configs/powerhint.xml
+         HintConfigs here. Dual SIM radio is not this product (RM-1104).
+         Overlay only; not a fuel-gauge meter pass / not P0 Working.
+    -->
     <!-- All values are in mA except as noted -->
 
     <!-- Nothing -->
     <item name="none">0</item>
 
-    <!-- This is the battery capacity in mAh. BV-T5E / Talkman stock pack is 3000; 2700 was bullhead. -->
+    <!-- leftover MATCH cea7f03: 3000 mAh, not bullhead 2700, not powerhint. -->
     <item name="battery.capacity">3000</item>
 
     <!-- Number of cores each CPU cluster contains -->
