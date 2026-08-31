@@ -1,13 +1,11 @@
 # PMI8994 RGB leds-qpnp (red/green/blue) + mdss lcd-backlight + GPIO torch.
 # Types come from platform public/file.te (also labels /sys/class/leds).
-# lights.talkman writes:
-#   /sys/class/leds/lcd-backlight/brightness
-#   /sys/class/leds/{red,green,blue}/brightness
-#   /sys/class/leds/{red,green,blue}/trigger
+# HIDL torch nodes (hal_light_default.te): led:flash_torch + led:torch_0.
+# No leftover led::flash_torch.
 # init.talkman.rc chown/chmod camera flash:
 #   /sys/class/leds/led:flash_{0,1}/brightness
-#   /sys/class/leds/led:flash_torch/brightness  (torch.dtsi, one colon)
-#   /sys/class/leds/led:torch_{0,1}/brightness  (qpnp-flash-led)
+#   /sys/class/leds/led:flash_torch/brightness
+#   /sys/class/leds/led:torch_{0,1}/brightness
 
 # init.talkman.rc flash chmod + ueventd.talkman.rc RGB/backlight/torch
 allow init sysfs_leds:dir r_dir_perms;
@@ -16,10 +14,6 @@ allow init sysfs_leds:lnk_file r_file_perms;
 allow ueventd sysfs_leds:dir r_dir_perms;
 allow ueventd sysfs_leds:file { getattr setattr };
 allow ueventd sysfs_leds:lnk_file r_file_perms;
-
-allow hal_light_default sysfs_leds:dir r_dir_perms;
-allow hal_light_default sysfs_leds:file rw_file_perms;
-allow hal_light_default sysfs_leds:lnk_file r_file_perms;
 
 r_dir_file(dumpstate, sysfs_leds)
 r_dir_file(hal_dumpstate_impl, sysfs_leds)
