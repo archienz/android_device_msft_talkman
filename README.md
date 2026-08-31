@@ -150,7 +150,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 
 ### Display and lights
 
-- Duke AMOLED is command-mode. Always-on display is false.
+- Duke AMOLED is command-mode. Always-on display is false. Pickup pulse is false.
 - Light HIDL 2.0 writes lcd-backlight and RGB sysfs. Torch writes `led:flash_torch` and `led:torch_0` (`d92e6c3`). sepolicy `hal_light` sysfs_leds matches those names (`6a8f621`). There is no leftover `led::flash_torch`.
 
 ### Other
