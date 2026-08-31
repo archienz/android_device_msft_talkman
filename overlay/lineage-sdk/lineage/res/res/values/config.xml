@@ -55,26 +55,24 @@
     <!-- RGB notification (1) + RGB battery (2) + battery LED (64). PMI8994 RGB. -->
     <integer name="config_deviceLightCapabilities">67</integer>
 
-    <!--
-         Bullhead leftover off. lineage-sdk default is false. Enable only
-         with a measured <300ms wake path. QPDS-T900 is on the AP; that
-         is not a nanohub proximity-check-on-wake claim.
-    -->
+    <!-- leftover MATCH ef27b11: no prox-on-wake. Bullhead leftover off.
+         lineage-sdk default is false. Enable only with a measured <300ms
+         wake path. QPDS-T900 is on the AP; that is not a nanohub
+         proximity-check-on-wake claim. No Dual SIM. -->
     <bool name="config_proximityCheckOnWake">false</bool>
     <integer name="config_proximityCheckTimeout">250</integer>
     <bool name="config_proximityCheckOnWakeEnabledByDefault">false</bool>
 
-    <!--
-         No /sys/class/graphics/fb0/color_temp (bullhead). CAF MDSS on
-         talkman has no that node. Do not run LiveDisplay against a
-         missing backend. Matches Settings leftover 2fca2c7.
-    -->
+    <!-- leftover MATCH ef27b11: no color_temp LiveDisplay. CAF MDSS on
+         talkman has no /sys/class/graphics/fb0/color_temp (bullhead).
+         Do not run LiveDisplay against a missing backend. Settings leftover
+         MATCH 2fca2c7 keeps config_enableColorTemperature false. No Dual SIM. -->
     <bool name="config_enableLiveDisplay">false</bool>
     <bool name="config_defaultAutoOutdoorMode">false</bool>
     <bool name="config_defaultColorEnhancement">false</bool>
     <bool name="config_defaultCABC">false</bool>
 
-    <!-- leftover MATCH b045cc4: no FPC on talkman. lineage-sdk defaults
+    <!-- leftover MATCH ef27b11 / b045cc4: no FPC. lineage-sdk defaults
          already false for config_cleanupUnusedFingerprints and
          config_fingerprintPostResetRunnableForAllClients. Do not overlay
          those bools (bullhead leftover). Settings 2fca2c7 owns face enroll.
