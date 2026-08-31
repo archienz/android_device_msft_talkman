@@ -74,9 +74,11 @@
     <bool name="config_defaultColorEnhancement">false</bool>
     <bool name="config_defaultCABC">false</bool>
 
-    <!-- No FPC. Do not cleanup fingerprints against a missing daemon. -->
-    <bool name="config_cleanupUnusedFingerprints">false</bool>
-    <bool name="config_fingerprintPostResetRunnableForAllClients">false</bool>
+    <!--
+         No FPC on talkman. lineage-sdk defaults already false for
+         unused-fingerprint cleanup / post-reset runnable. Do not overlay
+         those bools (bullhead leftover). Settings 2fca2c7 owns face enroll.
+    -->
 
     <!--
          Duke command-mode AMOLED: no MDSS doze/ULPS AOD. AOD bools live
