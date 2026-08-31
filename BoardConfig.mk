@@ -62,6 +62,8 @@ BOARD_KERNEL_CMDLINE += androidboot.selinux=permissive
 BOARD_KERNEL_CMDLINE += androidboot.usbconfigfs=0
 BOARD_KERNEL_CMDLINE += firmware_class.path=/vendor/firmware
 # No CONFIG_USB_CONFIGFS. Recovery/vold trees honor this name.
+# Leftover bullhead / LOS default TARGET_USES_USB_CONFIGFS := true would
+# take the gadget from g_android. Keep false.
 TARGET_USES_USB_CONFIGFS := false
 BOARD_MKBOOTIMG_ARGS := --ramdisk_offset $(BOARD_RAMDISK_OFFSET) --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)
 #KERNEL_TOOLCHAIN := $(shell pwd)/prebuilts/arm64-gcc/bin
@@ -99,12 +101,15 @@ USE_XML_AUDIO_POLICY_CONF := 1
 # Binder
 TARGET_USES_64_BIT_BINDER := true
 
-# Bluetooth — QCA Rome. MAC: persist /persist/bdaddr.txt or chip OTP
-# (NVM tag 2 zeros). QCOM_BT_READ_ADDR_FROM_PROP is the g_use_otpmac analog;
-# init.talkman.bt.sh sets ro.boot.btmacaddr from persist or 00:00:00:00:00:00.
-# Do not generate a MAC. Do not enable QCOM_BT_USE_BTNV (no .bt_nv.bin).
+# Bluetooth — QCA Rome. Leftover bullhead Broadcom stack is not this SoC.
+# Do not set BOARD_HAVE_BLUETOOTH_BCM. MAC: persist /persist/bdaddr.txt or
+# chip OTP (NVM tag 2 zeros). QCOM_BT_READ_ADDR_FROM_PROP is the g_use_otpmac
+# analog; init.talkman.bt.sh sets ro.boot.btmacaddr from persist or
+# 00:00:00:00:00:00. Do not generate a MAC. Do not enable QCOM_BT_USE_BTNV
+# (no .bt_nv.bin).
 BOARD_HAVE_BLUETOOTH := true
 BOARD_HAVE_BLUETOOTH_QCOM := true
+BOARD_HAVE_BLUETOOTH_BCM := false
 BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := $(DEVICE_PATH)/bluetooth
 BOARD_HAS_QCA_BT_ROME := true
 WCNSS_FILTER_USES_SIBS := true
@@ -233,6 +238,7 @@ BOARD_NFC_CHIPSET := pn547
 BOARD_NFC_HAL_SUFFIX := msm8992
 BOARD_NFC_DEVICE := "/dev/pn547"
 
-# Talkman has no FPC. Do not set BOARD_HAS_FINGERPRINT_FPC.
+# Talkman has no FPC. Leftover bullhead BOARD_HAS_FINGERPRINT_FPC must stay
+# unset (do not assign true). Do not ship an FPC HAL.
 
 -include vendor/msft/talkman/BoardConfigVendor.mk
