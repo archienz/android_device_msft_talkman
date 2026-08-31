@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-     Talkman Wi-Fi is QCA6174 2x2 PCIe (qwlan30.bin), not leftover LGE/bullhead
-     strings (no gsm.lge.com, no Nexus5X SSID, no com.lge.entitlement).
-     MATCH leftover 004a8fb. SoftAP SSID stays AOSP AndroidAP. Hotspot
-     provision is the Tethering overlay (already empty). MAC is persist
-     /wlan_mac.bin or QCA OTP. Do not put a MAC in overlay XML.
--->
+<!-- leftover MATCH e4b23cf: Talkman Wi-Fi is QCA6174 2x2 PCIe (qwlan30.bin),
+     not leftover LGE/bullhead strings (no gsm.lge.com, no Nexus5X SSID, no
+     com.lge.entitlement). SoftAP SSID stays AOSP AndroidAP. Hotspot provision
+     is the Tethering overlay (already empty). MAC is persist /wlan_mac.bin or
+     QCA OTP. Do not put a MAC in overlay XML. hostapd/wpa stay WPA2-PSK 11n
+     (no SAE / 6 GHz / VHT AP). No Dual SIM. -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
     <!-- Talkman QCA6174 802.11ac 2x2. No 6 GHz, no 11ax. -->
