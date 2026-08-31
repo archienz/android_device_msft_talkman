@@ -17,6 +17,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <inttypes.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -26,36 +27,73 @@
 #include <hardware/hardware.h>
 #include <hardware/thermal.h>
 
-#define MAX_LENGTH                      50
+#define MAX_LENGTH                      80
+#define MAX_THERMAL_ZONES               48
 
 #define CPU_USAGE_FILE                  "/proc/stat"
-#define TEMPERATURE_FILE_FORMAT         "/sys/class/thermal/thermal_zone%d/temp"
-#define SKIN_TEMPERATURE_FILE           "/sys/class/hwmon/hwmon2/device/xo_therm"
-#define SKIN_TEMPERATURE_FORMAT         "Result:%f Raw:%*d\n"
+#define ZONE_TYPE_FORMAT                "/sys/class/thermal/thermal_zone%d/type"
+#define ZONE_TEMP_FORMAT                "/sys/class/thermal/thermal_zone%d/temp"
 #define CPU_ONLINE_FILE_FORMAT          "/sys/devices/system/cpu/cpu%d/online"
 
-#define BATTERY_SENSOR_NUM              1
-#define GPU_SENSOR_NUM                  12
+/*
+ * MSM8992 TSENS hw ids from msm8992.dtsi qcom,sensor-id /
+ * qcom,sensor-information. No hw 6/8 (8994 extra A57s). Sysfs type is
+ * tsens_tz_sensorN, not bullhead thermal_zone index {8,8,9,10,13,14}.
+ */
+static const char *CPU_SENSOR_TYPE[] = {
+    "tsens_tz_sensor7",
+    "tsens_tz_sensor7",
+    "tsens_tz_sensor9",
+    "tsens_tz_sensor10",
+    "tsens_tz_sensor13",
+    "tsens_tz_sensor14",
+};
 
-const int CPU_SENSORS[] = {8, 8, 9, 10, 13, 14};
+#define GPU_SENSOR_TYPE                 "tsens_tz_sensor12"
+#define BATTERY_SENSOR_TYPE             "battery"
+#define SKIN_SENSOR_TYPE                "quiet_therm"
 
-#define CPU_NUM                         (sizeof(CPU_SENSORS) / sizeof(int))
+#define CPU_NUM                         (sizeof(CPU_SENSOR_TYPE) / sizeof(CPU_SENSOR_TYPE[0]))
 #define TEMPERATURE_NUM                 9
 
-// qcom, therm-reset-temp
+/* msm-thermal qcom,therm-reset-temp / qcom,limit-temp (msm8992.dtsi). */
 #define CPU_SHUTDOWN_THRESHOLD          115
-//qcom, limit-temp
 #define CPU_THROTTLING_THRESHOLD        60
 
 #define BATTERY_SHUTDOWN_THRESHOLD      60
-// vendor/msft/talkman/proprietary/thermal-engine/thermal-engine-8992.conf
-#define SKIN_THROTTLING_THRESHOLD       37
+/* LCD_management first threshold in vendor thermal-engine-8992.conf (36000 mC). */
+#define SKIN_THROTTLING_THRESHOLD       36
 
 #define GPU_LABEL                       "GPU"
 #define BATTERY_LABEL                   "battery"
 #define SKIN_LABEL                      "skin"
 
 const char *CPU_LABEL[] = {"CPU0", "CPU1", "CPU2", "CPU3", "CPU4", "CPU5"};
+
+static int zone_index_for_type(const char *want) {
+    int i;
+    char path[MAX_LENGTH];
+    char type[MAX_LENGTH];
+    FILE *file;
+
+    for (i = 0; i < MAX_THERMAL_ZONES; i++) {
+        snprintf(path, sizeof(path), ZONE_TYPE_FORMAT, i);
+        file = fopen(path, "r");
+        if (file == NULL) {
+            continue;
+        }
+        if (fgets(type, sizeof(type), file) == NULL) {
+            fclose(file);
+            continue;
+        }
+        fclose(file);
+        type[strcspn(type, "\r\n")] = '\0';
+        if (strcmp(type, want) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
 
 /**
  * Reads device temperature.
@@ -102,20 +140,33 @@ static ssize_t read_temperature(const char *file_name, const char *temperature_f
     return 0;
 }
 
+static ssize_t read_zone_celsius(const char *zone_type, int type, const char *name,
+        float millidegree_mult, float throttling_threshold, float shutdown_threshold,
+        temperature_t *out) {
+    char file_name[MAX_LENGTH];
+    int zone = zone_index_for_type(zone_type);
+
+    if (zone < 0) {
+        ALOGE("%s: no thermal zone type %s", __func__, zone_type);
+        return -ENODEV;
+    }
+    snprintf(file_name, sizeof(file_name), ZONE_TEMP_FORMAT, zone);
+    /* TSENS sysfs is degC; battery / ADC TM (quiet_therm) are millidegC. */
+    return read_temperature(file_name, "%f", type, name, millidegree_mult,
+            throttling_threshold, shutdown_threshold, out);
+}
+
 static ssize_t get_cpu_temperatures(temperature_t *list, size_t size) {
     size_t cpu;
 
     for (cpu = 0; cpu < CPU_NUM; cpu++) {
-        char file_name[MAX_LENGTH];
-
         if (cpu >= size) {
             break;
         }
 
-        sprintf(file_name, TEMPERATURE_FILE_FORMAT, CPU_SENSORS[cpu]);
-        // tsens_tz_sensor[7, 7, 9, 10, 13, 14]: temperature in Celsius.
-        ssize_t result = read_temperature(file_name, "%f", DEVICE_TEMPERATURE_CPU, CPU_LABEL[cpu],
-                1, CPU_THROTTLING_THRESHOLD, CPU_SHUTDOWN_THRESHOLD, &list[cpu]);
+        ssize_t result = read_zone_celsius(CPU_SENSOR_TYPE[cpu],
+                DEVICE_TEMPERATURE_CPU, CPU_LABEL[cpu], 1,
+                CPU_THROTTLING_THRESHOLD, CPU_SHUTDOWN_THRESHOLD, &list[cpu]);
         if (result != 0) {
             return result;
         }
@@ -126,7 +177,6 @@ static ssize_t get_cpu_temperatures(temperature_t *list, size_t size) {
 static ssize_t get_temperatures(thermal_module_t *module, temperature_t *list, size_t size) {
     ssize_t result = 0;
     size_t current_index = 0;
-    char file_name[MAX_LENGTH];
 
     if (list == NULL) {
         return TEMPERATURE_NUM;
@@ -138,11 +188,8 @@ static ssize_t get_temperatures(thermal_module_t *module, temperature_t *list, s
     }
     current_index += result;
 
-    // GPU temperautre.
     if (current_index < size) {
-        // tsens_tz_sensor12: temperature in Celsius.
-        sprintf(file_name, TEMPERATURE_FILE_FORMAT, GPU_SENSOR_NUM);
-        result = read_temperature(file_name, "%f", DEVICE_TEMPERATURE_GPU, GPU_LABEL, 1,
+        result = read_zone_celsius(GPU_SENSOR_TYPE, DEVICE_TEMPERATURE_GPU, GPU_LABEL, 1,
                 UNKNOWN_TEMPERATURE, UNKNOWN_TEMPERATURE, &list[current_index]);
         if (result != 0) {
             return result;
@@ -150,11 +197,8 @@ static ssize_t get_temperatures(thermal_module_t *module, temperature_t *list, s
         current_index++;
     }
 
-    // Battery temperautre.
     if (current_index < size) {
-        // hwmon sensor: battery: temperature in millidegrees Celsius.
-        sprintf(file_name, TEMPERATURE_FILE_FORMAT, BATTERY_SENSOR_NUM);
-        result = read_temperature(file_name, "%f", DEVICE_TEMPERATURE_BATTERY, BATTERY_LABEL,
+        result = read_zone_celsius(BATTERY_SENSOR_TYPE, DEVICE_TEMPERATURE_BATTERY, BATTERY_LABEL,
                 0.001, UNKNOWN_TEMPERATURE, BATTERY_SHUTDOWN_THRESHOLD, &list[current_index]);
         if (result != 0) {
             return result;
@@ -162,12 +206,9 @@ static ssize_t get_temperatures(thermal_module_t *module, temperature_t *list, s
         current_index++;
     }
 
-    // Skin temperature.
     if (current_index < size) {
-        // xo_therm: temperature in Celsius.
-        result = read_temperature(SKIN_TEMPERATURE_FILE, SKIN_TEMPERATURE_FORMAT,
-                DEVICE_TEMPERATURE_SKIN, SKIN_LABEL, 1, SKIN_THROTTLING_THRESHOLD,
-                UNKNOWN_TEMPERATURE, &list[current_index]);
+        result = read_zone_celsius(SKIN_SENSOR_TYPE, DEVICE_TEMPERATURE_SKIN, SKIN_LABEL,
+                0.001, SKIN_THROTTLING_THRESHOLD, UNKNOWN_TEMPERATURE, &list[current_index]);
         if (result != 0) {
             return result;
         }
@@ -198,7 +239,7 @@ static ssize_t get_cpu_usages(thermal_module_t *module, cpu_usage_t *list) {
     }
 
     while ((read = getline(&line, &len, file)) != -1) {
-        // Skip non "cpu[0-9]" lines.
+        /* Skip non "cpu[0-9]" lines. */
         if (strnlen(line, read) < 4 || strncmp(line, "cpu", 3) != 0 || !isdigit(line[3])) {
             free(line);
             line = NULL;
@@ -227,7 +268,6 @@ static ssize_t get_cpu_usages(thermal_module_t *module, cpu_usage_t *list) {
         active = user + nice + system;
         total = active + idle;
 
-        // Read online CPU information.
         snprintf(file_name, MAX_LENGTH, CPU_ONLINE_FILE_FORMAT, cpu_num);
         cpu_file = fopen(file_name, "r");
         online = 0;
