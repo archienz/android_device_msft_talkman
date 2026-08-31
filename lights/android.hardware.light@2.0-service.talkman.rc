@@ -13,6 +13,10 @@ on post-fs-data
     chmod 0660 /sys/class/leds/red/trigger
     chmod 0660 /sys/class/leds/green/trigger
     chmod 0660 /sys/class/leds/blue/trigger
+    chown system camera /sys/class/leds/led:flash_torch/brightness
+    chown system camera /sys/class/leds/led:torch_0/brightness
+    chmod 0660 /sys/class/leds/led:flash_torch/brightness
+    chmod 0660 /sys/class/leds/led:torch_0/brightness
 
 service vendor.light-hal-2-0 /vendor/bin/hw/android.hardware.light@2.0-service.talkman
     interface android.hardware.light@2.0::ILight default

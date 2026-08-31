@@ -5,8 +5,9 @@
 #   /sys/class/leds/{red,green,blue}/brightness
 #   /sys/class/leds/{red,green,blue}/trigger
 # init.talkman.rc chown/chmod camera flash:
-#   /sys/class/leds/led:flash_{0,1,torch}/brightness
-# torch.dtsi gpio-leds label is led::flash_torch.
+#   /sys/class/leds/led:flash_{0,1}/brightness
+#   /sys/class/leds/led:flash_torch/brightness  (torch.dtsi, one colon)
+#   /sys/class/leds/led:torch_{0,1}/brightness  (qpnp-flash-led)
 
 # init.talkman.rc flash chmod + ueventd.talkman.rc RGB/backlight/torch
 allow init sysfs_leds:dir r_dir_perms;

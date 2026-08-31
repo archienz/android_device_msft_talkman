@@ -126,7 +126,7 @@
 /sys/class/leds/wled(/.*)?                                                 u:object_r:sysfs_leds:s0
 /sys/class/leds/led:flash_[0-9]+(/.*)?                                     u:object_r:sysfs_leds:s0
 /sys/class/leds/led:flash_torch(/.*)?                                      u:object_r:sysfs_leds:s0
-/sys/class/leds/led::flash_torch(/.*)?                                     u:object_r:sysfs_leds:s0
+/sys/class/leds/led:torch_[0-9]+(/.*)?                                     u:object_r:sysfs_leds:s0
 /sys/class/timed_output(/.*)?                                              u:object_r:sysfs_vibrator:s0
 /sys/devices/virtual/timed_output/vibrator(/.*)?                           u:object_r:sysfs_vibrator:s0
 /sys/devices/soc\.0/qpnp-haptic-[0-9]+(/.*)?                               u:object_r:sysfs_vibrator:s0

@@ -54,6 +54,9 @@ static const char kBlueLedFile[] = "/sys/class/leds/blue/brightness";
 static const char kRedTriggerFile[] = "/sys/class/leds/red/trigger";
 static const char kGreenTriggerFile[] = "/sys/class/leds/green/trigger";
 static const char kBlueTriggerFile[] = "/sys/class/leds/blue/trigger";
+/* GPIO torch.dtsi label led:flash_torch (one colon). qpnp-flash-led torch_0. */
+static const char kFlashTorchFile[] = "/sys/class/leds/led:flash_torch/brightness";
+static const char kTorch0File[] = "/sys/class/leds/led:torch_0/brightness";
 
 static constexpr int kLedBattery = 0;
 static constexpr int kLedNotifications = 1;
@@ -119,13 +122,22 @@ Light::Light() {
 
     mRgbOk = nodeWritable(kRedLedFile) && nodeWritable(kGreenLedFile) &&
              nodeWritable(kBlueLedFile);
-    if (!mRgbOk) {
+    if (!mRgbOk)
         ALOGE("RGB brightness nodes missing or not writable");
-        return;
+    else {
+        rgbClaimTriggers();
+        writeRgb(0, 0, 0);
     }
 
-    rgbClaimTriggers();
-    writeRgb(0, 0, 0);
+    if (nodeWritable(kFlashTorchFile)) {
+        mTorchOk = true;
+        mTorchFile = kFlashTorchFile;
+    } else if (nodeWritable(kTorch0File)) {
+        mTorchOk = true;
+        mTorchFile = kTorch0File;
+    } else {
+        ALOGE("torch sysfs missing (%s and %s)", kFlashTorchFile, kTorch0File);
+    }
 }
 
 Light::~Light() {
@@ -140,6 +152,8 @@ Return<Status> Light::setLight(Type type, const LightState& state) {
     switch (type) {
         case Type::BACKLIGHT:
             return setBacklight(state);
+        case Type::FLASHLIGHT:
+            return setFlashlight(state);
         case Type::BATTERY:
             return setRgbLight(state, kLedBattery);
         case Type::NOTIFICATIONS:
@@ -160,6 +174,8 @@ Return<void> Light::getSupportedTypes(getSupportedTypes_cb _hidl_cb) {
         types.push_back(Type::NOTIFICATIONS);
         types.push_back(Type::ATTENTION);
     }
+    if (mTorchOk)
+        types.push_back(Type::FLASHLIGHT);
     _hidl_cb(types);
     return Void();
 }
@@ -168,6 +184,17 @@ Status Light::setBacklight(const LightState& state) {
     if (!mBacklightOk)
         return Status::UNKNOWN;
     return errToStatus(writeInt(kLcdFile, rgbToBrightness(state)));
+}
+
+Status Light::setFlashlight(const LightState& state) {
+    if (!mTorchOk)
+        return Status::LIGHT_NOT_SUPPORTED;
+    int brightness = rgbToBrightness(state);
+    int e1 = writeInt(kFlashTorchFile, brightness);
+    int e2 = writeInt(kTorch0File, brightness);
+    if (e1 == 0 || e2 == 0)
+        return Status::SUCCESS;
+    return Status::UNKNOWN;
 }
 
 Status Light::setRgbLight(const LightState& state, int type) {

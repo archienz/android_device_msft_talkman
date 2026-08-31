@@ -35,7 +35,7 @@ using android::hardware::light::V2_0::implementation::Light;
 int main() {
     sp<Light> light = new Light();
     if (!light->usable()) {
-        ALOGE("lcd-backlight / RGB sysfs not usable; not registering ILight");
+        ALOGE("lcd-backlight sysfs not usable; not registering ILight");
         return 1;
     }
 

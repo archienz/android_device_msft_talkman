@@ -42,7 +42,7 @@ class Light : public ILight {
     Light();
     ~Light();
 
-    bool usable() const { return mBacklightOk && mRgbOk; }
+    bool usable() const { return mBacklightOk; }
 
     Return<Status> setLight(Type type, const LightState& state) override;
     Return<void> getSupportedTypes(getSupportedTypes_cb _hidl_cb) override;
@@ -55,6 +55,7 @@ class Light : public ILight {
     };
 
     Status setBacklight(const LightState& state);
+    Status setFlashlight(const LightState& state);
     Status setRgbLight(const LightState& state, int type);
     Status setAttention(const LightState& state);
     Status setLightLocked(const LightState& state, int type);
@@ -68,6 +69,8 @@ class Light : public ILight {
     std::mutex mLock;
     bool mBacklightOk = false;
     bool mRgbOk = false;
+    bool mTorchOk = false;
+    const char* mTorchFile = nullptr;
     LedConfig mLeds[3];
     int mCurLed = -1;
     LedConfig mBlinkLed;
