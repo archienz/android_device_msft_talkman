@@ -19,9 +19,14 @@
 
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
-    <!-- Whether a software navigation bar should be shown. NOTE: in the future this may be
-         autodetected from the Configuration. -->
+    <!-- leftover MATCH bullhead: software nav (no capacitive Home/Back/Recents).
+         Recents is SystemUI overview on the bar, not gpio-keys APP_SWITCH.
+         lineage-sdk leftover da9e012 keys 96 is SHOT+VOL only. No Dual SIM. -->
     <bool name="config_showNavigationBar">true</bool>
+    <bool name="config_hasRecents">true</bool>
+    <!-- 3-button default like bullhead; Settings may offer 2-button swipe-up. -->
+    <integer name="config_navBarInteractionMode">0</integer>
+    <bool name="config_swipe_up_gesture_setting_available">true</bool>
 
     <!-- Set to true to add links to Cell Broadcast app from Settings and MMS app. -->
     <bool name="config_cellBroadcastAppLinks">true</bool>
@@ -424,7 +429,7 @@
    <!-- If this is true, device supports Sustained Performance Mode. -->
    <bool name="config_sustainedPerformanceModeSupported">true</bool>
 
-   <!-- Enable system navigation keys. -->
+   <!-- leftover MATCH bullhead: DPAD/system nav keys (keyboard), not Dual SIM. -->
    <bool name="config_supportSystemNavigationKeys">true</bool>
 
    <!-- Boolean indicating whether the HWC setColorTransform function can be performed efficiently
