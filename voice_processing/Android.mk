@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Fluence AEC/NS descriptors for talkman. TARGET_DEVICE talkman only
+# (not leftover bullhead). No speaker-prot / SPKR_PROT module.
+
 ifneq ($(filter talkman, $(TARGET_DEVICE)),)
 
 LOCAL_PATH:= $(call my-dir)

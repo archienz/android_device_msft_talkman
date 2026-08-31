@@ -18,6 +18,11 @@
 //------------------------------------------------------------------------------
 // Effect descriptors
 //------------------------------------------------------------------------------
+// Talkman Fluence mic pre-proc only (AEC + NS). Same UUIDs/flags as leftover
+// bullhead MSM8992 qcom_product_* so libqcomvoiceprocessing.so +
+// audio/audio_effects.xml stay in lockstep.
+// Not speaker-prot: TAS2553 on QUAT_MI2S, persist.speaker.prot.enable=false,
+// AUDIO_FEATURE_ENABLED_SPKR_PROTECTION=false. No SPKR_PROT descriptor.
 
 // UUIDs for effect types have been generated from http://www.itu.int/ITU-T/asn1/uuid.html
 // as the pre processing effects are not defined by OpenSL ES
