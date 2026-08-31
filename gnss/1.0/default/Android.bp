@@ -1,5 +1,7 @@
 // Talkman copy of hardware/interfaces/gnss/1.0/default.
 // nmeaCb ignores CAF's off-by-one length so hidl_string does not abort.
+// Stem/overrides stock android.hardware.gnss@1.0-impl. VINTF is not on
+// this module (device vintf/android.hardware.gnss@1.0.xml).
 cc_library_shared {
     name: "android.hardware.gnss@1.0-impl.talkman",
     stem: "android.hardware.gnss@1.0-impl",
