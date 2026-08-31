@@ -1,3 +1,10 @@
 # dumpstate_board.sh is dumpstate_exec (file_contexts).
 # Walk /sys/class/power_supply labeled sysfs_batteryinfo (genfs + file_contexts).
 r_dir_file(dumpstate, sysfs_batteryinfo)
+
+# leftover bf43f49: dump torch/flash LED sysfs and list /dev/video*.
+# Names are led:flash_torch / led:torch_0 (one colon). No leftover led::flash_torch.
+# Listing only: getattr on video_device, no open, no V4L2, no CCI write.
+r_dir_file(dumpstate, sysfs_leds)
+allow dumpstate video_device:dir r_dir_perms;
+allow dumpstate video_device:chr_file getattr;
