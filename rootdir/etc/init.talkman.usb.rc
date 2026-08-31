@@ -1,7 +1,7 @@
-# Talkman USB gadget — CAF 3.10 g_android (CONFIG_USB_G_ANDROID).
-# No CONFIG_USB_CONFIGFS. Do not mkdir /config/usb_gadget.
-# TYPE_C connector + HD3SS460 SS mux (mmo-usbc). Dual-role DWC3 stays
-# UFP/sink so USBIN charges. No PD PHY / no PD sink UI.
+# Talkman USB gadget leftover — CAF 3.10 g_android (CONFIG_USB_G_ANDROID).
+# MATCH leftover (93506aa): no CONFIG_USB_CONFIGFS. Do not mkdir
+# /config/usb_gadget. TYPE_C + HD3SS460 SS mux (mmo-usbc). Dual-role
+# DWC3 stays UFP/sink so USBIN charges. No PD PHY / no PD sink UI.
 
 on early-init
     setprop sys.usb.configfs 0
