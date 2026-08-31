@@ -35,8 +35,9 @@ Cellular / RIL is **P2**. Do not stop P0 for modem SMD errors.
 
 | Item | Value |
 |---|---|
-| Personal GitHub | [archienz/android_device_msft_talkman](https://github.com/archienz/android_device_msft_talkman) (**private**) |
+| Personal GitHub | [archienz/android_device_msft_talkman](https://github.com/archienz/android_device_msft_talkman) (**public**) |
 | Branch | `lineage-18.1-talkman-hw` |
+| Write access | **archienz** only |
 | Community source | [Android4Lumia950/android_device_msft_talkman](https://github.com/Android4Lumia950/android_device_msft_talkman) |
 | Lunch target | `lineage_talkman-userdebug` (use `lunch`, not `breakfast`) |
 
@@ -53,11 +54,11 @@ Push personal work to **archienz**. Do not open pull requests on the community o
 | GPU | Adreno 418 |
 | PMIC | PM8994 + PMI8994 |
 | Battery pack | BV-T5E, 3000 mAh |
-| Rear camera | Sony IMX230 (DCC 104541, chip 0x0230) |
-| Front camera | SMIApp, name not known |
-| OIS | Mitsumi bu24210 (DCC `.kar` MCU image) |
-| Speaker | TAS2553 on QUAT_MI2S |
-| NFC | NXP PN547 |
+| Rear camera | Sony IMX230 (DCC 104541, chip 0x0230 on paper). First SMIA `0x0016` decides IMX230 vs IMX278 |
+| Front camera | SMIApp, name not known. EpicLPer dump `0x2140` is a lab note, not our scan |
+| OIS | Mitsumi bu24210 (DCC `.kar` MCU image). No `libmmcamera_ois_bu24210.so` |
+| Speaker | TAS2553 on QUAT_MI2S. PGA default **0x12** (11 dB) |
+| NFC | NXP PN547 `/dev/pn547`. Kernel `nq-nci`: 250 ms I2C timeout, no `read_mutex` across IRQ, VEN without eSE |
 | WLAN | QCA6174 |
 | USB-C | HD3SS460 + iCE5LP2K. No USB Power Delivery |
 
@@ -71,16 +72,30 @@ CCI 7-bit slave IDs are **not** in this tree. Do not invent `qcom,slave-id`.
 
 No P0 item is **Working**.
 
+Waves 2–11 closed in trees. Wave 12/13 leftover still live. Wave 14 live: LVS1 hold (not cam vreg), leftover init/overlay/BT/media, Hill ident notes only.
+
 Host blockers: no WSL Ubuntu 22.04. About 23 GB free on C:. CCI scan never ran. No GPSTest log.
 
 | ID | Subsystem | Status | What is in source | What is still missing |
 |---|---|---|---|---|
 | P0.0 | Rebuild LOS 18.1 | Not done | Manifest and `README-BUILD.md` | WSL Ubuntu 22.04, 250–400 GB ext4, `mka bacon` |
 | P0.1 | Battery UI | Not Working | Fuel-gauge OCV+CC if pack ID does not match. Overlay capacity 3000 mAh. Warning levels 15 / 5. Settings health reads `bms/charge_full*`. Dumpstate walks psy. No hardcoded 50% | `dumpsys battery` and USB-meter log on the telephone |
-| P0.2 | Charge | Not Working | Kernel driver sets cable 1800 mA and Qi 900 mA. Overlay strings say 5 V 1.8 A and Qi 900 mA. No PD. No HVDCP | USB-meter proof that SoC increases |
-| P0.3 | GPS | Not Working | GNSS HIDL `impl.talkman`. SUPL 2.0. NTP `pool.ntp.org`. 0-SV locations are dropped | GPSTest log with `numSvs` more than 0 |
-| P0.4 | Camera | Not Working | DT name `mot_imx230`. XML CameraId 0. Clark 32-bit sensor libraries. Flash/torch PMI nodes. HAL1 props | CCI scan on the telephone, JPEG still, OIS `.so` |
+| P0.2 | Charge | Not Working | Kernel driver sets cable 1800 mA and Qi 900 mA. Overlay strings say 5 V 1.8 A and Qi 900 mA. USB-C mux driver `mmo-usbc.c`. No PD. No HVDCP | USB-meter proof that SoC increases |
+| P0.3 | GPS | Not Working | GNSS HIDL `impl.talkman`. SUPL 2.0. NTP `pool.ntp.org`. Packed installer `modem.img` 70 MiB with MBA/MPSS. 0-SV locations are dropped | GPSTest log with `numSvs` more than 0 |
+| P0.4 | Camera | Not Working | DT name `mot_imx230`. XML CameraId 0. Clark 32-bit sensor libraries. Flash/torch PMI nodes. HAL1 props. OIS `.kar` staged, not loaded | CCI scan on the telephone, JPEG still, OIS `.so`, LVS1 not sequenced as cam vreg |
 | P2 | RIL | Deferred | Research notes only | Modem SMD |
+
+### EpicLPer compare (camera / NFC / audio)
+
+Keep QCamera2 MSMB `mot_imx230`. EpicLPer HAL1 “preview” is CSID test-generator, not live CSI. Do not ship TG.
+
+`qcom,cci-master` is still `<0>`. Hill ident used CCI1. Conflict is **open**. Resolve with `talkman-cci-scan`. Do not pick a master by guess.
+
+LVS1 1.8 V (`cam_vio` → `pm8994_lvs1`) is still in `qcom,cam-vreg-name`. EpicLPer nested `sensor_power_up` on LVS1 bootlooped. Next kernel pass: keep LVS1 on. Stop sequencing LVS1 as a camera vreg. Wave 14 owns that edit.
+
+NFC and TAS already match his measured fixes: PN547 VEN without eSE, 250 ms timeout, no IRQ `read_mutex`; TAS PGA **11 dB**. Keep our userspace. Do not Magisk.
+
+His 8-bit IDs (`0x20` / `0x7c` / SID remap `0x22`) are lab measurements. They are **not** DT. Do not write `qcom,slave-id`.
 
 ---
 
@@ -140,6 +155,8 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - Do not return a fake battery capacity of 50 percent.
 - Do not count a black camera buffer as success.
 - Do not enable USB Power Delivery in the UI. The hardware has no PD.
+- Do not ship CSID test-generator as camera.
+- Do not Magisk-bind a random `imx230` HAL.
 
 ---
 
