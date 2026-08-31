@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Talkman leftover Updater overlay.
+
+     Official updater_server_url is download.lineageos.org/api/v1/{device}/...
+     That index lists bullhead and angler. Talkman is not an official
+     product. BoardConfig TARGET_OTA_ASSERT_DEVICE is talkman only.
+
+     JSON is Android4Lumia950/julian-ota talkman.json (talkman zip URL).
+     Changelog is that repo changelog.txt. Blocked-upgrade wiki URL for
+     bullhead/angler is not this product.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="updater_server_url" translatable="false">https://raw.githubusercontent.com/Android4Lumia950/julian-ota/main/{device}.json</string>
+    <string name="menu_changelog_url" translatable="false">https://raw.githubusercontent.com/Android4Lumia950/julian-ota/main/changelog.txt</string>
+    <string name="blocked_update_info_url" translatable="false">https://github.com/archienz/android_device_msft_talkman</string>
+</resources>
