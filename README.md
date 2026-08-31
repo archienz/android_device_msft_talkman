@@ -190,7 +190,9 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - Bluetooth overlay leftover: `profile_supported_sap` is true. There is no generated MAC.
 - `init.talkman.rc` imports camera/nfc/gps. There is no duplicate `qcamerasvr` start. There is no CCI echo.
 - Tethering hotspot provision arrays are empty (no LGE entitlement URL). `privapp-permissions-talkman.xml` dropped `com.lge.entitlement`.
-- Mixer speaker path is QUAT_MI2S (TAS2553). WCD SPK DRV is not wired.
+- Mixer speaker path is QUAT_MI2S (TAS2553). Speaker-prot ACDB IDs are **14**. WCD SPK DRV is not wired.
+- `init.talkman.bt.sh` leftover is QCA6174 persist `/persist/bdaddr.txt` or controller OTP. No generated MAC (`0d7a854`).
+- `init.talkman.power.sh` leftover takes A57 offline then plugins cpu4/cpu5. Permanent offline is charger-only (`d2c43fb`).
 - `extract-files.sh` dests match COPY_FILES. 32-bit `mot_imx230` and bu24210 `.kar` only. Banned dests: IMX377, OV5693, nanohub, OMADM, LGE entitlement, LifeTimer.
 - WCNSS `wifi/WCNSS_qcom_cfg.ini` is QCA6174 2×2 (`gEnable2x2=1`, `gNumRxAnt=2`). No 11ax, no 6 GHz, no WPA3/SAE ini keys. MAC is not in this ini.
 - Kernel `wlan.dtsi` is QCA6174 CNSS on PCIe0. The DT does not contain a MAC address.
