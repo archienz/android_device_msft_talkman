@@ -17,7 +17,7 @@
 LOCAL_PATH := $(call my-dir)
 
 # Persist BD_ADDR: chmod /persist/bdaddr.txt or leave QCA OTP.
-# Do not ship a MAC in the tree.
+# Leftover bullhead Broadcom did not apply. Do not ship or generate a MAC.
 include $(CLEAR_VARS)
 LOCAL_MODULE := init.talkman.bt.sh
 LOCAL_MODULE_TAGS := optional

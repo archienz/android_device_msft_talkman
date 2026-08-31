@@ -1,9 +1,11 @@
 #!/vendor/bin/sh
 #
-# Talkman QCA Rome BD_ADDR.
+# Talkman QCA6174 (Rome UART) BD_ADDR leftover.
+# Leftover bullhead Broadcom stack is not this SoC: no BCM, no btnvtool,
+# no serial-derived / locally administered MAC, no sample BD_ADDR.
 #  1. /persist/bdaddr.txt (installer copies DPP/QCOM/BT.PROVISION)
 #  2. QCA OTP when persist is missing or a placeholder
-# Analog of WCNSS g_use_otpmac=1. Do not invent a MAC.
+# Analog of WCNSS g_use_otpmac=1. Do not generate a MAC.
 # CAF libbt-vendor (hw_rome.c) memcpy()s ro.boot.btmacaddr over NVM tag 2.
 # Zeros leave talkman nvm_tlv_3.2.bin tag 2 as zeros so the controller OTP wins.
 

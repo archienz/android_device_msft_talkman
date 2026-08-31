@@ -1,4 +1,5 @@
-# Talkman BT persist. Not LGE bullhead lge_handle_panic sysfs.
+# Talkman QCA6174 BT persist leftover. Not leftover bullhead Broadcom
+# (no BCM MAC gen). Not LGE bullhead lge_handle_panic sysfs.
 
 on post-fs
     exec - root root -- /vendor/bin/init.talkman.bt.sh
