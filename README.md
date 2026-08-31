@@ -82,9 +82,11 @@ Hill ident candidates **0x20** / **0x7c** / **0x22** are lab notes in `CAMERA-ID
 
 ## Progress (2026-08-31)
 
+Wave 15 start.
+
 **Definition of done:** a physical talkman log in `out/qa-*`. Source in Git is not a pass.
 
-No P0 item is **Working**.
+No P0 item is **Working**. Mixer speaker is QUAT_MI2S. `privapp-permissions` dropped LGE. NFC GPIOs match schematic DT.
 
 Host blockers: no WSL Ubuntu 22.04. About 23 GB free on C:. CCI scan never ran. No GPSTest log.
 
@@ -142,7 +144,8 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 
 - NFC node is `/dev/pn547`. Firmware matches WOA `nxppn547fw.dat`. Kernel `nq-nci` already has 250 ms timeout and VEN without eSE.
 - `init.talkman.rc` imports camera/nfc/gps. There is no duplicate `qcamerasvr` start. There is no CCI echo.
-- Tethering hotspot provision arrays are empty (no LGE entitlement URL). `privapp-permissions` still lists `com.lge.entitlement` leftover.
+- Tethering hotspot provision arrays are empty (no LGE entitlement URL). `privapp-permissions-talkman.xml` dropped `com.lge.entitlement`.
+- Mixer speaker path is QUAT_MI2S (TAS2553). WCD SPK DRV is not wired.
 - Wi-Fi MAC comes from factory DPP. The image does not contain a MAC address.
 - Sensors HAL is `sensors.talkman.so`. No BMI160. No nanohub.
 - Speaker volume curves are AOSP defaults for TAS2553. Bullhead WCD DRC curves are gone. TAS PGA default is **11 dB**.
