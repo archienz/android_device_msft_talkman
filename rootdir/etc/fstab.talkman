@@ -7,6 +7,7 @@
 # firmware_class.path=/vendor/firmware is the vendor ext4 (cmdline). Do not mount
 # GPT modem over /vendor/firmware.
 # persist: /persist/wlan_mac.bin (provision.sh).
+# No bullhead sbl1/tz/imgdata/keymaster/*bak. WP SBL1/TZ stay on GPT, not here.
 
 /dev/block/platform/soc.0/f9824900.sdhci/by-name/system       /system         ext4    ro,barrier=1,inode_readahead_blks=8                             wait,check,first_stage_mount
 /dev/block/platform/soc.0/f9824900.sdhci/by-name/vendor       /vendor         ext4    ro,barrier=1,inode_readahead_blks=8                             wait,check,first_stage_mount
