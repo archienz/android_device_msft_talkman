@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Talkman is single-SIM. Dual SIM stays off.
+     Leftover bullhead Verizon MCC overlays and FeliCa NFC packaging
+     remain as leftover; this overlay does not add rild.
+-->
+<resources>
+    <bool name="config_msim">false</bool>
+</resources>
