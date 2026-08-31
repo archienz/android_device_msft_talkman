@@ -37,12 +37,20 @@
          rather than attempt to query through TelephonyManager.requestNetworkScan() first. -->
     <bool name="config_requestNetworkScan_disable">true</bool>
 
-    <!-- Leftover IMS besides CarrierConfig: MATCH VoLTE false until RIL modem bring-up.
-         Empty MMTEL/RCS package. No video-call fallback. No rild Dual SIM / DSDS 5G. -->
+    <!-- leftover MATCH ad80a92: IMS/VoLTE false until RIL modem bring-up.
+         Empty MMTEL/RCS package. No video-call fallback. RTT off.
+         Empty simless RTT country list (AOSP default is US).
+         No rild Dual SIM / DSDS 5G. CarrierConfig IMS already false. -->
     <string name="config_ims_mmtel_package" translatable="false"/>
     <string name="config_ims_rcs_package" translatable="false"/>
     <bool name="config_support_video_calling_fallback">false</bool>
     <bool name="config_5g_connection_in_dsds_mode">false</bool>
     <bool name="config_support_rtt">false</bool>
     <bool name="config_support_simless_emergency_rtt">false</bool>
+    <string-array name="config_simless_emergency_rtt_supported_countries" translatable="false">
+    </string-array>
+    <string-array translatable="false" name="config_volte_provision_error_on_publish_response">
+    </string-array>
+    <string-array translatable="false" name="config_rcs_provision_error_on_publish_response">
+    </string-array>
 </resources>
