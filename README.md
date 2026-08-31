@@ -199,7 +199,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - Telephony overlay IMS packages are empty (`config_ims_mmtel_package`, `config_ims_rcs_package`). Video-calling fallback is false. RTT is false.
 - `media_codecs.xml` is Venus VFE44, 3840x2160 at 30 fps. There is no HEVC encode.
 - `libshims` keeps `libcutils_shim`. Bullhead audio and empty sensor shims are gone.
-- NFC overlay is PN547. It is not FeliCa.
+- NFC overlay leftover (`1ccb479` MATCH `54afc57`): PN547, `enable_nfc_provisioning` false. No FeliCa SKU bools. `libnfc-nci.conf` is untouched. GPIOs stay in kernel `nfc.dtsi`.
 - Bluetooth overlay is QCA6174. There is no generated MAC.
 - Thermal HAL uses MSM8992 TSENS type names. Init chmod uses thermal_zone type and temp.
 - Vendor COPY_FILES for PIL use adsp, venus, and cpe. They do not use qcadsp8992.
