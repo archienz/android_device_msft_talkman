@@ -102,7 +102,7 @@ Source in Git is not a pass. A pass is a physical talkman log in `out/qa-*`.
 
 There is no LineageOS zip. There is no `out/qa-*` meter log. CCI scan never ran on the telephone. GPSTest never ran.
 
-`boot.img` exists on the Steam Deck build tree (`out/target/product/talkman/boot.img`, 9.3 MiB, kernel 3.10.108-perf). `mka bacon` is not finished.
+`boot.img` and an unofficial zip exist on the Steam Deck build tree (`out/target/product/talkman/lineage-18.1-20260901-UNOFFICIAL-talkman.zip`). That is not a hardware pass.
 
 No P0 item is **Working**. Dual SIM RM-1118 is not this product. There is no `qcom,slave-id`. There is no `CONFIG_MSM_OIS`.
 
@@ -112,7 +112,7 @@ Host: Steam Deck SteamOS, ext4 `/home/deck/android/los-18.1`. Do not `repo sync`
 
 | ID | Subsystem | Status | What is in source | What is still missing |
 |---|---|---|---|---|
-| P0.0 | Rebuild LOS 18.1 | In progress | `boot.img` built. CAF display/media compile fixes in `patches/` | `mka bacon` zip |
+| P0.0 | Rebuild LOS 18.1 | Zip built | `lineage-18.1-20260901-UNOFFICIAL-talkman.zip` on the Steam Deck. CAF compile patches in `patches/` | Flash + `out/qa-*` logs |
 | P0.1 | Battery UI | Not Working | Fuel-gauge OCV+CC if pack ID does not match. Overlay capacity 3000 mAh. Kernel FG 3200/3500 (`91c0c0317c3`). Warning levels 15 / 5. Settings health reads `bms/charge_full*`. Dumpstate walks psy. No hardcoded 50% | `dumpsys battery` and USB-meter log on the telephone |
 | P0.2 | Charge | Not Working | Kernel driver sets cable 1800 mA and Qi 900 mA. Overlay strings say 5 V 1.8 A and Qi 900 mA. USB-C mux driver `mmo-usbc.c`. Kernel GPIO12 (`3068a345c0e`). No PD. No HVDCP | USB-meter proof that SoC increases |
 | P0.3 | GPS | Not Working | GNSS HIDL `impl.talkman`. SUPL 2.0. NTP `pool.ntp.org`. Packed installer `modem.img` (`dc847d5`) 70 MiB with MBA/MPSS. 0-SV locations are dropped | GPSTest log with `numSvs` more than 0 |
