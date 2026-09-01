@@ -107,6 +107,18 @@ copy_one() {
       out="${OUT_BASE}/bin/${dest#vendor/bin/}"
       ;;
   esac
+  # Same for the loc QMI libs: the donor ships them in /system/lib*, but the
+  # GNSS HAL, loc_launcher and libizat_core that dlopen them are all vendor
+  # processes, so talkman-vendor.mk installs them to vendor from
+  # proprietary/lib*.
+  case "${dest}" in
+    vendor/lib/libloc_api_v02.so|vendor/lib/libloc_ds_api.so)
+      out="${OUT_BASE}/lib/${dest#vendor/lib/}"
+      ;;
+    vendor/lib64/libloc_api_v02.so|vendor/lib64/libloc_ds_api.so)
+      out="${OUT_BASE}/lib64/${dest#vendor/lib64/}"
+      ;;
+  esac
 
   mkdir -p "$(dirname "${out}")"
   cp -f "${src_file}" "${out}"

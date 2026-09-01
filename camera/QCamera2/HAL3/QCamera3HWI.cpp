@@ -6533,8 +6533,17 @@ int QCamera3HardwareInterface::initStaticMetadata(uint32_t cameraId)
     staticInfo.update(ANDROID_FLASH_FIRING_POWER,
             available_flash_levels, count);
 
+    /* The daemon only reports a flash when the sensor has an msm_flash subdev.
+     * Talkman's rear flash is TORCH_EN on MSM GPIO 12 behind leds-gpio, so
+     * flash_available comes back 0 with the LED physically present, and the
+     * framework will not call setTorchMode() unless FLASH_INFO_AVAILABLE is
+     * true. QCameraFlash drives that LED; see QCameraFlash.h.
+     */
+    bool subdevFlash = (gCamCapability[cameraId]->flash_available != 0);
+    bool anyFlash = subdevFlash || QCameraFlash::hasGpioTorch((int)cameraId);
+
     uint8_t flashAvailable;
-    if (gCamCapability[cameraId]->flash_available)
+    if (anyFlash)
         flashAvailable = ANDROID_FLASH_INFO_AVAILABLE_TRUE;
     else
         flashAvailable = ANDROID_FLASH_INFO_AVAILABLE_FALSE;
@@ -6547,7 +6556,11 @@ int QCamera3HardwareInterface::initStaticMetadata(uint32_t cameraId)
     for (size_t i = 0; i < count; i++) {
         avail_ae_modes.add(gCamCapability[cameraId]->supported_ae_modes[i]);
     }
-    if (flashAvailable) {
+    /* A single enable GPIO cannot be metered into the pre-flash/main-flash
+     * sequence these AE modes hand to the daemon, so they stay tied to the
+     * subdev flash. Torch is exposed through setTorchMode() either way.
+     */
+    if (subdevFlash) {
         avail_ae_modes.add(ANDROID_CONTROL_AE_MODE_ON_AUTO_FLASH);
         avail_ae_modes.add(ANDROID_CONTROL_AE_MODE_ON_ALWAYS_FLASH);
     }

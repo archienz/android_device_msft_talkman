@@ -22,9 +22,11 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := libpn547_fw.c
 LOCAL_MODULE := libpn547_fw
 LOCAL_MODULE_OWNER := nxp
-# nfc_nci.msm8992.so (32 and 64) dlopens this exact path, not /vendor/firmware.
+# nfc_nci.msm8992.so dlopens libpn547_fw from vendor firmware.
 # Blob is WOA nxppn547fw.dat (FirmwareMap 5/8). Sony 8.1 dump is leftover — do not swap.
-LOCAL_MODULE_PATH := $(TARGET_OUT)/vendor/firmware
+# Android 11 multiarch: RELATIVE_PATH, not LOCAL_MODULE_PATH on shared libraries.
+LOCAL_VENDOR_MODULE := true
+LOCAL_MODULE_RELATIVE_PATH := firmware
 LOCAL_MODULE_TAGS := optional
 LOCAL_PACK_MODULE_RELOCATIONS := false
 

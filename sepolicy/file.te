@@ -39,6 +39,10 @@ type cnd_data_file, file_type, data_file_type, core_data_file_type;
 
 type nfc_vendor_data_file, file_type, data_file_type;
 
+# /vendor/firmware payloads dlopened by HALs: PN547 libpn547_fw.so (nfc),
+# Rome 3.2 btfw32.tlv / btnv32.bin (hal_bluetooth).
+type vendor_firmware_file, file_type, vendor_file_type;
+
 type sysfs_smdcntl_open_timeout, fs_type, sysfs_type;
 
 type sysfs_camera, sysfs_type, fs_type;

@@ -30,6 +30,12 @@
 
 #include <hardware/lights.h>
 
+/* Android 11 lights.h dropped LIGHT_ID_FLASHLIGHT; torch is still
+ * schematic TORCH_EN (GPIO 12) via set_light_flashlight. */
+#ifndef LIGHT_ID_FLASHLIGHT
+#define LIGHT_ID_FLASHLIGHT "flashlight"
+#endif
+
 /*
  * PMI8994 RGB: arch/arm/boot/dts/qcom/msm-pmi8994.dtsi qcom,leds@d000
  *   linux,name = "red" / "green" / "blue"

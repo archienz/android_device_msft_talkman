@@ -229,8 +229,8 @@ PRODUCT_PACKAGES += \
 # GPS
 PRODUCT_PACKAGES += \
     libgps.utils \
-    libgnss \
-    liblocation_api \
+    libloc_core \
+    libloc_eng \
     gps.msm8992
 
 PRODUCT_COPY_FILES += \
@@ -242,9 +242,12 @@ PRODUCT_COPY_FILES += \
     vendor/msft/talkman/proprietary/etc/flp.conf:$(TARGET_COPY_OUT_VENDOR)/etc/flp.conf \
     vendor/msft/talkman/proprietary/etc/lowi.conf:$(TARGET_COPY_OUT_VENDOR)/etc/lowi.conf
 
-# Health
+# Health — health/HealthImpl.cpp pins charge_full, charge_full_design and
+# cycle_count to the qpnp-fg "bms" node. The stock -impl cannot autodetect them
+# because smbcharger's "battery" psy does not export those three properties.
+# Recovery keeps base_vendor.mk's android.hardware.health@2.0-impl-default.
 PRODUCT_PACKAGES += \
-    android.hardware.health@2.1-impl \
+    android.hardware.health@2.1-impl-talkman \
     android.hardware.health@2.1-service
 
 # HIDL

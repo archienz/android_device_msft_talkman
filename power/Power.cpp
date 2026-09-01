@@ -327,7 +327,7 @@ Return<void> Power::powerHint(PowerHint hint, int32_t data) {
 }
 
 Return<void> Power::setFeature(Feature feature, bool activate) {
-    if (feature == Feature::DOUBLE_TAP_TO_WAKE) {
+    if (feature == Feature::POWER_FEATURE_DOUBLE_TAP_TO_WAKE) {
         ALOGI("DOUBLE_TAP_TO_WAKE activate=%d: no talkman sysfs node", activate);
     }
     return Void();
@@ -337,7 +337,7 @@ Return<void> Power::getPlatformLowPowerStats(getPlatformLowPowerStats_cb _hidl_c
     hidl_vec<PowerStatePlatformSleepState> states;
     std::string raw;
     if (readFile(kRpmStats, &raw) < 0 || raw.empty()) {
-        _hidl_cb(states, Status::SUCCESS_UNAVAILABLE);
+        _hidl_cb(states, Status::FILESYSTEM_ERROR);
         return Void();
     }
 
@@ -380,7 +380,7 @@ Return<void> Power::getPlatformLowPowerStats(getPlatformLowPowerStats_cb _hidl_c
 
     if (parsed.empty()) {
         ALOGE("%s parsed 0 RPM modes", kRpmStats);
-        _hidl_cb(states, Status::SUCCESS_UNAVAILABLE);
+        _hidl_cb(states, Status::FILESYSTEM_ERROR);
         return Void();
     }
 

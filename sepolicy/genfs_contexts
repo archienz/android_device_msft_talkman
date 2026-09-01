@@ -105,10 +105,10 @@ genfscon sysfs /devices/soc.0/qcom,camera-flash                          u:objec
 genfscon sysfs /devices/soc.0/fd900000.qcom,mdss_mdp/qcom,mdss_fb_primary u:object_r:sysfs_leds:s0
 
 # qpnp-haptic timed_output. Platform genfs only labels .../vibrator/enable;
-# vtg_level / vtg_min / vtg_max / vtg_default live on the same kobj.
+# vtg_level / vtg_min / vtg_max / vtg_default live on the same kobj, and
+# device/lineage/sepolicy/common already labels the whole vibrator kobj.
 # HIDL opens /sys/class/timed_output/vibrator/* (symlink to devices/virtual/...).
 genfscon sysfs /class/timed_output                    u:object_r:sysfs_vibrator:s0
-genfscon sysfs /devices/virtual/timed_output/vibrator u:object_r:sysfs_vibrator:s0
 genfscon sysfs /devices/soc.0/qpnp-haptic             u:object_r:sysfs_vibrator:s0
 
 

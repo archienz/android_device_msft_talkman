@@ -1,0 +1,378 @@
+diff --git a/arch/arm64/boot/dts/mmo/common/audio.dtsi b/arch/arm64/boot/dts/mmo/common/audio.dtsi
+index 664ab23ad13..de20b55f27c 100644
+--- a/arch/arm64/boot/dts/mmo/common/audio.dtsi
++++ b/arch/arm64/boot/dts/mmo/common/audio.dtsi
+@@ -74,6 +74,7 @@
+ 		reg = <0x40>;
+ 
+ 		ti,enable-gpio = <&pm8994_gpios 12 0>;
++		ti,pga-gain = <0x12>;			/* 11 dB; PMIC brownout above this */
+ 
+ 		pinctrl-names = "default";
+ 		pinctrl-0 = <&quat_mi2s_active>, <&quat_mi2s_sd2_active>;
+diff --git a/arch/arm64/boot/dts/mmo/common/charger.dtsi b/arch/arm64/boot/dts/mmo/common/charger.dtsi
+index 5541165ffb4..41e5fdeebfc 100644
+--- a/arch/arm64/boot/dts/mmo/common/charger.dtsi
++++ b/arch/arm64/boot/dts/mmo/common/charger.dtsi
+@@ -14,12 +14,14 @@
+ 	status = "ok";
+ 	qcom,hold-soc-while-full;
+ 	qcom,charger = <&pmi8994_charger>;
+-	qcom,fg-vbatt-low-threshold = <4200>;
++	/* WOA QcBattMngr LowBatteryVoltage is 3500 mV. */
++	qcom,fg-vbatt-low-threshold = <3500>;
+ 	qcom,resume-soc = <99>;
+ 	qcom,resume-soc-raw = <253>;
+ 	qcom,fg-iterm-ma = <200>;
+ 	qcom,fg-chg-iterm-ma = <100>;
+-	qcom,fg-cutoff-voltage-mv = <2800>;
++	/* Keep the FG above the Microsoft 3200 mV empty cutoff. */
++	qcom,fg-cutoff-voltage-mv = <3200>;
+ 	qcom,warm-bat-decidegc = <450>;
+ 	qcom,hot-bat-decidegc = <550>;
+ 	qcom,cool-bat-decidegc = <(-50)>;
+@@ -44,6 +46,7 @@
+ 	qcom,chg-vadc = <&pmi8994_vadc>;
+ 	qcom,dc-psy-type = "Wireless";
+ 	qcom,dc-psy-ma = <900>;
++	/* Schematic TYPE_C CC into PMI8994. PD_EN exists as a net; no PD PHY. */
+ 	qcom,usb-cc-controller;
+ 	qcom,disable-apsd;
+ 	qcom,disable-hvdcp;
+diff --git a/arch/arm64/boot/dts/mmo/common/pinctrl.dtsi b/arch/arm64/boot/dts/mmo/common/pinctrl.dtsi
+index a0341a90083..8c6256c4525 100644
+--- a/arch/arm64/boot/dts/mmo/common/pinctrl.dtsi
++++ b/arch/arm64/boot/dts/mmo/common/pinctrl.dtsi
+@@ -140,5 +140,57 @@
+ 				bias-disable;
+ 			};
+ 		};
++
++		/*
++		 * Front CAM_FRONT_RES_N (schematic GPIO 104). Do not claim
++		 * GPIO 105 (MTP standby, not on 4VM_08r).
++		 */
++		cam_sensor_front_rst_active {
++			qcom,pins = <&gp 104>;
++			qcom,num-grp-pins = <1>;
++			label = "cam_sensor_front_rst_active";
++
++			cam_sensor_front_rst_active: cam_sensor_front_rst_active {
++				drive-strength = <2>;
++				bias-disable;
++			};
++		};
++
++		cam_sensor_front_rst_suspend {
++			qcom,pins = <&gp 104>;
++			qcom,num-grp-pins = <1>;
++			label = "cam_sensor_front_rst_suspend";
++
++			cam_sensor_front_rst_suspend: cam_sensor_front_rst_suspend {
++				drive-strength = <2>;
++				bias-disable;
++			};
++		};
++
++		/*
++		 * Iris IRIS_CAM_RES_N (schematic GPIO 102). GPIO 106 is not
++		 * on the drawing. Do not use cam_sensor_rear2 (GPIO 94 = NFC).
++		 */
++		cam_sensor_iris_active {
++			qcom,pins = <&gp 102>;
++			qcom,num-grp-pins = <1>;
++			label = "cam_sensor_iris_active";
++
++			cam_sensor_iris_active: cam_sensor_iris_active {
++				drive-strength = <2>;
++				bias-disable;
++			};
++		};
++
++		cam_sensor_iris_suspend {
++			qcom,pins = <&gp 102>;
++			qcom,num-grp-pins = <1>;
++			label = "cam_sensor_iris_suspend";
++
++			cam_sensor_iris_suspend: cam_sensor_iris_suspend {
++				drive-strength = <2>;
++				bias-disable;
++			};
++		};
+ 	};
+ };
+\ No newline at end of file
+diff --git a/arch/arm64/boot/dts/mmo/common/regulator.dtsi b/arch/arm64/boot/dts/mmo/common/regulator.dtsi
+index 6b7c0d2bce1..dac4084776e 100644
+--- a/arch/arm64/boot/dts/mmo/common/regulator.dtsi
++++ b/arch/arm64/boot/dts/mmo/common/regulator.dtsi
+@@ -296,7 +296,7 @@
+ 		pm8994_l25: regulator-l25 {
+ 			regulator-min-microvolt = <1150000>;
+ 			regulator-max-microvolt = <1150000>;
+-			qcom,init-voltage = <1000000>;
++			qcom,init-voltage = <1150000>;
+ 			regulator-always-on;
+ 			status = "okay";
+ 		};
+@@ -409,4 +409,13 @@
+ 		enable-active-high;
+ 		gpio = <&pm8994_gpios 9 0>;
+ 	};
+-};
+\ No newline at end of file
++};
++
++/* Shared camera / sensor 1.8 V VIO (schematic VREG_LVS1A_1P8). Hold on.
++ * Do not sequence this rail as cam_vio in talkman-camera.dtsi.
++ */
++&pm8994_lvs1 {
++	regulator-always-on;
++	regulator-boot-on;
++	status = "okay";
++};
+diff --git a/arch/arm64/boot/dts/mmo/common/talkman-camera.dtsi b/arch/arm64/boot/dts/mmo/common/talkman-camera.dtsi
+new file mode 100644
+index 00000000000..ae11446018c
+--- /dev/null
++++ b/arch/arm64/boot/dts/mmo/common/talkman-camera.dtsi
+@@ -0,0 +1,123 @@
++/*
++ * Lumia 950 RM-1104 (4VM_08r) camera. Schematic sheet 3 (page-02).
++ *
++ * Rear: CSI0 4-lane, CCI1, CAM_MCLK0 GPIO 13.
++ *       VREG_L25A_1P1 VDIG, VREG_L29A_2P8 VANA, VREG_L23A_2P8 VAF,
++ *       VREG_LVS1A_1P8 VIO (shared — always-on, not in cam-vreg seq).
++ *       TORCH_EN GPIO 12 (torch.dtsi). No PMI flash bind.
++ * Rear XSHUTDOWN is not labelled on the drawing — do not copy MTP 91/92.
++ *
++ * Front (disabled, no CameraId 1): CSI2, CCI0, CAM_MCLK2 GPIO 15,
++ *       CAM_FRONT_RES_N GPIO 104. GPIO 105 is not on the drawing.
++ * Iris (disabled): CCI0, CAM_MCLK1 GPIO 14, IRIS_CAM_RES_N GPIO 102.
++ *
++ * No qcom,slave-id. No OIS node. Do not use cam_sensor_rear2 (GPIO 94 = NFC DWL).
++ */
++
++&cci {
++	qcom,camera@0 {
++		cell-index = <0>;
++		compatible = "qcom,camera";
++		reg = <0x0>;
++		qcom,csiphy-sd-index = <0>;
++		qcom,csid-sd-index = <0>;
++		qcom,csi-lane-assign = <0x4320>;
++		qcom,csi-lane-mask = <0x1F>;
++		qcom,mount-angle = <360>;
++		cam_vdig-supply = <&pm8994_l25>;
++		cam_vana-supply = <&pm8994_l29>;
++		cam_vaf-supply = <&pm8994_l23>;
++		qcom,cam-vreg-name = "cam_vdig", "cam_vana", "cam_vaf";
++		qcom,cam-vreg-min-voltage = <1150000 2850000 2850000>;
++		qcom,cam-vreg-max-voltage = <1150000 2850000 2850000>;
++		qcom,cam-vreg-op-mode = <105000 80000 100000>;
++		qcom,gpio-no-mux = <0>;
++		pinctrl-names = "cam_default", "cam_suspend";
++		pinctrl-0 = <&cam_sensor_mclk0_active>;
++		pinctrl-1 = <&cam_sensor_mclk0_suspend>;
++		gpios = <&msm_gpio 13 0>;
++		qcom,gpio-req-tbl-num = <0>;
++		qcom,gpio-req-tbl-flags = <1>;
++		qcom,gpio-req-tbl-label = "CAMIF_MCLK0";
++		qcom,cam-power-seq-type = "sensor_vreg", "sensor_vreg",
++			"sensor_vreg", "sensor_clk";
++		qcom,cam-power-seq-val = "cam_vdig", "cam_vana", "cam_vaf",
++			"sensor_cam_mclk";
++		/* WOA PEP CAMS votes 0x00927c00: 9.6 MHz MCLK0. */
++		qcom,cam-power-seq-cfg-val = <1 1 1 9600000>;
++		qcom,cam-power-seq-delay = <1 1 1 5>;
++		qcom,sensor-position = <0>;
++		qcom,sensor-mode = <0>;
++		qcom,cci-master = <1>;
++		status = "ok";
++		clocks = <&clock_mmss clk_mclk0_clk_src>,
++			<&clock_mmss clk_camss_mclk0_clk>;
++		clock-names = "cam_src_clk", "cam_clk";
++	};
++
++	/* Front SMIA — schematic only. No CameraId 1 XML. No SID. */
++	qcom,camera@1 {
++		cell-index = <1>;
++		compatible = "qcom,camera";
++		reg = <0x1>;
++		qcom,csiphy-sd-index = <2>;
++		qcom,csid-sd-index = <2>;
++		qcom,mount-angle = <90>;
++		cam_vana-supply = <&pm8994_l17>;
++		qcom,cam-vreg-name = "cam_vana";
++		qcom,cam-vreg-min-voltage = <2800000>;
++		qcom,cam-vreg-max-voltage = <2800000>;
++		qcom,cam-vreg-op-mode = <80000>;
++		qcom,gpio-no-mux = <0>;
++		pinctrl-names = "cam_default", "cam_suspend";
++		pinctrl-0 = <&cam_sensor_mclk2_active &cam_sensor_front_rst_active>;
++		pinctrl-1 = <&cam_sensor_mclk2_suspend &cam_sensor_front_rst_suspend>;
++		gpios = <&msm_gpio 15 0>,
++			<&msm_gpio 104 0>;
++		qcom,gpio-reset = <1>;
++		qcom,gpio-req-tbl-num = <0 1>;
++		qcom,gpio-req-tbl-flags = <1 0>;
++		qcom,gpio-req-tbl-label = "CAMIF_MCLK2",
++					  "CAM_FRONT_RES_N";
++		qcom,sensor-position = <1>;
++		qcom,sensor-mode = <0>;
++		qcom,cci-master = <0>;
++		status = "disabled";
++		clocks = <&clock_mmss clk_mclk2_clk_src>,
++			<&clock_mmss clk_camss_mclk2_clk>;
++		clock-names = "cam_src_clk", "cam_clk";
++	};
++
++	/* Iris / SIIRI — schematic IRIS_CAM_RES_N GPIO 102, MCLK1 GPIO 14. */
++	qcom,camera@2 {
++		cell-index = <2>;
++		compatible = "qcom,camera";
++		reg = <0x2>;
++		qcom,csiphy-sd-index = <2>;
++		qcom,csid-sd-index = <2>;
++		qcom,mount-angle = <90>;
++		cam_vana-supply = <&pm8994_l17>;
++		qcom,cam-vreg-name = "cam_vana";
++		qcom,cam-vreg-min-voltage = <2800000>;
++		qcom,cam-vreg-max-voltage = <2800000>;
++		qcom,cam-vreg-op-mode = <80000>;
++		qcom,gpio-no-mux = <0>;
++		pinctrl-names = "cam_default", "cam_suspend";
++		pinctrl-0 = <&cam_sensor_mclk1_active &cam_sensor_iris_active>;
++		pinctrl-1 = <&cam_sensor_mclk1_suspend &cam_sensor_iris_suspend>;
++		gpios = <&msm_gpio 14 0>,
++			<&msm_gpio 102 0>;
++		qcom,gpio-reset = <1>;
++		qcom,gpio-req-tbl-num = <0 1>;
++		qcom,gpio-req-tbl-flags = <1 0>;
++		qcom,gpio-req-tbl-label = "CAMIF_MCLK1",
++					  "IRIS_CAM_RES_N";
++		qcom,sensor-position = <2>;
++		qcom,sensor-mode = <0>;
++		qcom,cci-master = <0>;
++		status = "disabled";
++		clocks = <&clock_mmss clk_mclk1_clk_src>,
++			<&clock_mmss clk_camss_mclk1_clk>;
++		clock-names = "cam_src_clk", "cam_clk";
++	};
++};
+diff --git a/arch/arm64/boot/dts/mmo/common/torch.dtsi b/arch/arm64/boot/dts/mmo/common/torch.dtsi
+index d3e8410a439..7d8e5f3ef94 100644
+--- a/arch/arm64/boot/dts/mmo/common/torch.dtsi
++++ b/arch/arm64/boot/dts/mmo/common/torch.dtsi
+@@ -8,7 +8,7 @@
+     leds {
+         compatible = "gpio-leds";
+         flashlight {
+-            label = "led::flash_torch";
++            label = "led:flash_torch";
+             gpios = <&msm_gpio 12 0>;
+             default-state = "off";
+             linux,default-trigger = "none";
+diff --git a/arch/arm64/boot/dts/mmo/common/usbc.dtsi b/arch/arm64/boot/dts/mmo/common/usbc.dtsi
+new file mode 100644
+index 00000000000..c95fec2cb72
+--- /dev/null
++++ b/arch/arm64/boot/dts/mmo/common/usbc.dtsi
+@@ -0,0 +1,64 @@
++/*
++ * Lumia 950 RM-1104 4VM_08r USB-C.
++ *
++ * Lattice iCE5LP2K (UC120 Type-C PHY, firmware bitstream) + TI HD3SS460
++ * SuperSpeed mux. No USB Power Delivery. No HVDCP.
++ *
++ * HD3SS460 POL/AMSEL/EN sit next to GPIO_8/9/10 on sheet 4. Those cannot
++ * be TLMM 8/9/10: MSM GPIO 10 is DISPLAY_TE. Hold the mux on PMI8994
++ * GPIO 8/9/10 + GPIO 5 VBUS (already OTG switch). No PD PHY node.
++ */
++
++&pmi8994_gpios {
++	gpio@c400 {	/* GPIO 5  USB_VBUS / OTG SWITCH */
++		status = "okay";
++		qcom,pin-num = <5>;
++		qcom,mode = <1>;		/* digital output */
++		qcom,output-type = <0>;		/* CMOS */
++		qcom,invert = <0>;		/* VBUS off */
++		qcom,pull = <5>;		/* no pull */
++		qcom,vin-sel = <2>;		/* 1.8 V */
++		qcom,src-sel = <0>;		/* constant */
++		qcom,out-strength = <1>;	/* low */
++		qcom,master-en = <1>;
++	};
++
++	gpio@c700 {	/* GPIO 8  HD3SS460 POL */
++		status = "okay";
++		qcom,pin-num = <8>;
++		qcom,mode = <1>;
++		qcom,output-type = <0>;
++		qcom,invert = <0>;		/* POL 0 */
++		qcom,pull = <5>;
++		qcom,vin-sel = <2>;
++		qcom,src-sel = <0>;
++		qcom,out-strength = <1>;
++		qcom,master-en = <1>;
++	};
++
++	gpio@c800 {	/* GPIO 9  HD3SS460 AMSEL */
++		status = "okay";
++		qcom,pin-num = <9>;
++		qcom,mode = <1>;
++		qcom,output-type = <0>;
++		qcom,invert = <0>;		/* AMSEL 0 = USB, not DP */
++		qcom,pull = <5>;
++		qcom,vin-sel = <2>;
++		qcom,src-sel = <0>;
++		qcom,out-strength = <1>;
++		qcom,master-en = <1>;
++	};
++
++	gpio@c900 {	/* GPIO 10 HD3SS460 EN */
++		status = "okay";
++		qcom,pin-num = <10>;
++		qcom,mode = <1>;
++		qcom,output-type = <0>;
++		qcom,invert = <1>;		/* EN 1 */
++		qcom,pull = <5>;
++		qcom,vin-sel = <2>;
++		qcom,src-sel = <0>;
++		qcom,out-strength = <1>;
++		qcom,master-en = <1>;
++	};
++};
+diff --git a/arch/arm64/boot/dts/mmo/msm8992-chi.dtsi b/arch/arm64/boot/dts/mmo/msm8992-chi.dtsi
+index 1a6c7edd66d..52f8c282b66 100644
+--- a/arch/arm64/boot/dts/mmo/msm8992-chi.dtsi
++++ b/arch/arm64/boot/dts/mmo/msm8992-chi.dtsi
+@@ -11,7 +11,7 @@
+  */
+ 
+ #include "../qcom/msm8992-pinctrl.dtsi"
+-#include "../qcom/msm8992-camera-sensor-mtp.dtsi"
++#include "common/talkman-camera.dtsi"
+ #include "panels/dsi-panel-duke-wqhd-dualdsi-cmd.dtsi"
+ #include "common/pinctrl.dtsi"
+ #include "common/regulator.dtsi"
+@@ -29,6 +29,7 @@
+ #include "common/reserved-memory.dtsi"
+ #include "common/nfc.dtsi"
+ #include "common/gpios.dtsi"
++#include "common/usbc.dtsi"
+ #include "common/torch.dtsi"
+ #include "common/sensors.dtsi"
+ 
+@@ -103,7 +104,10 @@
+ 	status = "ok";
+ 	qcom,usbin-vadc = <&pmi8994_vadc>;
+ 	qcom,internal-chg-detect;
+- 
++
++	/* TYPE_C + USB_VBUS into PMI8994. PD_EN is an interconnect net,
++	 * not a PD sink/source stack. Gadget is g_android, not configfs.
++	 */
+ 	dwc3@f9200000 {
+ 		maximum-speed = "high-speed";
+ 		no-set-vbus-power;

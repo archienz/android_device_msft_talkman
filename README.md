@@ -96,21 +96,23 @@ Qi GPIOs match 4VM_08r: `wc-en` GPIO **2**, `wc-det` GPIO **14**.
 
 ---
 
-## Progress (2026-08-31)
+## Progress (2026-09-01)
 
 Source in Git is not a pass. A pass is a physical talkman log in `out/qa-*`.
 
 There is no LineageOS zip. There is no `out/qa-*` meter log. CCI scan never ran on the telephone. GPSTest never ran.
 
+`boot.img` exists on the Steam Deck build tree (`out/target/product/talkman/boot.img`, 9.3 MiB, kernel 3.10.108-perf). `mka bacon` is not finished.
+
 No P0 item is **Working**. Dual SIM RM-1118 is not this product. There is no `qcom,slave-id`. There is no `CONFIG_MSM_OIS`.
 
 The Microsoft service schematic is for implementation only. It is not published.
 
-Host blockers: no WSL Ubuntu 22.04. About 23 GB free on C:. You need 250 GB or more of ext4.
+Host: Steam Deck SteamOS, ext4 `/home/deck/android/los-18.1`. Do not `repo sync` onto NTFS.
 
 | ID | Subsystem | Status | What is in source | What is still missing |
 |---|---|---|---|---|
-| P0.0 | Rebuild LOS 18.1 | Not done | Manifest and `README-BUILD.md` | WSL Ubuntu 22.04, 250–400 GB ext4, `mka bacon` |
+| P0.0 | Rebuild LOS 18.1 | In progress | `boot.img` built. CAF display/media compile fixes in `patches/` | `mka bacon` zip |
 | P0.1 | Battery UI | Not Working | Fuel-gauge OCV+CC if pack ID does not match. Overlay capacity 3000 mAh. Kernel FG 3200/3500 (`91c0c0317c3`). Warning levels 15 / 5. Settings health reads `bms/charge_full*`. Dumpstate walks psy. No hardcoded 50% | `dumpsys battery` and USB-meter log on the telephone |
 | P0.2 | Charge | Not Working | Kernel driver sets cable 1800 mA and Qi 900 mA. Overlay strings say 5 V 1.8 A and Qi 900 mA. USB-C mux driver `mmo-usbc.c`. Kernel GPIO12 (`3068a345c0e`). No PD. No HVDCP | USB-meter proof that SoC increases |
 | P0.3 | GPS | Not Working | GNSS HIDL `impl.talkman`. SUPL 2.0. NTP `pool.ntp.org`. Packed installer `modem.img` (`dc847d5`) 70 MiB with MBA/MPSS. 0-SV locations are dropped | GPSTest log with `numSvs` more than 0 |
@@ -131,7 +133,7 @@ This section is a description of the tree. It is not a procedure.
 - Overlay warning levels are 15 percent and 5 percent.
 - Charge UI strings are 5 V 1.8 A and Qi 900 mA. The UI does not say PD or Quick Charge. Qi `wc-en` GPIO 2 and `wc-det` GPIO 14 match 4VM_08r.
 - Settings Battery Health reads `bms/charge_full`, `charge_full_design`, and `cycle_count`.
-- Health is generic `android.hardware.health@2.1-impl`. There is no talkman Health HAL constant.
+- Health is `android.hardware.health@2.1-impl.talkman` (`health/HealthImpl.cpp`). It pins `bms/charge_full`, `charge_full_design`, `cycle_count`, and energy from `bms/charge_now` × `voltage_now`. Capacity still comes from `battery` (smbcharger proxy). No hardcoded 50%.
 - Overlay `config_chargingFastThreshold` is 15 W. Charge UI does not say Fast Charge or PD.
 - Dumpstate reads `battery`, `bms`, `usb`, and `dc`. Dumpstate lists torch/flash LED sysfs and `/dev/video*` (`bf43f49`). Dumpstate `getattr` on torch LED sysfs. Dumpstate does not write CCI scan.
 - `sepolicy/dumpstate.te` lets `dumpstate` read `sysfs_batteryinfo`. SELinux stays permissive.
@@ -140,6 +142,8 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 
 ### GPS
 
+- CAF loc modules (`libgps.utils`, `libloc_core`, `libloc_eng`, `gps.msm8992`) install to vendor. `libloc_api_v02` / `libloc_ds_api` copy to `/vendor/lib*`.
+- `init.talkman.gps.rc` chmods `izat.conf`, `sap.conf`, `flp.conf`, `lowi.conf` under `/system/etc` (the path the blobs open).
 - Package `android.hardware.gnss@1.0-impl.talkman`.
 - NMEA callback copies data to an owned buffer. CAF length must not go to HIDL `setToExternal` (that path caused SIGABRT).
 - Locations with 0 satellites or position (0,0) are dropped.
@@ -167,7 +171,8 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - Duke AMOLED is command-mode. LAB/IBB mode is amoled at 4.6 V. Always-on display is false. Pickup pulse is false.
 - Recents is SystemUI `OverviewProxyRecentsImpl` on the software 3-button navbar. There is no capacitive APP_SWITCH.
 - Overlay `config_deviceHardwareKeys` is 96 (CAMERA plus VOLUME). Wake keys are the same. There is no APP_SWITCH key.
-- Light HIDL 2.0 writes lcd-backlight and RGB sysfs. Torch writes `led:flash_torch` and `led:torch_0` (`d92e6c3`). Torch GPIO is **12**. Kernel `flash.dtsi` is PMI8994 qpnp-flash-led with that GPIO. sepolicy `hal_light` sysfs_leds matches those names (`6a8f621`). There is no leftover `led::flash_torch`.
+- Light HIDL 2.0 writes lcd-backlight and RGB sysfs. Torch writes `led:flash_torch` and `led:torch_0` (`d92e6c3`). Torch GPIO is **12**. HIDL 2.0 has no `Type::FLASHLIGHT` enum; torch stays on the liblight `LIGHT_ID_FLASHLIGHT` path and `QCameraFlash` GPIO LED backend. Kernel `flash.dtsi` is PMI8994 qpnp-flash-led with that GPIO. sepolicy `hal_light` sysfs_leds matches those names (`6a8f621`). There is no leftover `led::flash_torch`.
+- Rear torch is MSM GPIO 12 into flash driver IC N1400 TORCH pin. I2C address is not on the drawing. There is no `qcom,slave-id`.
 
 ### Other
 

@@ -20,8 +20,9 @@
 #include <android/hardware/light/2.0/ILight.h>
 #include <hidl/Status.h>
 
+#include <pthread.h>
+
 #include <mutex>
-#include <thread>
 
 namespace android {
 namespace hardware {
@@ -55,7 +56,6 @@ class Light : public ILight {
     };
 
     Status setBacklight(const LightState& state);
-    Status setFlashlight(const LightState& state);
     Status setRgbLight(const LightState& state, int type);
     Status setAttention(const LightState& state);
     Status setLightLocked(const LightState& state, int type);
@@ -66,15 +66,16 @@ class Light : public ILight {
     void blinkLoop();
     void sleepBlinkMs(int ms);
 
+    static void* blinkThreadEntry(void* arg);
+
     std::mutex mLock;
     bool mBacklightOk = false;
     bool mRgbOk = false;
-    bool mTorchOk = false;
-    const char* mTorchFile = nullptr;
     LedConfig mLeds[3];
     int mCurLed = -1;
     LedConfig mBlinkLed;
-    std::thread mBlinkThread;
+    pthread_t mBlinkThread = {};
+    bool mBlinkThreadStarted = false;
     bool mBlinkRunning = false;
 };
 

@@ -1,0 +1,327 @@
+diff --git a/msm8994/common.mk b/msm8994/common.mk
+index bbc2223111..351e1bc083 100644
+--- a/msm8994/common.mk
++++ b/msm8994/common.mk
+@@ -15,6 +15,14 @@ common_libs := liblog libutils libcutils libhardware
+ #Common C flags
+ common_flags := -DDEBUG_CALC_FPS -Wno-missing-field-initializers
+ common_flags += -Wconversion -Wall -Werror
++# Clang r383902 (Android 11) treats CAF -Wconversion / GNU designators as errors.
++common_flags += -Wno-error=sign-conversion -Wno-error=conversion
++common_flags += -Wno-error=gnu-designator -Wno-gnu-designator
++common_flags += -Wno-error=unused-function -Wno-unused-function
++common_flags += -Wno-error=unused-parameter -Wno-error=unused-variable
++common_flags += -Wno-error=unused-const-variable -Wno-error=overloaded-virtual
++common_flags += -Wno-error=reorder -Wno-error=format -Wno-error=missing-braces
++common_flags += -Wno-error=unused-value -Wno-error=unused-label
+ 
+ ifeq ($(TARGET_USES_POST_PROCESSING),true)
+     common_flags     += -DUSES_POST_PROCESSING
+diff --git a/msm8994/libcopybit/Android.mk b/msm8994/libcopybit/Android.mk
+index 7b12310c03..3ff3284030 100644
+--- a/msm8994/libcopybit/Android.mk
++++ b/msm8994/libcopybit/Android.mk
+@@ -22,7 +22,6 @@ include $(BUILD_COPY_HEADERS)
+ 
+ include $(CLEAR_VARS)
+ # b/24171136 many files not compiling with clang/llvm yet
+-LOCAL_CLANG := false
+ 
+ LOCAL_MODULE                  := copybit.$(TARGET_BOARD_PLATFORM)
+ LOCAL_MODULE_RELATIVE_PATH    := hw
+diff --git a/msm8994/libgralloc/Android.mk b/msm8994/libgralloc/Android.mk
+index ac3d4929ee..7d78db5f18 100644
+--- a/msm8994/libgralloc/Android.mk
++++ b/msm8994/libgralloc/Android.mk
+@@ -18,7 +18,6 @@ include $(LOCAL_PATH)/../common.mk
+ include $(CLEAR_VARS)
+ 
+ # b/24171136 many files not compiling with clang/llvm yet
+-LOCAL_CLANG := false
+ 
+ LOCAL_MODULE                  := gralloc.$(TARGET_BOARD_PLATFORM)
+ LOCAL_MODULE_RELATIVE_PATH    := hw
+@@ -46,7 +45,6 @@ include $(BUILD_SHARED_LIBRARY)
+ include $(CLEAR_VARS)
+ 
+ # b/24171136 many files not compiling with clang/llvm yet
+-LOCAL_CLANG := false
+ 
+ LOCAL_MODULE                  := libmemalloc
+ LOCAL_MODULE_TAGS             := optional
+diff --git a/msm8994/libhdmi/Android.mk b/msm8994/libhdmi/Android.mk
+index 1aab46d8a4..ac403a7d1b 100644
+--- a/msm8994/libhdmi/Android.mk
++++ b/msm8994/libhdmi/Android.mk
+@@ -3,7 +3,6 @@ include $(LOCAL_PATH)/../common.mk
+ include $(CLEAR_VARS)
+ 
+ # b/24171136 many files not compiling with clang/llvm yet
+-LOCAL_CLANG := false
+ 
+ LOCAL_MODULE                  := libhdmi
+ LOCAL_MODULE_TAGS             := optional
+diff --git a/msm8994/libhwcomposer/Android.mk b/msm8994/libhwcomposer/Android.mk
+index 9ae742d39e..f0077b5f84 100644
+--- a/msm8994/libhwcomposer/Android.mk
++++ b/msm8994/libhwcomposer/Android.mk
+@@ -3,7 +3,6 @@ include $(LOCAL_PATH)/../common.mk
+ include $(CLEAR_VARS)
+ 
+ # b/24171136 many files not compiling with clang/llvm yet
+-LOCAL_CLANG := false
+ 
+ LOCAL_MODULE                  := hwcomposer.$(TARGET_BOARD_PLATFORM)
+ LOCAL_MODULE_RELATIVE_PATH    := hw
+@@ -21,8 +20,10 @@ ifeq ($(TARGET_USES_QCOM_BSP),true)
+ LOCAL_SHARED_LIBRARIES += libskia
+ endif #TARGET_USES_QCOM_BSP
+ 
+-LOCAL_CFLAGS                  := $(common_flags) -DLOG_TAG=\"qdhwcomposer\" \
+-                                 -std=c++11
++# libbinder/libutils headers (String16, Parcel, IInterface) need C++17.
++# The old CAF -std=c++11 in LOCAL_CFLAGS came after the platform -std, so it won.
++LOCAL_CPP_STD                 := gnu++17
++LOCAL_CFLAGS                  := $(common_flags) -DLOG_TAG=\"qdhwcomposer\"
+ #Enable Dynamic FPS if PHASE_OFFSET is not set
+ ifeq ($(VSYNC_EVENT_PHASE_OFFSET_NS),)
+     LOCAL_CFLAGS += -DDYNAMIC_FPS
+diff --git a/msm8994/libhwcomposer/hwc_dump_layers.cpp b/msm8994/libhwcomposer/hwc_dump_layers.cpp
+index 39108edc56..bde29188e5 100644
+--- a/msm8994/libhwcomposer/hwc_dump_layers.cpp
++++ b/msm8994/libhwcomposer/hwc_dump_layers.cpp
+@@ -241,7 +241,7 @@ void HwcDebug::logLayer(size_t layerIndex, hwc_layer_1_t hwLayers[])
+     }
+ 
+     if (hnd)
+-        getHalPixelFormatStr(hnd->format, pixFormatStr);
++        getHalPixelFormatStr(hnd->format, pixFormatStr, sizeof(pixFormatStr));
+ 
+     // Log Line 1
+     ALOGI("Display[%s] Layer[%zu] SrcBuff[%dx%d] SrcCrop[%dl, %dt, %dr, %db] "
+@@ -313,7 +313,7 @@ void HwcDebug::dumpLayer(size_t layerIndex, hwc_layer_1_t hwLayers[])
+         return;
+     }
+ 
+-    getHalPixelFormatStr(hnd->format, pixFormatStr);
++    getHalPixelFormatStr(hnd->format, pixFormatStr, sizeof(pixFormatStr));
+ #ifdef QCOM_BSP
+     if (needDumpPng && hnd->base) {
+         bool bResult = false;
+@@ -376,79 +376,78 @@ void HwcDebug::dumpLayer(size_t layerIndex, hwc_layer_1_t hwLayers[])
+     }
+ }
+ 
+-void HwcDebug::getHalPixelFormatStr(int format, char pixFormatStr[])
++void HwcDebug::getHalPixelFormatStr(int format, char pixFormatStr[], size_t arraySize)
+ {
+     if (!pixFormatStr)
+         return;
+ 
+     switch(format) {
+         case HAL_PIXEL_FORMAT_RGBA_8888:
+-            strlcpy(pixFormatStr, "RGBA_8888", sizeof(pixFormatStr));
++            strlcpy(pixFormatStr, "RGBA_8888", arraySize);
+             break;
+         case HAL_PIXEL_FORMAT_RGBX_8888:
+-            strlcpy(pixFormatStr, "RGBX_8888", sizeof(pixFormatStr));
++            strlcpy(pixFormatStr, "RGBX_8888", arraySize);
+             break;
+         case HAL_PIXEL_FORMAT_RGB_888:
+-            strlcpy(pixFormatStr, "RGB_888", sizeof(pixFormatStr));
++            strlcpy(pixFormatStr, "RGB_888", arraySize);
+             break;
+         case HAL_PIXEL_FORMAT_RGB_565:
+-            strlcpy(pixFormatStr, "RGB_565", sizeof(pixFormatStr));
++            strlcpy(pixFormatStr, "RGB_565", arraySize);
+             break;
+         case HAL_PIXEL_FORMAT_BGRA_8888:
+-            strlcpy(pixFormatStr, "BGRA_8888", sizeof(pixFormatStr));
++            strlcpy(pixFormatStr, "BGRA_8888", arraySize);
+             break;
+         case HAL_PIXEL_FORMAT_RGBA_5551:
+-            strlcpy(pixFormatStr, "RGBA_5551", sizeof(pixFormatStr));
++            strlcpy(pixFormatStr, "RGBA_5551", arraySize);
+             break;
+         case HAL_PIXEL_FORMAT_RGBA_4444:
+-            strlcpy(pixFormatStr, "RGBA_4444", sizeof(pixFormatStr));
++            strlcpy(pixFormatStr, "RGBA_4444", arraySize);
+             break;
+         case HAL_PIXEL_FORMAT_YV12:
+-            strlcpy(pixFormatStr, "YV12", sizeof(pixFormatStr));
++            strlcpy(pixFormatStr, "YV12", arraySize);
+             break;
+         case HAL_PIXEL_FORMAT_YCbCr_422_SP:
+-            strlcpy(pixFormatStr, "YCbCr_422_SP_NV16", sizeof(pixFormatStr));
++            strlcpy(pixFormatStr, "YCbCr_422_SP_NV16", arraySize);
+             break;
+         case HAL_PIXEL_FORMAT_YCrCb_420_SP:
+-            strlcpy(pixFormatStr, "YCrCb_420_SP_NV21", sizeof(pixFormatStr));
++            strlcpy(pixFormatStr, "YCrCb_420_SP_NV21", arraySize);
+             break;
+         case HAL_PIXEL_FORMAT_YCbCr_422_I:
+-            strlcpy(pixFormatStr, "YCbCr_422_I_YUY2", sizeof(pixFormatStr));
++            strlcpy(pixFormatStr, "YCbCr_422_I_YUY2", arraySize);
+             break;
+         case HAL_PIXEL_FORMAT_YCrCb_422_I:
+-            strlcpy(pixFormatStr, "YCrCb_422_I_YVYU", sizeof(pixFormatStr));
++            strlcpy(pixFormatStr, "YCrCb_422_I_YVYU", arraySize);
+             break;
+         case HAL_PIXEL_FORMAT_NV12_ENCODEABLE:
+-            strlcpy(pixFormatStr, "NV12_ENCODEABLE", sizeof(pixFormatStr));
++            strlcpy(pixFormatStr, "NV12_ENCODEABLE", arraySize);
+             break;
+         case HAL_PIXEL_FORMAT_YCbCr_420_SP_TILED:
+             strlcpy(pixFormatStr, "YCbCr_420_SP_TILED_TILE_4x2",
+-                   sizeof(pixFormatStr));
++                   arraySize);
+             break;
+         case HAL_PIXEL_FORMAT_YCbCr_420_SP:
+-            strlcpy(pixFormatStr, "YCbCr_420_SP", sizeof(pixFormatStr));
++            strlcpy(pixFormatStr, "YCbCr_420_SP", arraySize);
+             break;
+         case HAL_PIXEL_FORMAT_YCrCb_420_SP_ADRENO:
+-            strlcpy(pixFormatStr, "YCrCb_420_SP_ADRENO", sizeof(pixFormatStr));
++            strlcpy(pixFormatStr, "YCrCb_420_SP_ADRENO", arraySize);
+             break;
+         case HAL_PIXEL_FORMAT_YCrCb_422_SP:
+-            strlcpy(pixFormatStr, "YCrCb_422_SP", sizeof(pixFormatStr));
++            strlcpy(pixFormatStr, "YCrCb_422_SP", arraySize);
+             break;
+         case HAL_PIXEL_FORMAT_R_8:
+-            strlcpy(pixFormatStr, "R_8", sizeof(pixFormatStr));
++            strlcpy(pixFormatStr, "R_8", arraySize);
+             break;
+         case HAL_PIXEL_FORMAT_RG_88:
+-            strlcpy(pixFormatStr, "RG_88", sizeof(pixFormatStr));
++            strlcpy(pixFormatStr, "RG_88", arraySize);
+             break;
+         case HAL_PIXEL_FORMAT_INTERLACE:
+-            strlcpy(pixFormatStr, "INTERLACE", sizeof(pixFormatStr));
++            strlcpy(pixFormatStr, "INTERLACE", arraySize);
+             break;
+         case HAL_PIXEL_FORMAT_YCbCr_420_SP_VENUS:
+-            strlcpy(pixFormatStr, "YCbCr_420_SP_VENUS", sizeof(pixFormatStr));
++            strlcpy(pixFormatStr, "YCbCr_420_SP_VENUS", arraySize);
+             break;
+         default:
+-            size_t len = sizeof(pixFormatStr);
+-            snprintf(pixFormatStr, len, "Unknown0x%X", format);
++            snprintf(pixFormatStr, arraySize, "Unknown0x%X", format);
+             break;
+     }
+ }
+diff --git a/msm8994/libhwcomposer/hwc_dump_layers.h b/msm8994/libhwcomposer/hwc_dump_layers.h
+index be911f0185..7563fb4735 100644
+--- a/msm8994/libhwcomposer/hwc_dump_layers.h
++++ b/msm8994/libhwcomposer/hwc_dump_layers.h
+@@ -128,7 +128,7 @@ void logLayer(size_t layerIndex, hwc_layer_1_t hwLayers[]);
+  */
+ void dumpLayer(size_t layerIndex, hwc_layer_1_t hwLayers[]);
+ 
+-void getHalPixelFormatStr(int format, char pixelformatstr[]);
++void getHalPixelFormatStr(int format, char pixelformatstr[], size_t arraySize);
+ };
+ 
+ } // namespace qhwc
+diff --git a/msm8994/libhwcomposer/hwc_qclient.cpp b/msm8994/libhwcomposer/hwc_qclient.cpp
+index 6d05d3862c..9b0306be1f 100644
+--- a/msm8994/libhwcomposer/hwc_qclient.cpp
++++ b/msm8994/libhwcomposer/hwc_qclient.cpp
+@@ -230,14 +230,17 @@ static void toggleDynamicDebug(hwc_context_t* ctx, const Parcel* inParcel) {
+             qhwc::MDPComp::dynamicDebug(enable);
+             if (debug_type != IQService::DEBUG_ALL)
+                 break;
++            [[fallthrough]];
+         case IQService::DEBUG_VSYNC:
+             ctx->vstate.debug = enable;
+             if (debug_type != IQService::DEBUG_ALL)
+                 break;
++            [[fallthrough]];
+         case IQService::DEBUG_VD:
+             HWCVirtualVDS::dynamicDebug(enable);
+             if (debug_type != IQService::DEBUG_ALL)
+                 break;
++            [[fallthrough]];
+         case IQService::DEBUG_PIPE_LIFECYCLE:
+             Overlay::debugPipeLifecycle(enable);
+             if (debug_type != IQService::DEBUG_ALL)
+diff --git a/msm8994/libhwcomposer/hwc_uevents.cpp b/msm8994/libhwcomposer/hwc_uevents.cpp
+index d1c68a5d3e..0c85a8dbf7 100644
+--- a/msm8994/libhwcomposer/hwc_uevents.cpp
++++ b/msm8994/libhwcomposer/hwc_uevents.cpp
+@@ -58,7 +58,7 @@ static bool getPanelResetStatus(hwc_context_t* ctx, const char* strUdata, int le
+     const char* iter_str = strUdata;
+     if (strcasestr("change@/devices/virtual/graphics/fb0", strUdata)) {
+         while(((iter_str - strUdata) <= len) && (*iter_str)) {
+-            char* pstr = strstr(iter_str, "PANEL_ALIVE=0");
++            const char* pstr = strstr(iter_str, "PANEL_ALIVE=0");
+             if (pstr != NULL) {
+                 ALOGI("%s: got change event in fb0 with PANEL_ALIVE=0",
+                                                            __FUNCTION__);
+@@ -76,7 +76,7 @@ static int getConnectedState(const char* strUdata, int len)
+ {
+     const char* iter_str = strUdata;
+     while(((iter_str - strUdata) <= len) && (*iter_str)) {
+-        char* pstr = strstr(iter_str, "SWITCH_STATE=");
++        const char* pstr = strstr(iter_str, "SWITCH_STATE=");
+         if (pstr != NULL) {
+             return (atoi(pstr + strlen("SWITCH_STATE=")));
+         }
+diff --git a/msm8994/libhwcomposer/hwc_utils.cpp b/msm8994/libhwcomposer/hwc_utils.cpp
+index 436e09b1e8..4ec17f232b 100644
+--- a/msm8994/libhwcomposer/hwc_utils.cpp
++++ b/msm8994/libhwcomposer/hwc_utils.cpp
+@@ -1199,7 +1199,7 @@ bool isRotationDoable(hwc_context_t *ctx, private_handle_t *hnd) {
+     // Rotate layers, if it is not secure display buffer and not
+     // for the MDP versions below MDP5
+     if((!isSecureDisplayBuffer(hnd) && isRotatorSupportedFormat(hnd) &&
+-        !ctx->mMDP.version < qdutils::MDSS_V5)
++        !(ctx->mMDP.version < qdutils::MDSS_V5))
+                    || isYuvBuffer(hnd)) {
+         return true;
+     }
+diff --git a/msm8994/liboverlay/Android.mk b/msm8994/liboverlay/Android.mk
+index 26a058f2bc..31c0052366 100644
+--- a/msm8994/liboverlay/Android.mk
++++ b/msm8994/liboverlay/Android.mk
+@@ -3,7 +3,6 @@ include $(LOCAL_PATH)/../common.mk
+ include $(CLEAR_VARS)
+ 
+ # b/24171136 many files not compiling with clang/llvm yet
+-LOCAL_CLANG := false
+ 
+ LOCAL_MODULE                  := liboverlay
+ LOCAL_MODULE_TAGS             := optional
+diff --git a/msm8994/libqdutils/Android.mk b/msm8994/libqdutils/Android.mk
+index e9861a082c..5a90e88a84 100644
+--- a/msm8994/libqdutils/Android.mk
++++ b/msm8994/libqdutils/Android.mk
+@@ -3,7 +3,6 @@ include $(LOCAL_PATH)/../common.mk
+ include $(CLEAR_VARS)
+ 
+ # b/24171136 many files not compiling with clang/llvm yet
+-LOCAL_CLANG := false
+ 
+ LOCAL_MODULE                  := libqdutils
+ LOCAL_MODULE_TAGS             := optional
+@@ -23,7 +22,6 @@ include $(BUILD_SHARED_LIBRARY)
+ include $(CLEAR_VARS)
+ 
+ # b/24171136 many files not compiling with clang/llvm yet
+-LOCAL_CLANG := false
+ 
+ LOCAL_COPY_HEADERS_TO           := $(common_header_export_path)
+ LOCAL_COPY_HEADERS              := qdMetaData.h
+diff --git a/msm8994/libqservice/Android.mk b/msm8994/libqservice/Android.mk
+index 9acbd88f7b..bc13f1a240 100644
+--- a/msm8994/libqservice/Android.mk
++++ b/msm8994/libqservice/Android.mk
+@@ -3,7 +3,6 @@ include $(LOCAL_PATH)/../common.mk
+ include $(CLEAR_VARS)
+ 
+ # b/24171136 many files not compiling with clang/llvm yet
+-LOCAL_CLANG := false
+ 
+ LOCAL_MODULE                  := libqservice
+ LOCAL_MODULE_TAGS             := optional

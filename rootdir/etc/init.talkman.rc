@@ -573,10 +573,23 @@ service msm_irqbalance /vendor/bin/msm_irqbalance -f /vendor/etc/msm_irqbalance.
     group root
     writepid /dev/cpuset/system-background/tasks
 
-service charger /charger
+# system/core/healthd/Android.bp builds `charger` as a plain cc_binary, so it
+# lands in /system/bin. Android 11 dropped the /charger root symlink, and
+# nothing in this tree recreates it, so the old `/charger` path never execs and
+# off-mode charging shows no UI. Capabilities/user/group follow the grants in
+# system/sepolicy/public/charger.te (sys_boot, sys_tty_config, wakelock_use,
+# input_device read). Not `critical`: charger exiting is normal when the cable
+# is pulled, and critical would reboot into recovery.
+service charger /system/bin/charger
     class charger
-    critical
     seclabel u:r:charger:s0
+    user system
+    group system wakelock input
+    capabilities SYS_BOOT SYS_TTY_CONFIG
+    file /dev/kmsg w
+    file /sys/fs/pstore/console-ramoops-0 r
+    file /sys/fs/pstore/console-ramoops r
+    file /proc/last_kmsg r
 
 # qcamerasvr lives in init.talkman.camera.rc (imported). Duplicate service names abort init.
 

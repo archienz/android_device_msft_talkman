@@ -23,11 +23,11 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
-#include <exception>
 #include <vector>
 
 namespace android {
@@ -45,6 +45,10 @@ namespace implementation {
  *
  * Duke AMOLED backlight: mdss_fb.c led_classdev.name = "lcd-backlight"
  *   (DCS, not qpnp-wled @d800 "wled").
+ *
+ * Torch (GPIO 12, qpnp-flash-led) is not exposed here: light@2.0 Type has no
+ * FLASHLIGHT member. It stays on the legacy LIGHT_ID_FLASHLIGHT node in
+ * liblight/lights.c, and CameraManager torch goes through QCameraFlash.
  */
 
 static const char kLcdFile[] = "/sys/class/leds/lcd-backlight/brightness";
@@ -54,9 +58,6 @@ static const char kBlueLedFile[] = "/sys/class/leds/blue/brightness";
 static const char kRedTriggerFile[] = "/sys/class/leds/red/trigger";
 static const char kGreenTriggerFile[] = "/sys/class/leds/green/trigger";
 static const char kBlueTriggerFile[] = "/sys/class/leds/blue/trigger";
-/* GPIO torch.dtsi label led:flash_torch (one colon). qpnp-flash-led torch_0. */
-static const char kFlashTorchFile[] = "/sys/class/leds/led:flash_torch/brightness";
-static const char kTorch0File[] = "/sys/class/leds/led:torch_0/brightness";
 
 static constexpr int kLedBattery = 0;
 static constexpr int kLedNotifications = 1;
@@ -128,16 +129,6 @@ Light::Light() {
         rgbClaimTriggers();
         writeRgb(0, 0, 0);
     }
-
-    if (nodeWritable(kFlashTorchFile)) {
-        mTorchOk = true;
-        mTorchFile = kFlashTorchFile;
-    } else if (nodeWritable(kTorch0File)) {
-        mTorchOk = true;
-        mTorchFile = kTorch0File;
-    } else {
-        ALOGE("torch sysfs missing (%s and %s)", kFlashTorchFile, kTorch0File);
-    }
 }
 
 Light::~Light() {
@@ -152,8 +143,6 @@ Return<Status> Light::setLight(Type type, const LightState& state) {
     switch (type) {
         case Type::BACKLIGHT:
             return setBacklight(state);
-        case Type::FLASHLIGHT:
-            return setFlashlight(state);
         case Type::BATTERY:
             return setRgbLight(state, kLedBattery);
         case Type::NOTIFICATIONS:
@@ -174,8 +163,6 @@ Return<void> Light::getSupportedTypes(getSupportedTypes_cb _hidl_cb) {
         types.push_back(Type::NOTIFICATIONS);
         types.push_back(Type::ATTENTION);
     }
-    if (mTorchOk)
-        types.push_back(Type::FLASHLIGHT);
     _hidl_cb(types);
     return Void();
 }
@@ -184,17 +171,6 @@ Status Light::setBacklight(const LightState& state) {
     if (!mBacklightOk)
         return Status::UNKNOWN;
     return errToStatus(writeInt(kLcdFile, rgbToBrightness(state)));
-}
-
-Status Light::setFlashlight(const LightState& state) {
-    if (!mTorchOk)
-        return Status::LIGHT_NOT_SUPPORTED;
-    int brightness = rgbToBrightness(state);
-    int e1 = writeInt(kFlashTorchFile, brightness);
-    int e2 = writeInt(kTorch0File, brightness);
-    if (e1 == 0 || e2 == 0)
-        return Status::SUCCESS;
-    return Status::UNKNOWN;
 }
 
 Status Light::setRgbLight(const LightState& state, int type) {
@@ -278,13 +254,13 @@ int Light::writeLedsLocked(const LedConfig* led) {
     if (led->colorRgb && led->onMs > 0 && led->offMs > 0) {
         mBlinkLed = *led;
         mBlinkRunning = true;
-        try {
-            mBlinkThread = std::thread(&Light::blinkLoop, this);
-        } catch (const std::exception& e) {
+        int err = pthread_create(&mBlinkThread, nullptr, &Light::blinkThreadEntry, this);
+        if (err != 0) {
             mBlinkRunning = false;
-            ALOGE("rgb blink thread create failed (%s), solid color", e.what());
+            ALOGE("rgb blink thread create failed (%s), solid color", strerror(err));
             return writeRgb(red, green, blue);
         }
+        mBlinkThreadStarted = true;
         return 0;
     }
 
@@ -314,13 +290,14 @@ void Light::rgbClaimTriggers() {
 }
 
 void Light::stopBlinkLocked() {
-    if (!mBlinkThread.joinable())
+    if (!mBlinkThreadStarted)
         return;
 
     mBlinkRunning = false;
     mLock.unlock();
-    mBlinkThread.join();
+    pthread_join(mBlinkThread, nullptr);
     mLock.lock();
+    mBlinkThreadStarted = false;
 }
 
 void Light::sleepBlinkMs(int ms) {
@@ -334,6 +311,11 @@ void Light::sleepBlinkMs(int ms) {
         if (!run)
             return;
     }
+}
+
+void* Light::blinkThreadEntry(void* arg) {
+    static_cast<Light*>(arg)->blinkLoop();
+    return nullptr;
 }
 
 void Light::blinkLoop() {

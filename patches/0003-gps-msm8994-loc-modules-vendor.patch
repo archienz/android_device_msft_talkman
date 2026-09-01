@@ -1,0 +1,62 @@
+diff --git a/msm8994/core/Android.mk b/msm8994/core/Android.mk
+index 9758c6f..0bd5de7 100644
+--- a/msm8994/core/Android.mk
++++ b/msm8994/core/Android.mk
+@@ -10,6 +10,10 @@ LOCAL_MODULE_OWNER := qcom
+ 
+ LOCAL_MODULE_TAGS := optional
+ 
++# DT_NEEDED of /vendor/lib64/libizat_core.so, and pulled in by gps.$(platform)
++# from /vendor/lib*/hw. Must be on the same partition as its consumers.
++LOCAL_PROPRIETARY_MODULE := true
++
+ ifeq ($(TARGET_DEVICE),apq8026_lw)
+ LOCAL_CFLAGS += -DPDK_FEATURE_SET
+ else ifeq ($(BOARD_VENDOR_QCOM_LOC_PDK_FEATURE_SET),true)
+diff --git a/msm8994/loc_api/libloc_api_50001/Android.mk b/msm8994/loc_api/libloc_api_50001/Android.mk
+index 97f7331..839e9df 100644
+--- a/msm8994/loc_api/libloc_api_50001/Android.mk
++++ b/msm8994/loc_api/libloc_api_50001/Android.mk
+@@ -10,6 +10,10 @@ LOCAL_MODULE_OWNER := qcom
+ 
+ LOCAL_MODULE_TAGS := optional
+ 
++# Linked by gps.$(BOARD_VENDOR_QCOM_GPS_LOC_API_HARDWARE), which the vendor
++# gnss@1.0 passthrough impl loads out of /vendor/lib*/hw.
++LOCAL_PROPRIETARY_MODULE := true
++
+ LOCAL_SHARED_LIBRARIES := \
+     libutils \
+     libcutils \
+@@ -67,6 +71,13 @@ LOCAL_MODULE_OWNER := qcom
+ 
+ LOCAL_MODULE_TAGS := optional
+ 
++# hw_get_module("gps") from the vendor android.hardware.gnss@1.0-impl. libhardware
++# searches /odm/lib*/hw then /vendor/lib*/hw then /system/lib*/hw, but the vendor
++# linker namespace does not permit /system/lib*/hw, so a /system install of this
++# module is unloadable. It also dlopen()s libloc_api_v02.so, which is a vendor
++# blob (talkman-vendor.mk installs it to /vendor/lib*).
++LOCAL_PROPRIETARY_MODULE := true
++
+ ## Libs
+ 
+ LOCAL_SHARED_LIBRARIES := \
+diff --git a/msm8994/utils/Android.mk b/msm8994/utils/Android.mk
+index 5d75497..50e1181 100644
+--- a/msm8994/utils/Android.mk
++++ b/msm8994/utils/Android.mk
+@@ -56,6 +56,13 @@ LOCAL_MODULE := libgps.utils
+ 
+ LOCAL_MODULE_TAGS := optional
+ 
++# The consumers of this library all live on /vendor: /vendor/bin/loc_launcher,
++# /vendor/lib64/libizat_core.so and the vendor gnss@1.0 passthrough impl. A
++# vendor process cannot dlopen out of /system/${LIB}, so this cannot stay on
++# /system the way the pre-Treble msm8994 branch left it. msm8996 and msm8998
++# in this same repo already mark the loc stack proprietary.
++LOCAL_PROPRIETARY_MODULE := true
++
+ LOCAL_PRELINK_MODULE := false
+ 
+ include $(BUILD_SHARED_LIBRARY)

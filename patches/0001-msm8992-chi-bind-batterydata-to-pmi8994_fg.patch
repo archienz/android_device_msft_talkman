@@ -1,0 +1,47 @@
+msm8992-chi: bind talkman_batterydata to pmi8994_fg as well
+
+msm8992-chi.dtsi hands qcom,battery-data to &pmi8994_charger only. The
+fuel gauge is the consumer that actually needs the BV-T5E profile:
+qpnp-fg's fg_batt_profile_init() is what loads qcom,fg-profile-data, and
+without a profile the gauge falls through to "No available batterydata,
+using OTP defaults" and reports an SOC that was never characterised for
+this cell.
+
+Today it still works by accident. In this kernel qpnp-fg looks the node
+up with
+
+    drivers/power/qpnp-fg.c:3679
+    batt_node = of_find_node_by_name(node, "qcom,battery-data");
+
+and of_find_node_by_name() is a global walk of of_allnodes starting
+*after* `node`, not a search of the fg node's children or phandles. The
+root-level talkman_batterydata node happens to sit after the fg node in
+the flattened tree, so it is found. Anything that reorders root children
+ahead of /soc silently drops the profile, and the failure mode is a wrong
+battery percentage rather than a boot failure.
+
+CAF binds it explicitly on both PMIC children, e.g.
+arch/arm64/boot/dts/qcom/msm8992-mtp.dtsi:791. qpnp-smbcharger does read
+the property as a phandle (qpnp-smbcharger.c:2976), so keep that one.
+
+Not included here, because there is no evidence for it on 4VM_08r:
+msm8992-mtp.dtsi also sets qcom,ext-sense-type on the fg node, selecting
+an external sense resistor instead of the PMI8994 internal one. Getting
+that wrong scales POWER_SUPPLY_PROP_CURRENT_NOW and the coulomb counter.
+It needs an on-device check (charging current in
+/sys/class/power_supply/bms/current_now against the charger's
+qcom,fastchg-current-ma) before it is set either way.
+
+--- a/arch/arm64/boot/dts/mmo/msm8992-chi.dtsi
++++ b/arch/arm64/boot/dts/mmo/msm8992-chi.dtsi
+@@ -145,6 +145,10 @@
+ 	};
+ };
+ 
++&pmi8994_fg {
++	qcom,battery-data = <&talkman_batterydata>;
++};
++
+ &pmi8994_charger {
+ 	qcom,battery-data = <&talkman_batterydata>;
+ };

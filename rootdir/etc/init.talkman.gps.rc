@@ -24,12 +24,18 @@ on post-fs-data
     mkdir /data/misc/location/xtwifi 0770 gps gps
     mkdir /data/misc/location/gpsone_d 0770 system gps
     mkdir /data/vendor/location 0770 gps gps
-    chmod 0644 /vendor/etc/gps.conf
+    # Every reader of these resolves /etc, which is a symlink to /system/etc:
+    # loc_launcher and libloc_eng open /etc/gps.conf and /etc/sap.conf,
+    # lowi-server /etc/lowi.conf, flp.default.so /etc/flp.conf, and
+    # location-mq has /system/etc/izat.conf spelled out. talkman-vendor.mk
+    # installs izat/sap/flp/lowi to system/etc for that reason -- chmod of a
+    # /vendor/etc path that does not exist just fails in the init log.
     chmod 0644 /system/etc/gps.conf
-    chmod 0644 /vendor/etc/izat.conf
-    chmod 0644 /vendor/etc/sap.conf
-    chmod 0644 /vendor/etc/flp.conf
-    chmod 0644 /vendor/etc/lowi.conf
+    chmod 0644 /vendor/etc/gps.conf
+    chmod 0644 /system/etc/izat.conf
+    chmod 0644 /system/etc/sap.conf
+    chmod 0644 /system/etc/flp.conf
+    chmod 0644 /system/etc/lowi.conf
 
 on property:init.svc.qmuxd=running
     start loc_launcher

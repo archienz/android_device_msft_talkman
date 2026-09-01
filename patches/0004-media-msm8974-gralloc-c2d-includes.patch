@@ -1,0 +1,53 @@
+diff --git a/msm8974/libc2dcolorconvert/Android.mk b/msm8974/libc2dcolorconvert/Android.mk
+index 5614128f2..93c12e3db 100644
+--- a/msm8974/libc2dcolorconvert/Android.mk
++++ b/msm8974/libc2dcolorconvert/Android.mk
+@@ -8,6 +8,10 @@ LOCAL_SRC_FILES := \
+ LOCAL_CFLAGS += -Wno-error
+ 
+ LOCAL_HEADER_LIBRARIES := display_headers generated_kernel_headers
++# msm8992 uses the 8994 display copybit C2D headers (c2d2.h).
++ifeq ($(TARGET_BOARD_PLATFORM),msm8992)
++LOCAL_C_INCLUDES += $(TOP)/hardware/qcom/display/msm8994/libcopybit
++endif
+ 
+ LOCAL_SHARED_LIBRARIES := liblog libdl
+ 
+diff --git a/msm8974/mm-video-v4l2/vidc/vdec.mk b/msm8974/mm-video-v4l2/vidc/vdec.mk
+index 145bfbaaa..37d280bda 100644
+--- a/msm8974/mm-video-v4l2/vidc/vdec.mk
++++ b/msm8974/mm-video-v4l2/vidc/vdec.mk
+@@ -105,6 +105,14 @@ libmm-vdec-inc          += $(vdec-inc)
+ libmm-vdec-inc      += hardware/qcom/media/msm8974/libc2dcolorconvert
+ libmm-vdec-inc      += frameworks/av/include/media/stagefright
+ 
++# msm8992 uses the 8994 display HAL, whose private headers (gralloc_priv.h,
++# qdMetaData.h, c2d2.h) are not exported through display_headers.
++ifeq ($(TARGET_BOARD_PLATFORM),msm8992)
++libmm-vdec-inc      += $(TOP)/hardware/qcom/display/msm8994/libgralloc
++libmm-vdec-inc      += $(TOP)/hardware/qcom/display/msm8994/libqdutils
++libmm-vdec-inc      += $(TOP)/hardware/qcom/display/msm8994/libcopybit
++endif
++
+ 
+ LOCAL_MODULE                    := libOmxVdec
+ LOCAL_MODULE_TAGS               := optional
+diff --git a/msm8974/mm-video-v4l2/vidc/venc.mk b/msm8974/mm-video-v4l2/vidc/venc.mk
+index 6886c73db..1d952ecfd 100644
+--- a/msm8974/mm-video-v4l2/vidc/venc.mk
++++ b/msm8974/mm-video-v4l2/vidc/venc.mk
+@@ -87,6 +87,14 @@ libmm-venc-inc      += frameworks/av/include/media/stagefright
+ libmm-venc-inc      += frameworks/av/include/media/hardware
+ libmm-venc-inc      += $(venc-inc)
+ 
++# msm8992 uses the 8994 display HAL, whose private headers (gralloc_priv.h,
++# qdMetaData.h, c2d2.h) are not exported through display_headers.
++ifeq ($(TARGET_BOARD_PLATFORM),msm8992)
++libmm-venc-inc      += $(TOP)/hardware/qcom/display/msm8994/libgralloc
++libmm-venc-inc      += $(TOP)/hardware/qcom/display/msm8994/libqdutils
++libmm-venc-inc      += $(TOP)/hardware/qcom/display/msm8994/libcopybit
++endif
++
+ LOCAL_MODULE                    := libOmxVenc
+ LOCAL_MODULE_TAGS               := optional
+ LOCAL_CFLAGS                    := $(libmm-venc-def)

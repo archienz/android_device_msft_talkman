@@ -28,7 +28,11 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include <linux/media.h>
 #include <media/msmb_camera.h>
 #include <media/msm_cam_sensor.h>
@@ -42,6 +46,113 @@
 volatile uint32_t gCamHal3LogLevel = 1;
 
 namespace qcamera {
+
+namespace {
+
+const char kGpioTorchBrightness[] = QCAMERA_GPIO_TORCH_NODE "/brightness";
+const char kGpioTorchMaxBrightness[] = QCAMERA_GPIO_TORCH_NODE "/max_brightness";
+
+/*===========================================================================
+ * FUNCTION   : readGpioTorchMaxBrightness
+ *
+ * DESCRIPTION: Value that means "on" for the leds-gpio torch.
+ *
+ *              create_gpio_led() never assigns cdev.max_brightness, so
+ *              led_classdev_register() leaves it at LED_FULL. gpio_led_set()
+ *              only compares against LED_OFF, so any non-zero write drives
+ *              TORCH_EN high, but write what the class device publishes so the
+ *              brightness readback is not clamped by led_brightness_store().
+ *
+ * PARAMETERS : None
+ *
+ * RETURN     : Brightness to write for "on".
+ *==========================================================================*/
+int32_t readGpioTorchMaxBrightness()
+{
+    int32_t max = 255; /* LED_FULL */
+    int fd = open(kGpioTorchMaxBrightness, O_RDONLY);
+
+    if (fd >= 0) {
+        char buf[16];
+        ssize_t bytes = read(fd, buf, sizeof(buf) - 1);
+        close(fd);
+
+        if (bytes > 0) {
+            buf[bytes] = '\0';
+            long value = strtol(buf, NULL, 10);
+            if (value > 0 && value <= 255) {
+                max = (int32_t)value;
+            }
+        }
+    }
+
+    return max;
+}
+
+}  // namespace
+
+/*===========================================================================
+ * FUNCTION   : hasGpioTorch
+ *
+ * DESCRIPTION: Whether the given camera's flash is the leds-gpio TORCH_EN LED
+ *              rather than an msm_flash subdev. Checks that the class device
+ *              is really there; a missing node means no torch is reported.
+ *
+ * PARAMETERS :
+ *   @camera_id : Camera id to query.
+ *
+ * RETURN     : true if the LED class device exists for this camera.
+ *==========================================================================*/
+bool QCameraFlash::hasGpioTorch(const int camera_id)
+{
+    if (camera_id != QCAMERA_GPIO_TORCH_CAMERA_ID) {
+        return false;
+    }
+
+    return access(kGpioTorchBrightness, F_OK) == 0;
+}
+
+/*===========================================================================
+ * FUNCTION   : setGpioTorchMode
+ *
+ * DESCRIPTION: Drive TORCH_EN through the LED class device.
+ *
+ * PARAMETERS :
+ *   @on      : Whether to turn the torch on (true) or off (false)
+ *
+ * RETURN     :
+ *   0        : success
+ *   -errno   : the write to the class device failed
+ *==========================================================================*/
+int32_t QCameraFlash::setGpioTorchMode(const bool on)
+{
+    int fd = open(kGpioTorchBrightness, O_WRONLY);
+    if (fd < 0) {
+        int32_t retVal = -errno;
+        ALOGE("%s: Unable to open '%s': %s",
+                __func__,
+                kGpioTorchBrightness,
+                strerror(errno));
+        return retVal;
+    }
+
+    char value[16];
+    int len = snprintf(value, sizeof(value), "%d\n",
+            on ? readGpioTorchMaxBrightness() : 0);
+    ssize_t written = write(fd, value, (size_t)len);
+    int32_t retVal = (written == (ssize_t)len) ? 0 : -errno;
+
+    if (retVal != 0) {
+        ALOGE("%s: Unable to write '%s' to '%s': %s",
+                __func__,
+                value,
+                kGpioTorchBrightness,
+                strerror(errno));
+    }
+
+    close(fd);
+    return retVal;
+}
 
 /*===========================================================================
  * FUNCTION   : getInstance
@@ -71,6 +182,7 @@ QCameraFlash::QCameraFlash() : m_callbacks(NULL)
 {
     memset(&m_flashOn, 0, sizeof(m_flashOn));
     memset(&m_cameraOpen, 0, sizeof(m_cameraOpen));
+    memset(&m_gpioTorch, 0, sizeof(m_gpioTorch));
     for (int pos = 0; pos < MM_CAMERA_MAX_NUM_SENSORS; pos++) {
         m_flashFds[pos] = -1;
     }
@@ -93,6 +205,11 @@ QCameraFlash::~QCameraFlash()
                 setFlashMode(pos, false);
                 close(m_flashFds[pos]);
                 m_flashFds[pos] = -1;
+            }
+        else if (m_gpioTorch[pos])
+            {
+                setFlashMode(pos, false);
+                m_gpioTorch[pos] = false;
             }
     }
 }
@@ -152,7 +269,12 @@ int32_t QCameraFlash::initFlash(const int camera_id)
             flashNode,
             sizeof(flashPath));
 
-    if (!hasFlash) {
+    /* No msm_flash subdev on this board, so fall back to the leds-gpio
+     * TORCH_EN device. See QCameraFlash.h.
+     */
+    bool gpioTorch = !hasFlash && hasGpioTorch(camera_id);
+
+    if (!hasFlash && !gpioTorch) {
         ALOGE("%s: No flash available for camera id: %d",
                 __func__,
                 camera_id);
@@ -162,6 +284,15 @@ int32_t QCameraFlash::initFlash(const int camera_id)
                 __func__,
                 camera_id);
         retVal = -EBUSY;
+    } else if (gpioTorch) {
+        /* The LED class device carries no per-client state, so there is no fd
+         * to hold and no CFG_FLASH_INIT equivalent to run. Record the backend
+         * so setFlashMode() and deinitFlash() take the sysfs path.
+         */
+        m_gpioTorch[camera_id] = true;
+        CDBG("%s: Using leds-gpio torch for camera id: %d",
+                __func__,
+                camera_id);
     } else if (m_flashFds[camera_id] >= 0) {
         CDBG("%s: Flash is already inited for camera id: %d",
                 __func__,
@@ -232,6 +363,10 @@ int32_t QCameraFlash::setFlashMode(const int camera_id, const bool mode)
                 camera_id,
                 mode);
         retVal = -EALREADY;
+    } else if (m_gpioTorch[camera_id]) {
+        retVal = setGpioTorchMode(mode);
+        if (retVal == 0)
+            m_flashOn[camera_id] = mode;
     } else if (m_flashFds[camera_id] < 0) {
         ALOGE("%s: called for uninited flash: %d", __func__, camera_id);
         retVal = -EINVAL;
@@ -274,6 +409,11 @@ int32_t QCameraFlash::deinitFlash(const int camera_id)
     if (camera_id < 0 || camera_id >= MM_CAMERA_MAX_NUM_SENSORS) {
         ALOGE("%s: Invalid camera id: %d", __func__, camera_id);
         retVal = -EINVAL;
+    } else if (m_gpioTorch[camera_id]) {
+        retVal = setFlashMode(camera_id, false);
+        if (retVal == -EALREADY)
+            retVal = 0;
+        m_gpioTorch[camera_id] = false;
     } else if (m_flashFds[camera_id] < 0) {
         ALOGE("%s: called deinitFlash for uninited flash", __func__);
         retVal = -EINVAL;
@@ -337,6 +477,12 @@ int32_t QCameraFlash::reserveFlashForCamera(const int camera_id)
                 hasFlash,
                 flashNode);
 
+        /* Without this the daemon's flash_available == 0 would suppress the
+         * status change, and the framework would keep offering a torch that
+         * the open camera has taken over.
+         */
+        hasFlash = hasFlash || hasGpioTorch(camera_id);
+
         if (m_callbacks == NULL ||
                 m_callbacks->torch_mode_status_change == NULL) {
             ALOGE("%s: Callback is not defined!", __func__);
@@ -393,6 +539,8 @@ int32_t QCameraFlash::releaseFlashFromCamera(const int camera_id)
         QCamera3HardwareInterface::getFlashInfo(camera_id,
                 hasFlash,
                 flashNode);
+
+        hasFlash = hasFlash || hasGpioTorch(camera_id);
 
         if (m_callbacks == NULL ||
                 m_callbacks->torch_mode_status_change == NULL) {

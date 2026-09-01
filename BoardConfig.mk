@@ -109,7 +109,8 @@ TARGET_USES_64_BIT_BINDER := true
 # (no .bt_nv.bin).
 BOARD_HAVE_BLUETOOTH := true
 BOARD_HAVE_BLUETOOTH_QCOM := true
-BOARD_HAVE_BLUETOOTH_BCM := false
+# Leave BCM unset. `:= false` is still non-empty, so hardware/broadcom/libbt
+# would still build and collide with QCA libbt-vendor.
 BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := $(DEVICE_PATH)/bluetooth
 BOARD_HAS_QCA_BT_ROME := true
 WCNSS_FILTER_USES_SIBS := true

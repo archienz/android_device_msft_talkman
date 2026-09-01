@@ -103,10 +103,10 @@ system/etc/permissions/rcsservice.xml
 system/etc/qcril.db
 system/etc/sap.conf
 system/etc/sysconfig/talkman_common.xml
-system/lib/libloc_api_v02.so
-system/lib/libloc_ds_api.so
-system/lib64/libloc_api_v02.so
-system/lib64/libloc_ds_api.so
+vendor/lib/libloc_api_v02.so
+vendor/lib/libloc_ds_api.so
+vendor/lib64/libloc_api_v02.so
+vendor/lib64/libloc_ds_api.so
 
 # Camera daemon, TZ, slim, wcnss, GPU/MBA/MPSS/widevine, vendor libs.
 vendor/bin/mm-qcamera-daemon
