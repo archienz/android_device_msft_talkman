@@ -42,6 +42,7 @@ Do not mark P0 Working without `out/qa-*` logs from the telephone. Do not invent
 | Write access | **archienz** only |
 | Community source | [Android4Lumia950/android_device_msft_talkman](https://github.com/Android4Lumia950/android_device_msft_talkman) |
 | Lunch target | `lineage_talkman-userdebug` (use `lunch`, not `breakfast`) |
+| Install procedure | [`docs/INSTALL.md`](docs/INSTALL.md) |
 
 Push personal work to **archienz**. Do not open pull requests on the community organization unless the owner asks.
 
@@ -96,28 +97,27 @@ Qi GPIOs match 4VM_08r: `wc-en` GPIO **2**, `wc-det` GPIO **14**.
 
 ---
 
-## Progress (2026-09-01)
+## Progress (2026-09-02)
 
 Source in Git is not a pass. A pass is a physical talkman log in `out/qa-*`.
 
-There is no LineageOS zip. There is no `out/qa-*` meter log. CCI scan never ran on the telephone. GPSTest never ran.
-
-`boot.img` and an unofficial zip exist on the Steam Deck build tree (`out/target/product/talkman/lineage-18.1-20260901-UNOFFICIAL-talkman.zip`). That is not a hardware pass.
-
-No P0 item is **Working**. Dual SIM RM-1118 is not this product. There is no `qcom,slave-id`. There is no `CONFIG_MSM_OIS`.
-
-The Microsoft service schematic is for implementation only. It is not published.
+Unofficial zip `lineage-18.1-20260901-UNOFFICIAL-talkman` is installed on one RM-1104. The telephone boots to the home screen. Procedure: [`docs/INSTALL.md`](docs/INSTALL.md). Capture: workspace `out/qa-pre-steamos-20260902/` (not in Git).
 
 Host: Steam Deck SteamOS, ext4 `/home/deck/android/los-18.1`. Do not `repo sync` onto NTFS.
 
-| ID | Subsystem | Status | What is in source | What is still missing |
+No P0 item is **Working**. Dual SIM RM-1118 is not this product. There is no `qcom,slave-id`. There is no `CONFIG_MSM_OIS`. CCI scan never ran (flashed DTB has no scan node).
+
+The Microsoft service schematic is for implementation only. It is not published.
+
+| ID | Subsystem | Status | What is on the telephone | What is still missing |
 |---|---|---|---|---|
-| P0.0 | Rebuild LOS 18.1 | Zip built | `lineage-18.1-20260901-UNOFFICIAL-talkman.zip` on the Steam Deck. CAF compile patches in `patches/` | Flash + `out/qa-*` logs |
-| P0.1 | Battery UI | Not Working | Fuel-gauge OCV+CC if pack ID does not match. Overlay capacity 3000 mAh. Kernel FG 3200/3500 (`91c0c0317c3`). Warning levels 15 / 5. Settings health reads `bms/charge_full*`. Dumpstate walks psy. No hardcoded 50% | `dumpsys battery` and USB-meter log on the telephone |
-| P0.2 | Charge | Not Working | Kernel driver sets cable 1800 mA and Qi 900 mA. Overlay strings say 5 V 1.8 A and Qi 900 mA. USB-C mux driver `mmo-usbc.c`. Kernel GPIO12 (`3068a345c0e`). No PD. No HVDCP | USB-meter proof that SoC increases |
-| P0.3 | GPS | Not Working | GNSS HIDL `impl.talkman`. SUPL 2.0. NTP `pool.ntp.org`. Packed installer `modem.img` (`dc847d5`) 70 MiB with MBA/MPSS. 0-SV locations are dropped | GPSTest log with `numSvs` more than 0 |
-| P0.4 | Camera | Not Working | DT name `mot_imx230`. XML CameraId 0. Clark 32-bit sensor libraries. Flash/torch PMI nodes. HAL1 props. LVS1 always-on, not a cam vreg. `cam_vio` is not in rear/front `qcom,cam-vreg-name`. Iris `camera@2` disabled. OIS `.kar` in COPY_FILES; `msm_ois` does not `request_firmware` | CCI scan on the telephone, JPEG still, OIS `.so` |
-| P2 | RIL | Deferred | Research notes only | Modem SMD |
+| P0.0 | Rebuild LOS 18.1 | Built and flashed | `lineage_talkman-userdebug` zip 2026-09-01. SteamOS ext4 `/home/deck/android/los-18.1` | Next bacon with camera DT + VINTF + no LifeTimer |
+| P0.1 | Battery UI | Not Working | `dumpsys battery` 66 percent, 4.030 V, 41 °C, Li-ion. Not 50 percent | USB-meter log |
+| P0.2 | Charge | Not Working | USB powered, ~500 mA in the log. No PD | USB-meter proof that SoC increases |
+| P0.3 | GPS | Not Working | GPSTest installed. `loc_eng_start`. 0 satellites. `ril-daemon` restarts | `numSvs` more than 0. MPSS online |
+| P0.4 | Camera | Not Working | XML `mot_imx230`. Daemon probes **imx377**. Snap crash `length=0`. GPIO torch works | Kernel DT `mot_imx230` in the **built** DTB, CCI scan, JPEG still |
+| — | Display / Wi-Fi / speaker | On this telephone | 1440×2560. QCA6174 factory MAC. Loudspeaker `STREAM_MUSIC` | Not P0 |
+| P2 | RIL | Deferred | `ril-daemon` exit 1 | Modem SMD |
 
 Keep QCamera2 MSMB `mot_imx230`. EpicLPer HAL1 “preview” is CSID test-generator, not live CSI. Do not ship TG.
 
@@ -126,6 +126,15 @@ Keep QCamera2 MSMB `mot_imx230`. EpicLPer HAL1 “preview” is CSID test-genera
 ## Changes
 
 This section is a description of the tree. It is not a procedure.
+
+### Install and first boot (2026-09-02)
+
+- Procedure: [`docs/INSTALL.md`](docs/INSTALL.md).
+- `manifest.xml` does not list health 2.1, power 1.0, or vibrator 1.0. Those HALs ship `vintf_fragments`. A duplicate list made `hwservicemanager` reject the device manifest (`HAL vibrator has a conflict`). SurfaceFlinger then aborted `gralloc-mapper is missing` (black screen).
+- Do not package `LifeTimerService`. The APK is a bullhead leftover. PackageManager whitelist crash loops `system_server`.
+- Snap `CameraLauncher` is disabled when the HAL has 0 cameras. That hides the icon. The crash is `PhotoModule.initializeFocusManager` index 0 on an empty list.
+- Lights HIDL must write **only** `led:flash_torch` (GPIO 12). A write to `led:torch_0` can light the red indicator. The QS tile uses CameraManager, not this sysfs.
+- Flashed DTB has `qcom,camera@0` and no `mot_imx230`. Userspace XML is `mot_imx230`. Kernel match_id is **imx377**.
 
 ### Battery and charge
 
@@ -219,7 +228,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - Overlay telephony `config_msim` is false (`f1b93a2`). Single SIM. No rild. Dual SIM is not this product.
 - `dataservices` leftover is `librmnetctl` / `rmnetcli` for MSM8992 `rmnet_data`. It is not rild.
 - `BoardConfig` leftover is QCA BT (no BCM). `BOARD_USB_CONFIGFS` is false. No FPC (`5f1d786`).
-- GNSS leftover does not put a stock AOSP impl VINTF on the HIDL package (`903abd6`). VINTF leftover lists GNSS + vibrator + camera.provider. No radio. No FPC (`55b29f2`).
+- GNSS leftover does not put a stock AOSP impl VINTF on the HIDL package (`903abd6`). `manifest.xml` lists GNSS and camera.provider. Health, power, and vibrator are `vintf_fragments` only. No radio. No FPC (`55b29f2`).
 - Vibrator HIDL 1.0 `android.hardware.vibrator@1.0-service.talkman` writes qpnp-haptic `timed_output`. It is not the AOSP passthrough impl.
 - QCOM `time_genoff` MATCH MSM8992 (`565f425`: ATS_DRM, ATS_TOD_MODEM).
 - Kernel USB-C leftover is iCE5LP2K + HD3SS460 UFP mux. No PD (`2c5bf855dfd`).
