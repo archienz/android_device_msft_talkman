@@ -281,7 +281,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/rootdir/etc/init.qcom.devwait.sh:$(TARGET_COPY_OUT_VENDOR)/bin/init.qcom.devwait.sh \
     $(LOCAL_PATH)/rootdir/etc/init.qcom.devstart.sh:$(TARGET_COPY_OUT_VENDOR)/bin/init.qcom.devstart.sh \
-    $(LOCAL_PATH)/recovery.fstab:recovery/root/etc/recovery.fstab
+    $(LOCAL_PATH)/recovery.fstab:recovery/root/system/etc/recovery.fstab
 
 
 ifeq ($(TARGET_BUILD_VARIANT),user)
