@@ -13,13 +13,10 @@ on boot
     setprop debug.nfc.fw_download true
     setprop debug.nfc.fw_boot_download false
 
-on device-added-/dev/pn547
-    chmod 0660 /dev/pn547
-    chown nfc nfc /dev/pn547
-    restorecon /dev/pn547
-    symlink /dev/pn547 /dev/pn54x
-    chmod 0660 /dev/pn54x
-    chown nfc nfc /dev/pn54x
+# Android 11 host_init_verifier rejects '/' in trigger names, so
+# `on device-added-/dev/pn547` cannot be used. Permissions for /dev/pn547
+# are in ueventd.talkman.rc (0660 nfc nfc). The on boot stanza above
+# creates the /dev/pn54x symlink the HAL still opens.
 
 on post-fs-data
     mkdir /data/nfc 0770 nfc nfc
