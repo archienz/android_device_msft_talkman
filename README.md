@@ -43,8 +43,10 @@ Do not mark P0 Working without `out/qa-*` logs from the telephone. Do not invent
 | Community source | [Android4Lumia950/android_device_msft_talkman](https://github.com/Android4Lumia950/android_device_msft_talkman) |
 | Lunch target | `lineage_talkman-userdebug` (use `lunch`, not `breakfast`) |
 | Install procedure | [`docs/INSTALL.md`](docs/INSTALL.md) |
+| GitHub Pages | https://archienz.github.io/android_device_msft_talkman/ (`docs/` on this branch) |
+| Pages install | https://archienz.github.io/android_device_msft_talkman/INSTALL.html |
 
-Push personal work to **archienz**. Do not open pull requests on the community organization unless the owner asks.
+Push personal work to **archienz**. Do not open pull requests on the community organization unless the owner asks. Do not push to `Android4Lumia950/Android4Lumia950.github.io`.
 
 ### Git author mistake (apology)
 
@@ -101,7 +103,7 @@ Qi GPIOs match 4VM_08r: `wc-en` GPIO **2**, `wc-det` GPIO **14**.
 
 Source in Git is not a pass. A pass is a physical talkman log in `out/qa-*`.
 
-Unofficial zip `lineage-18.1-20260901-UNOFFICIAL-talkman` is installed on one RM-1104. The telephone boots to the home screen. Procedure: [`docs/INSTALL.md`](docs/INSTALL.md). Capture: workspace `out/qa-pre-steamos-20260902/` (not in Git).
+Unofficial zip `lineage-18.1-20260901-UNOFFICIAL-talkman` is installed on one RM-1104. The telephone boots to the home screen. Procedure (steps that worked, failures, reproduce, Pages update): [`docs/INSTALL.md`](docs/INSTALL.md) and https://archienz.github.io/android_device_msft_talkman/INSTALL.html. Capture: workspace `out/qa-pre-steamos-20260902/` (not in Git).
 
 Host: Steam Deck SteamOS, ext4 `/home/deck/android/los-18.1`. Do not `repo sync` onto NTFS.
 
@@ -129,7 +131,7 @@ This section is a description of the tree. It is not a procedure.
 
 ### Install and first boot (2026-09-02)
 
-- Procedure: [`docs/INSTALL.md`](docs/INSTALL.md).
+- Procedure: [`docs/INSTALL.md`](docs/INSTALL.md). Pages: https://archienz.github.io/android_device_msft_talkman/INSTALL.html. How to update Pages is in that file.
 - `manifest.xml` does not list health 2.1, power 1.0, or vibrator 1.0. Those HALs ship `vintf_fragments`. A duplicate list made `hwservicemanager` reject the device manifest (`HAL vibrator has a conflict`). SurfaceFlinger then aborted `gralloc-mapper is missing` (black screen).
 - Do not package `LifeTimerService`. The APK is a bullhead leftover. PackageManager whitelist crash loops `system_server`.
 - Snap `CameraLauncher` is disabled when the HAL has 0 cameras. That hides the icon. The crash is `PhotoModule.initializeFocusManager` index 0 on an empty list.
