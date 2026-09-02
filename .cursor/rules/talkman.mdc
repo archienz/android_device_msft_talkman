@@ -1,0 +1,16 @@
+---
+description: Talkman (Lumia 950 RM-1104) Lineage 18.1 — product, remotes, never-sim
+alwaysApply: true
+---
+
+# Talkman
+
+- Product: **Lumia 950 RM-1104**, board **4VM_08r**, SoC **MSM8992**. Lunch: `lineage_talkman-userdebug`.
+- Dual-SIM **RM-1118 / 4VM_08d** is out of scope.
+- Build tree: ext4 `/home/deck/android/los-18.1`. Do not `repo sync` onto NTFS D Drive.
+- **Never sim**: no stub HALs, no fake 50% battery, no black camera, no invented `qcom,slave-id`, no `CONFIG_MSM_OIS`, no MTP GPIO 91/92 as camera reset, no CSID test-generator.
+- Git author: **archienz** `<archienz@users.noreply.github.com>`. Push **github/archienz** only. Never `git push origin` (Android4Lumia950) unless the owner asks.
+- Device branch: `lineage-18.1-talkman-hw`. Kernel fork: archienz/android_kernel_mmo_msm8994 `lineage-18.1-talkman`.
+- README: Purpose/Progress/Changes. Details in `changes.md`. Do not publish the Microsoft schematic.
+- Flash: **boot only**, LK2ND `18D1:D00D`. Not EDL. Strings `mot_imx230` and `talkman-cci-scan`. Do not wipe userdata.
+- Rear camera: IMX230 CCI1 write 0x20 chip 0x0230, CSI `0x0423`, mount-angle 90. AF is BU24210 at write 0x7c — do not bind lc898212xd.
