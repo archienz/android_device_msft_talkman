@@ -63,7 +63,17 @@ for mk in sorted(mk_dir.glob("talkman-*.mk")):
             copy_dests.add(dest.rstrip("\\").strip())
 
 listed_set = set(listed)
-missing = sorted(copy_dests - listed_set)
+
+# Dests installed from a blob that is already listed, under a second name.
+# No dump contains these paths, so proprietary-files.txt (a dump manifest that
+# extract-files.sh feeds straight to adb pull) must not list them.
+derived = {
+    # sensor_init_probe() in libmmcamera2_sensor_modules.so only dlopen()s
+    # libmmcamera_<name>.so for names in a list compiled into that blob, and
+    # "mot_imx230" is not one of them. See talkman-camera-xml.mk.
+    "vendor/lib/libmmcamera_imx230.so",
+}
+missing = sorted(copy_dests - listed_set - derived)
 extra = sorted(listed_set - copy_dests)
 banned = [p for p in listed if re.search(
     r"imx377|ov5693|nanohub|omadm|activity\.napp|fpctzappfingerprint", p, re.I)]

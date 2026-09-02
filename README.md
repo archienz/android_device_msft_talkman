@@ -117,7 +117,7 @@ The Microsoft service schematic is for implementation only. It is not published.
 | P0.1 | Battery UI | Not Working | `dumpsys battery` 66 percent, 4.030 V, 41 °C, Li-ion. Not 50 percent | USB-meter log |
 | P0.2 | Charge | Not Working | USB powered, ~500 mA in the log. No PD | USB-meter proof that SoC increases |
 | P0.3 | GPS | Not Working | GPSTest installed. `loc_eng_start`. 0 satellites. `ril-daemon` restarts | `numSvs` more than 0. MPSS online |
-| P0.4 | Camera | Not Working | XML `mot_imx230`. Daemon probes **imx377**. Snap crash `length=0`. GPIO torch works | Kernel DT `mot_imx230` in the **built** DTB, CCI scan, JPEG still |
+| P0.4 | Camera | Not Working | Daemon now probes **`mot_imx230`** only (was imx377). `msm_sensor_match_id: mot_imx230: read id failed`, CCI MASTER_1 no ACK. 0 devices. GPIO torch works | CCI ACK of Sony `0x0230` on the bus `qcom,camera@0` uses, then JPEG |
 | — | Display / Wi-Fi / speaker | On this telephone | 1440×2560. QCA6174 factory MAC. Loudspeaker `STREAM_MUSIC` | Not P0 |
 | P2 | RIL | Deferred | `ril-daemon` exit 1 | Modem SMD |
 
@@ -136,7 +136,22 @@ This section is a description of the tree. It is not a procedure.
 - Do not package `LifeTimerService`. The APK is a bullhead leftover. PackageManager whitelist crash loops `system_server`.
 - Snap `CameraLauncher` is disabled when the HAL has 0 cameras. That hides the icon. The crash is `PhotoModule.initializeFocusManager` index 0 on an empty list.
 - Lights HIDL must write **only** `led:flash_torch` (GPIO 12). A write to `led:torch_0` can light the red indicator. The QS tile uses CameraManager, not this sysfs.
-- Flashed DTB has `qcom,camera@0` and no `mot_imx230`. Userspace XML is `mot_imx230`. Kernel match_id is **imx377**.
+- The daemon probed **imx377** while the XML said `mot_imx230` because
+  `sensor_init_probe()` in `libmmcamera2_sensor_modules.so` does not read the XML.
+  It walks a sensor list compiled into that blob (`imx214`, `imx230`, `s5k3m2xx`,
+  `imx377`, `s5k3m2xm`, `ov4688`, `imx258`, `ov5693`) and opens
+  `vendor/lib/libmmcamera_<name>.so` for each. Only `libmmcamera_imx377.so` and
+  `libmmcamera_ov5693.so` were on the image, so only those two probed, and
+  `libmmcamera_mot_imx230.so` was never opened. The XML is read later, to match a
+  sensor the kernel already accepted.
+- Fix: drop the two bullhead sensor libraries and install the Clark library a
+  second time as `libmmcamera_imx230.so`. The probe name comes from the file name,
+  but the name that goes to the kernel comes from `sensor_slave_info` in the
+  library, so the `imx230` slot probes as `mot_imx230`. Measured on the telephone
+  2026-09-02: one probe, `msm_sensor_match_id: mot_imx230`, no imx377 and no ov5693.
+- `/data/sensor/<name>/libmmcamera_<name>.so` is an external-sensor path in the
+  same blob. It is a diagnostic only. Do not ship it: `/data` is late and the
+  camera domain has no policy for it.
 
 ### Battery and charge
 
@@ -206,7 +221,11 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - Overlay leftover also sets `config_showNavigationBar` true, `config_hasRecents` true, `config_navBarInteractionMode` 0, and `config_swipe_up_gesture_setting_available` true. That is software 3-button. There is no capacitive APP_SWITCH.
 - Overlay leftover also sets `config_cellBroadcastAppLinks` true. Intrusive notification LED is true. Default LED color is white. LED on is 1000 ms. LED off is 4000 ms. Intrusive battery LED is true. Multi-color battery LED is true. Safe media volume index is 5.
 - Overlay leftover also sets BLE peripheral true. Max scan filters is 1. Max advertisers is 4. Bluetooth operating voltage is 3300 mV. HFP inband ringing is true. Headset jack uses `/dev/input/event` (`config_useDevInputEventForAudioJack`). There is no generated MAC.
-- Vendor COPY_FILES has no IMX377.
+- Vendor COPY_FILES has no IMX377 and no OV5693. It also has no
+  `libactuator_lc898212xd*.so` and no `brcb032gwz` / `m24c64s` eeprom: those are
+  bullhead and no library on this image names them. `libmmcamera_mot_imx230.so`
+  asks for `mot_lc898212xd`, and no dump has that actuator, so the XML keeps no
+  `ActuatorName`.
 - lk2nd talkman DTS: `qcom,board-id = <26 0>` and `qcom,msm-id` `0x0001001a`. That is not a CCI slave-id.
 - Workspace `tools/cci_scan/Android.mk` builds `/system/bin/cci_scan`. The binary does not contain slave addresses.
 - Lineage `BUILD_FINGERPRINT` is `Microsoft/talkman/talkman:11/RQ3A.211001.001/1:user/release-keys` (`44cb3c5`).
@@ -220,7 +239,13 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - Mixer speaker path is QUAT_MI2S (TAS2553). Speaker-prot ACDB IDs are **14**. WCD SPK DRV is not wired.
 - `init.talkman.bt.sh` leftover is QCA6174 persist `/persist/bdaddr.txt` or controller OTP. No generated MAC (`0d7a854`).
 - `init.talkman.power.sh` leftover takes A57 offline then plugins cpu4/cpu5. Permanent offline is charger-only (`d2c43fb`).
-- `extract-files.sh` dests match COPY_FILES. 32-bit `mot_imx230` and bu24210 `.kar` only. Banned dests: IMX377, OV5693, nanohub, OMADM, LGE entitlement, LifeTimer.
+- `extract-files.sh` dests match COPY_FILES. 32-bit `mot_imx230` and bu24210 `.kar` only. Banned dests: IMX377, OV5693, `libactuator_lc898212xd`, brcb032gwz, m24c64s, nanohub, OMADM, LGE entitlement, LifeTimer.
+- `libgoog_eis_armeabi-v7a.so` and `libgoog_rownr.so` are **not** banned. They are
+  `dlopen()` names in `libmmcamera2_imglib_modules.so` and `libmmcamera_imglib.so`,
+  both of which ship, and `vendor.prop` sets `persist.camera.eis.enable=1`.
+- `libmmcamera_imx230.so` is a second install of `libmmcamera_mot_imx230.so`, not a
+  dump path. `setup-makefiles.sh` keeps it in a `derived` set, so
+  `proprietary-files.txt` stays a pure dump manifest for `extract-files.sh`.
 - WCNSS `wifi/WCNSS_qcom_cfg.ini` is QCA6174 2×2 (`gEnable2x2=1`, `gNumRxAnt=2`). No 11ax, no 6 GHz, no WPA3/SAE ini keys. MAC is not in this ini.
 - Kernel `wlan.dtsi` is QCA6174 CNSS on PCIe0. The DT does not contain a MAC address.
 - `init.talkman.usb.rc` is `g_android` sysfs. `sys.usb.configfs=0`. `BoardConfig` `androidboot.usbconfigfs=0`. No `/config/usb_gadget`. Default `persist.sys.usb.config=adb`.

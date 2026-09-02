@@ -17,8 +17,11 @@
 # Consumed by extract-files.sh. Same dests as proprietary-blobs.txt.
 # Leftover blob names dropped (not listed, extract-files.sh refuses dump):
 # imx377 / ov5693 chromatix, nanohub napp, FPC, OMADM dests, leftover LGE
-# acdb / entitlement / LifeTimer / libsensor_lge_cal, lc898212xd, VL6180,
-# bullhead privapp source. mot_imx230 is vendor/lib (32-bit CAMSS) only.
+# acdb / entitlement / LifeTimer / libsensor_lge_cal, libactuator_lc898212xd,
+# brcb032gwz + m24c64s eeprom, VL6180, bullhead privapp source.
+# mot_imx230 is vendor/lib (32-bit CAMSS) only, and is installed twice: also as
+# libmmcamera_imx230.so, the only rear name libmmcamera2_sensor_modules.so will
+# dlopen. See vendor/msft/talkman/talkman-camera-xml.mk.
 
 # Rear IMX230 — Motorola clark MSM8992 donor (CAMSS VFE44, mot_imx230).
 vendor/lib/libmmcamera_mot_imx230.so
@@ -99,7 +102,9 @@ system/etc/flp.conf
 system/etc/izat.conf
 system/etc/lowi.conf
 system/etc/permissions/cneapiclient.xml
-system/etc/permissions/privapp-permissions-talkman.xml
+# privapp-permissions-talkman.xml is not a dump dest: device.mk installs
+# configs/privapp-permissions-talkman.xml, which drops the bullhead LGE
+# entitlement grants. extract-files.sh refuses the dump copy.
 system/etc/permissions/qcrilhook.xml
 system/etc/permissions/qti_permissions.xml
 system/etc/permissions/rcsservice.xml
@@ -260,6 +265,10 @@ vendor/lib/libmmcamera_eeprom_util.so
 vendor/lib/libmmcamera_eztune_module.so
 vendor/lib/libmmcamera_faceproc.so
 vendor/lib/libmmcamera_imglib.so
+# dlopen()d by name from libmmcamera_imglib.so and libmmcamera2_imglib_modules.so
+# above, and vendor.prop sets persist.camera.eis.enable=1.
+vendor/lib/libgoog_rownr.so
+vendor/lib/libgoog_eis_armeabi-v7a.so
 vendor/lib/libmmcamera_isp_abcc44.so
 vendor/lib/libmmcamera_isp_abf44.so
 vendor/lib/libmmcamera_isp_bcc44.so

@@ -33,7 +33,7 @@ The telephone boots LineageOS 18.1 to the home screen. Identity on this telephon
 | Battery UI | `dumpsys battery` live percent and voltage. Not 50% | **Not Working** (no USB-meter pass) |
 | Charge | USB ~500 mA in the log. No PD | **Not Working** |
 | GPS | `loc_eng_start`. 0 satellites. `ril-daemon` restarts. MPSS offline | **Not Working** |
-| Camera | Snap APK is present. Icon was hidden. Open then crash. HAL probes **imx377**. 0 devices | **Not Working** |
+| Camera | Snap APK is present. Icon was hidden. Open then crash. HAL now probes **`mot_imx230`** only, but CCI gives no ACK. 0 devices | **Not Working** |
 | QS flashlight | Text "camera in use" | GPIO torch `led:flash_torch` works. Tile uses CameraManager |
 | RIL | `ril-daemon` exit 1 | P2 |
 
@@ -355,7 +355,34 @@ ArrayIndexOutOfBoundsException: length=0; index=0
 PhotoModule.initializeFocusManager
 ```
 
-Daemon: `msm_sensor_match_id: imx377: read id failed`. CCI MASTER_1 error. Probe failed ov5693 / ov4688 / imx258 / s5k3m2xm. Userspace XML `SensorName mot_imx230` + `libmmcamera_mot_imx230.so`. Flashed DTB has `qcom,camera@0` / `@1` / `@2` and **no** `mot_imx230` and **no** talkman-cci-scan. Kernel match_id is bullhead **imx377**. Do not invent `qcom,slave-id`. Do not ship a stub camera. Next: rebuild `boot.img` on SteamOS with `talkman-camera.dtsi`, flash boot only, then CCI scan.
+The daemon probed bullhead **imx377**, not the XML name, because
+`sensor_init_probe()` in `libmmcamera2_sensor_modules.so` never reads the XML. It
+walks a sensor list compiled into that blob — `imx214`, `imx230`, `s5k3m2xx`,
+`imx377`, `s5k3m2xm`, `ov4688`, `imx258`, `ov5693` — and opens
+`/vendor/lib/libmmcamera_<name>.so` for each one. `mot_imx230` is not in that list,
+so the Clark library was never opened, and the only two libraries on the image were
+the leftover `libmmcamera_imx377.so` and `libmmcamera_ov5693.so`.
+
+Fix (2026-09-02): the two leftovers are no longer packaged, and
+`libmmcamera_mot_imx230.so` is installed a second time as `libmmcamera_imx230.so`
+so the `imx230` slot finds it. The probe name comes from the file name, but the
+sensor name that reaches the kernel comes from `sensor_slave_info` inside the
+library, so the slot still probes as `mot_imx230`. This is the real Clark library
+under a second name, not a stub.
+
+Measured on the telephone after the change:
+
+```
+sensor_probe:323[imx230]probe failed.
+msm_sensor_match_id: mot_imx230: read id failed
+msm_cci_irq:1090 MASTER_1 error 0x40000000
+```
+
+One probe, and it is the XML name. No imx377 and no ov5693. Still 0 devices: the
+sensor does not answer on the CCI master that `qcom,camera@0` uses. That is a
+kernel DT / pinctrl question, not a blob question. Do not invent
+`qcom,slave-id`. Do not ship a stub camera. Next: a CCI ACK of Sony `0x0230` on
+the bus the rear node uses.
 
 ### 13. Enter TWRP after Android is installed
 

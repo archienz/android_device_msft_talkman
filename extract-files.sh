@@ -9,8 +9,18 @@
 #
 # Dump layout: system/, vendor/, product/ as on-device (or AOSP out).
 # Refuses leftover dump dests even if the dump has them: imx377 / ov5693 /
-# nanohub / FPC / OMADM / LGE entitlement / libsensor_lge_cal / lc898212xd /
-# bullhead privapp. mot_imx230 dests are vendor/lib only (32-bit).
+# nanohub / FPC / OMADM / LGE entitlement / libsensor_lge_cal /
+# libactuator_lc898212xd / bullhead privapp. mot_imx230 dests are vendor/lib
+# only (32-bit).
+#
+# The ban is on libactuator_lc898212xd, not on lc898212xd: libmmcamera_mot_imx230.so
+# names its actuator "mot_lc898212xd", so a clark libactuator_mot_lc898212xd.so
+# is wanted if a dump ever has one. The bare libactuator_lc898212xd*.so trio is
+# bullhead's and nothing on this image names it.
+# libgoog_eis_armeabi-v7a.so and libgoog_rownr.so are NOT banned: they are
+# literal dlopen() names in libmmcamera2_imglib_modules.so and
+# libmmcamera_imglib.so, both of which ship, and vendor.prop sets
+# persist.camera.eis.enable=1.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -32,7 +42,7 @@ LIST="${MY_DIR}/proprietary-files.txt"
 
 SRC="${1:-}"
 
-BANNED='imx377|ov5693|nanohub|activity\.napp|double_twist\.napp|pickup_gesture\.napp|sig_motion\.napp|napp_list\.cfg|fpctzappfingerprint|fingerprint\.bullhead|lib_fpc_tac_shared|context_hub\.default|omadm|OMADM|DCMO|DMConfigUpdate|com\.android\.omadm|whitelist_com\.android\.omadm|entitlement|com\.lge\.entitlement|LifeTimer|lib64/libmmcamera_mot_imx230|lib64/libchromatix_mot_imx230|libsensor_lge_cal|sensors\.qcom|sensors\.ssc|lc898212xd|brcb032gwz|m24c64s|libgoog_eis|libgoog_rownr|experimental2016|tof\.vl6180|activity_recognition|privapp-permissions-bullhead'
+BANNED='imx377|ov5693|nanohub|activity\.napp|double_twist\.napp|pickup_gesture\.napp|sig_motion\.napp|napp_list\.cfg|fpctzappfingerprint|fingerprint\.bullhead|lib_fpc_tac_shared|context_hub\.default|omadm|OMADM|DCMO|DMConfigUpdate|com\.android\.omadm|whitelist_com\.android\.omadm|entitlement|com\.lge\.entitlement|LifeTimer|lib64/libmmcamera_mot_imx230|lib64/libchromatix_mot_imx230|libsensor_lge_cal|sensors\.qcom|sensors\.ssc|libactuator_lc898212xd|brcb032gwz|m24c64s|experimental2016|tof\.vl6180|activity_recognition|privapp-permissions-bullhead'
 
 if [[ ! -f "${LIST}" ]]; then
   echo "missing ${LIST}" >&2
