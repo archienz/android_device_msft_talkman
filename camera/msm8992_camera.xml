@@ -1,8 +1,8 @@
 <!--
   mm-qcamera-daemon sensor list for talkman (MSM8992).
   CameraId 0 SensorName mot_imx230 -> libmmcamera_mot_imx230.so (clark MSM8992).
-  4-lane CSI: LaneMask 0x1F LaneAssign 0x4320 (CAF 80-NU323-2 MSM8992;
-  talkman-camera.dtsi qcom,csi-lane-mask / qcom,csi-lane-assign).
+  4-lane CSI: LaneMask 0x1F LaneAssign 0x0423 (RM-1104 CSI0 LN2/LN1/LN3/LN0).
+  MountAngle 90: HAL1 reported 0 with 360 (360 % 360). Rear phones use 90.
   No CameraId 1: front SMIA die unnamed (not ov5693, not imx230).
   No ActuatorName / OisName / FlashName / EepromName: VCM unknown,
   no libmmcamera_ois_bu24210, flash is not sky81296, NVM is Nokia DCC.
@@ -15,11 +15,11 @@
     <ChromatixName>mot_imx230_chromatix</ChromatixName>
     <ModesSupported>1</ModesSupported>
     <Position>BACK</Position>
-    <MountAngle>360</MountAngle>
+    <MountAngle>90</MountAngle>
     <CSIInfo>
       <CSIDCore>0</CSIDCore>
       <LaneMask>0x1F</LaneMask>
-      <LaneAssign>0x4320</LaneAssign>
+      <LaneAssign>0x0423</LaneAssign>
       <ComboMode>0</ComboMode>
     </CSIInfo>
     <LensInfo>

@@ -56,6 +56,18 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - Framework overlay `config_gpsParameters` matches that file: SUPL 2.0 MSB, NTP `pool.ntp.org`, XTRA `xtra3grc.bin`. There is no `GPS_LOCK`. There is no MSA.
 - Vendor `sap.conf` (`e65e4b2`) uses NDK names ICM-206xx Accelerometer / Gyroscope, AK09912 Magnetometer, ZPA2326 Pressure / Temperature. `SENSOR_PROVIDER=2`. Not nanohub. Not SSC.
 
+### Camera (2026-09-02, rear live preview)
+
+- Kernel `#28` on this telephone (boot-only flash). `mot_imx230` probe succeeds.
+  Snap shows a moving preview. Stills land in DCIM.
+- CSI lane map is board-specific: `qcom,csi-lane-assign = <0x0423>` (IMX230
+  DL0..DL3 to CSI0 LN2/LN1/LN3/LN0). Clark blob `0x4320` made CSID count
+  packets with ECC errors and no VFE frame. XML `LaneAssign` matches 0x0423.
+- 20nm CSIPHY MISC1 is stock CAF (`00/04/28/18/08`).
+- HAL1 dumpsys `Orientation: 0` because XML/DT `MountAngle` was **360**.
+  Rear module is **90**. XML and DT updated. Open Snap after cameraserver restart.
+- Front SMIA is still not a CameraId. AF / OIS not started. No FlashName.
+
 ### Camera (2026-09-02, after first boot)
 
 - CCI scan on the telephone: rear CSI0 / CCI **master 1** ACK write **0x20**,
