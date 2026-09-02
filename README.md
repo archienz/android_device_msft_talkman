@@ -108,16 +108,16 @@ Unofficial zip `lineage-18.1-20260901-UNOFFICIAL-talkman` is installed on one RM
 
 Host: Steam Deck SteamOS, ext4 `/home/deck/android/los-18.1`. Do not `repo sync` onto NTFS.
 
-P0.1 Battery UI and P0.2 USB cable charge are **Working on this telephone**. P0.4 rear camera **live preview and stills** are on this telephone (kernel `#28`, 2026-09-02). GPS is not. Dual SIM RM-1118 is not this product. There is no `CONFIG_MSM_OIS`. The Microsoft service schematic is for implementation only. It is not published.
+P0.1 Battery UI and P0.2 USB cable charge are **Working on this telephone**. P0.4 rear camera **live preview and stills** are on this telephone (kernel `#29`). Quick Settings flashlight is **Working on this telephone**. GPS is not. Dual SIM RM-1118 is not this product. There is no `CONFIG_MSM_OIS`. The Microsoft service schematic is for implementation only. It is not published.
 
 | ID | Subsystem | Status | What is on the telephone | What is still missing |
 |---|---|---|---|---|
-| P0.0 | Rebuild LOS 18.1 | Built and flashed | `lineage_talkman-userdebug` zip 2026-09-01. Later **boot-only** flashes. Kernel `#28` 2026-09-02 17:13 AEST | Next bacon for vendor/system |
+| P0.0 | Rebuild LOS 18.1 | Built and flashed | `lineage_talkman-userdebug` zip 2026-09-01. Later **boot-only** flashes. Kernel `#29` 2026-09-02 17:33 AEST | Next bacon for vendor/system (carries flashlight HAL) |
 | P0.1 | Battery UI | Working on this telephone | `dumpsys battery` live percent and voltage. Not 50 percent | — |
 | P0.2 | Charge | Working on this telephone (USB cable) | USB `online`, SDP 5 V / 500 mA, `charging_enabled`, status Full. No PD | Qi pad not tested. `bms/charge_full` is still a bad health value |
 | P0.3 | GPS | Not Working | GPSTest empty. `loc_eng_start`. 0 satellites. Modem OFFLINE | `numSvs` more than 0. MPSS online |
-| P0.4 | Camera | Working on this telephone (rear preview and stills) | HAL **1** CameraId 0. Probe `mot_imx230`. CCI1 write **0x20** chip **0x0230**. CSI lane map **0x0423**. Snap live view and DCIM stills. CSIPHY stock MISC1 | HAL reported Orientation **0** (`MountAngle` 360). Fix is 90. Front camera not listed. AF / OIS not started |
-| — | Display / Wi-Fi / speaker / GPIO torch | On this telephone | 1440×2560. QCA6174. Loudspeaker. `led:flash_torch` GPIO 12. Quick Settings flashlight through camera HAL `set_torch_mode` (`out/qa-torch-20260902/`) | Not P0 |
+| P0.4 | Camera | Working on this telephone (rear preview and stills) | HAL **1** CameraId 0. Probe `mot_imx230`. CCI1 write **0x20** chip **0x0230**. CSI lane map **0x0423**. Mount-angle **90**. Snap live view and DCIM stills | Front camera not listed. AF / OIS not started. No photo strobe |
+| — | Display / Wi-Fi / speaker / flashlight | Working on this telephone (QS torch) | 1440×2560. QCA6174. Loudspeaker. QS flashlight → HAL `set_torch_mode` → GPIO 12 `led:flash_torch` (`out/qa-torch-20260902/`). Owner confirmed 2026-09-02. Snap open turns the lamp off | Photo strobe (`flash_0`) not wired. Not P0 |
 | P2 | RIL | Deferred | `ril-daemon` exit 1 | Modem SMD |
 
 Keep QCamera2 MSMB `mot_imx230`. Do not ship CSID test-generator as camera. Rear CSI data lanes on RM-1104 are CSI0 LN2/LN1/LN3/LN0 (`qcom,csi-lane-assign = <0x0423>`), not Clark `0x4320`.
