@@ -4,6 +4,18 @@ This file is a description of the tree. It is not a procedure.
 
 Purpose, Progress, and battery differences compared to the community repository stay in [`README.md`](README.md).
 
+### Kernel boot-only items (2026-09-02, kernel `2b59cf6d3f6`, not yet on the telephone)
+
+These live in `android_kernel_mmo_msm8994` and need only a `boot.img` flash. None is measured yet.
+
+- Modem: stock `msm8992.dtsi` marks the APPS↔MODEM SMD edge `qcom,not-loadable`. Then `smd_edge_to_pil_str()` is NULL and nothing in the kernel calls `subsystem_get("modem")`; only the QMI peripheral-manager vote from `rild` boots MSS. `common/talkman-modem.dtsi` deletes that flag, so the first `smd_pkt` open (qmuxd on `DATA5_CNTL`, retried every second) runs `pil_boot("modem")`. `firmware_class.c` `fw_path` has `/firmware/image` (the GPT modem partition from `fstab.talkman`), where `mba.b00`, `mba.mbn`, `modem.mdt` are. The IPC-router XPRT keeps `qcom,disable-pil-loading`: it probes before `/firmware` is mounted and does not retry. Success is `pil-q6v5-mss` / `subsys-restart: modem ONLINE` in `dmesg` and GPS `numSvs` > 0. A TZ reject shows as `pil-q6v5-mss ... error` on the same boot.
+- Qi: PM8994 GPIO **2** (`WLC_EN`) and GPIO **14** (`WLC_DET`) are digital inputs, no pull. The receiver `EN` polarity is not on the drawing and the telephone Qi-charges with the AP off, so `WLC_EN` stays at the receiver default. Read `/sys/kernel/debug/qpnp_pin/pm8994-gpio/2` and `14` and `power_supply/dc/present` on a pad before any output is driven.
+- USB-C `common/usbc.dtsi` (PMI8994 GPIO 5 VBUS switch, GPIO 8/9/10 HD3SS460) is committed; `msm8992-chi.dtsi` at HEAD already included it. No PD.
+- Camera pinctrl `cam_sensor_front_rst_*` (GPIO 104) and `cam_sensor_iris_*` (GPIO 102), LVS1 always-on, L25 init 1.15 V, torch label `led:flash_torch`, TAS2552 PGA 11 dB are committed (were working-tree only).
+- `talkman-cci-scan`: the front sweep now releases `CAM_FRONT_RES_N` (GPIO 104) after L17 + MCLK2. A sensor in reset never ACKs; that is why the front half of every scan was empty. New debugfs `power` (`rear` / `front` / `off`, holds rails + MCLK + CCI INIT) and `i2c` (`r|w <master> <sid7> <reg> [val] [alen] [dlen]`). This is the tool for the BU24210 at write `0x7c` (sid `0x3e`, L23 VAF on): the `.kar` header byte 4 is `0x7c`, and Rohm publishes no BU24210 register map, so a lens move needs a register found on the telephone, not a guessed one. No `qcom,actuator` node: CAF `msm_actuator` takes the slave address from the userspace actuator library, so a node without `ActuatorName` does nothing. No `lc898212xd`, no `CONFIG_MSM_OIS`.
+- `cpu-boost`: on `mmo,talkman` the kernel defaults are `input_boost_ms` 1500, `input_boost_freq` 0-3:960000 4-5:1248000, `sched_boost_on_input`. Same values as `init.talkman.power.sh` / `powerhint.xml`. KGSL `qcom,initial-pwrlevel` was already 4 (300 MHz).
+- Touch: the `synaptics,rmi4` driver never writes F01 `report_rate`; the panel firmware default stands. No kernel register raises it. Measure with `getevent -t` before changing anything.
+
 ### Quick Settings flashlight (2026-09-02)
 
 - Measured on the telephone (`out/qa-torch-20260902/`): the tile said **Camera in use** with no camera client. `dumpsys media.camera` said `Has a flash unit: false`. SystemUI `FlashlightControllerImpl` had `mCameraId=null`, `mTorchAvailable=false`. The tile shows that string whenever `mTorchAvailable` is false; it never reached `setTorchMode`. There was no `CAMERA_IN_USE` and no held device.
