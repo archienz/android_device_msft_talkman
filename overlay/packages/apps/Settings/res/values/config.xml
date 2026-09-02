@@ -36,7 +36,17 @@
     <!--
          qpnp-fg sysfs (bms). charge_full / charge_full_design are µAh.
          cycle_count is the FG SRAM counter. Not a 50 % overlay stub.
-         Health 2.1-impl still walks /sys/class/power_supply (battery + bms).
+
+         Verified 2026-09-02: LineageOS 18.1 packages/apps/Settings has no
+         code that reads any of these four resources; they land in
+         Settings.apk only because this overlay declares them. The values
+         the framework does see (BatteryStats learned capacity, HIDL
+         HealthInfo) come through device/msft/talkman/health/HealthImpl.cpp,
+         which refuses charge_full / cycle_count that cannot be a pack
+         reading (kernel #21 exports -819000 µAh and 14921 cycles).
+         Kept so a Settings build that does grow a health page has the
+         paths; any such page must apply the same gate.
+
          dumpstate leftover MATCH bf43f49 walks the same psy plus torch
          sysfs / /dev/video* list. Fast Charge / PD strings live in
          frameworks overlay, not here.
