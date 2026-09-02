@@ -19,14 +19,32 @@
 # imx377 / ov5693 chromatix, nanohub napp, FPC, OMADM dests, leftover LGE
 # acdb / entitlement / LifeTimer / libsensor_lge_cal, libactuator_lc898212xd,
 # brcb032gwz + m24c64s eeprom, VL6180, bullhead privapp source.
-# mot_imx230 is vendor/lib (32-bit CAMSS) only, and is installed twice: also as
-# libmmcamera_imx230.so, the only rear name libmmcamera2_sensor_modules.so will
-# dlopen. See vendor/msft/talkman/talkman-camera-xml.mk.
+# mot_imx230 is vendor/lib (32-bit CAMSS) only. The whole mm-camera stack is
+# the Clark lineage-17.1 set (see vendor/msft/talkman/talkman-camera-xml.mk);
+# no bullhead mm-camera blob is mixed in.
 
 # Rear IMX230 — Motorola clark MSM8992 donor (CAMSS VFE44, mot_imx230).
 vendor/lib/libmmcamera_mot_imx230.so
 vendor/lib/libmmcamera_sony_imx230_eeprom.so
 vendor/lib/libSonyIMX230PdafLibrary.so
+vendor/lib/libflash_sky81296.so
+vendor/lib/libmotocalibration.so
+vendor/lib/libsensor1.so
+vendor/lib/libAisAdapter.so
+vendor/lib/libAlAisLib.so
+vendor/lib/libAlAisTune.so
+vendor/lib/libAlAisWrap.so
+vendor/lib/libllvd_smore.so
+vendor/lib/libmbs.so
+vendor/lib/libmot_lux_standardization.so
+vendor/lib/libmot_sensorlistener.so
+vendor/lib/libmmcamera_hdr_gb_lib.so
+vendor/lib/libmmcamera_llvd.so
+vendor/lib/libmmcamera_pdaf_v3.so
+vendor/lib/libmmcamera_vstab_module.so
+vendor/lib/libactuator_mot_lc898212xd.so
+vendor/lib/libactuator_mot_lc898212xd_camcorder.so
+vendor/lib/libactuator_mot_lc898212xd_camera.so
 vendor/lib/libchromatix_mot_imx230_common.so
 vendor/lib/libchromatix_mot_imx230_common_ihdr.so
 vendor/lib/libchromatix_mot_imx230_cpp_hfr_120.so
@@ -76,6 +94,10 @@ vendor/etc/thermal-engine-8992.conf
 vendor/lib/libthermalclient.so
 vendor/lib64/libthermalclient.so
 vendor/lib64/libthermalioctl.so
+# thermal-engine (arm64) links libqti-perfd-client.so; without it the service crash-loops
+# and libthermalclient's do_listen sleeps 5s per camera close (Clark 17.1 set)
+vendor/lib/libqti-perfd-client.so
+vendor/lib64/libqti-perfd-client.so
 vendor/bin/netmgrd
 vendor/bin/nl_listener
 vendor/bin/pm-proxy
@@ -258,9 +280,6 @@ vendor/lib/libmmcamera2_stats_algorithm.so
 vendor/lib/libmmcamera2_stats_modules.so
 vendor/lib/libmmcamera2_vpe_module.so
 vendor/lib/libmmcamera2_wnr_module.so
-vendor/lib/libmmcamera_cac2_lib.so
-vendor/lib/libmmcamera_dummyalgo.so
-vendor/lib/libmmcamera_eebinparse.so
 vendor/lib/libmmcamera_eeprom_util.so
 vendor/lib/libmmcamera_eztune_module.so
 vendor/lib/libmmcamera_faceproc.so
@@ -269,7 +288,6 @@ vendor/lib/libmmcamera_imglib.so
 # above, and vendor.prop sets persist.camera.eis.enable=1.
 vendor/lib/libgoog_rownr.so
 vendor/lib/libgoog_eis_armeabi-v7a.so
-vendor/lib/libmmcamera_isp_abcc44.so
 vendor/lib/libmmcamera_isp_abf44.so
 vendor/lib/libmmcamera_isp_bcc44.so
 vendor/lib/libmmcamera_isp_be_stats44.so

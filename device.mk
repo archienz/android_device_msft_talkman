@@ -163,13 +163,14 @@ PRODUCT_PACKAGES += \
 
 # Camera — QCamera2 LOCAL_MODULE names from camera/
 # msm8992_camera.xml SensorName mot_imx230 (CameraId 0 only). No slave-id.
+# HAL is the clark (Moto X Style, MSM8992) lineage-18.1 QCamera2: its
+# cam_intf ABI (CAM_INTF_PARM_MAX 213, metadata_buffer_t data at +216)
+# matches the Clark mm-qcamera-daemon/liboemcamera blobs in vendor.
 PRODUCT_PACKAGES += \
     camera.msm8992 \
     libmmcamera_interface \
     libmmjpeg_interface \
     libqomx_core \
-    libmm-qcamera \
-    mm-qcamera-app \
     android.hardware.camera.provider@2.4-impl \
     camera.device@1.0-impl \
     camera.device@3.2-impl \

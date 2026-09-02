@@ -70,6 +70,10 @@ vendor/etc/thermal-engine-8992.conf
 vendor/lib/libthermalclient.so
 vendor/lib64/libthermalclient.so
 vendor/lib64/libthermalioctl.so
+# thermal-engine (arm64) links libqti-perfd-client.so; without it the service crash-loops
+# and libthermalclient's do_listen sleeps 5s per camera close (Clark 17.1 set)
+vendor/lib/libqti-perfd-client.so
+vendor/lib64/libqti-perfd-client.so
 vendor/bin/netmgrd
 vendor/bin/nl_listener
 vendor/bin/pm-proxy
@@ -250,14 +254,10 @@ vendor/lib/libmmcamera2_stats_algorithm.so
 vendor/lib/libmmcamera2_stats_modules.so
 vendor/lib/libmmcamera2_vpe_module.so
 vendor/lib/libmmcamera2_wnr_module.so
-vendor/lib/libmmcamera_cac2_lib.so
-vendor/lib/libmmcamera_dummyalgo.so
-vendor/lib/libmmcamera_eebinparse.so
 vendor/lib/libmmcamera_eeprom_util.so
 vendor/lib/libmmcamera_eztune_module.so
 vendor/lib/libmmcamera_faceproc.so
 vendor/lib/libmmcamera_imglib.so
-vendor/lib/libmmcamera_isp_abcc44.so
 vendor/lib/libmmcamera_isp_abf44.so
 vendor/lib/libmmcamera_isp_bcc44.so
 vendor/lib/libmmcamera_isp_be_stats44.so
