@@ -109,23 +109,18 @@ persist.dbg.vt_avail_ovr=0
 persist.dbg.wfc_avail_ovr=0
 
 # Properties for Surfaceflinger
-# Panel is a 60 Hz command-mode DSI panel (TE driven), vsync 16.67 ms.
-# sf.duration 27.6 ms (bullhead video fix) keeps SF at phase 5.73 ms and its
-# expectedPresentTime two vsyncs out. With app.duration also 27.6 ms the app
-# woke at phase 11.47 ms and had only 10.9 ms before SF latched. Measured
-# Settings scrolling on talkman (dumpsys gfxinfo framestats): 9-12 ms of
-# CPU (p50-p90) plus 7-9 ms of Adreno 418 GPU at 300 MHz, so the GPU fence
-# landed at ~V+28..32 ms, right at the V+33 TE kickoff. app.duration 20.4 ms
-# -> app phase 2.0 ms: 20.4 ms app window, fence at ~V+19..23 ms, ~10 ms of
-# margin before the same TE, so touch-to-display latency is unchanged.
-# offset = vsync - (app + sf) % vsync = 16.67 - (48.0 % 16.67) = 2.0 ms
+# Panel TE is 60 Hz (16.67 ms). That period cannot be shortened.
+# Bullhead 27.6 ms SF+app durations schedule present two vsyncs out (~33 ms
+# extra). SF work on this telephone is ~1.25 ms. Fit app+SF in one vsync:
+# SF 5.5 ms, app 11.0 ms (sum 16.5). GPU at 300 MHz is 8-9 ms; if frames
+# miss, raise app.duration toward 16.67, do not go back to 27.6.
 debug.sf.use_phase_offsets_as_durations=1
-debug.sf.late.sf.duration=27600000
-debug.sf.late.app.duration=20400000
-debug.sf.early.sf.duration=27600000
-debug.sf.early.app.duration=20400000
-debug.sf.earlyGl.sf.duration=27600000
-debug.sf.earlyGl.app.duration=20400000
+debug.sf.late.sf.duration=5500000
+debug.sf.late.app.duration=11000000
+debug.sf.early.sf.duration=5500000
+debug.sf.early.app.duration=11000000
+debug.sf.earlyGl.sf.duration=5500000
+debug.sf.earlyGl.app.duration=11000000
 
 # RIL
 ro.vendor.extension_library=libqti-perfd-client.so
