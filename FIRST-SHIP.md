@@ -1,10 +1,10 @@
-# First-ship record — talkman tip 4d277af
+# First-ship record — talkman tip cb5a3af
 
 This file is the first-ship data for the personal **archienz** talkman device tree.
 
 The device is Microsoft Lumia 950 (`talkman`, RM-1104 / RM-1105 / RM-1108). The SoC is **MSM8992**.
 
-This file is **not** a copy of `README.md`. `README.md` is the tree description. This file records the locked facts for tip `4d277af`. Older tips stay as history below.
+This file is **not** a copy of `README.md`. `README.md` is the tree description. This file records the locked facts for tip `cb5a3af`. Older tips stay as history below.
 
 Vocabulary in this file follows **ASD-STE100** Simplified Technical English (Issue 9) style.
 Vocabulary was checked against known rulings and high-risk patterns only, not against the official ASD-STE100 Part 2 dictionary.
@@ -28,21 +28,24 @@ Do not push `lineage-18.1-talkman-hw` from a `cursor/*` side branch.
 
 | Item | Value |
 |---|---|
-| Short SHA | `4d277af` |
-| Full SHA | `4d277af8f3d224ecdfc4a64fe2e00ee8b380d738` |
-| Subject | docs: QS flashlight Working on this telephone |
-| Files in this commit | `README.md` + `changes.md` only |
-| Parent | `1fc5b8a9e571a6c2c3740ce67bec6526452be5e0` |
+| Short SHA | `cb5a3af` |
+| Full SHA | `cb5a3af720aa96ddf0ac6c97140f79d619e637ab` |
+| Subject | docs: kernel boot-only items |
+| Git subject | docs: kernel boot-only items (MSS self-load, Qi pins, cci-scan i2c, cpu-boost) |
+| Files in this commit | `changes.md` only |
+| Parent | `4d277af8f3d224ecdfc4a64fe2e00ee8b380d738` |
 | Branch | `lineage-18.1-talkman-hw` |
 | Repository | [archienz/android_device_msft_talkman](https://github.com/archienz/android_device_msft_talkman) |
 | Lunch target | `lineage_talkman-userdebug` |
 | Product | RM-1104 only |
 
-The protected tip moved: `1fc5b8a` → `4d277af`. This document records tip `4d277af`.
+The protected tip moved: `4d277af` → `cb5a3af`. This document records tip `cb5a3af`.
 
-This tip is docs only. This tip is **not** hardware. This tip is **not** a camera capture land.
+This tip is docs only. This tip is **not** hardware. This tip is **not** a camera capture land. This tip is **not** a GPS land.
 
-The torch HAL land stays `1fc5b8a` (`set_torch_mode` on `led:flash_torch`; evidence `out/qa-torch-20260902/`). This tip records that Quick Settings flashlight is **Working** on this telephone in `README.md` and `changes.md`.
+This tip describes kernel `638e2d9a` (MSS / Qi / cci-scan / cpu-boost). Those kernel items are **UNMEASURED**. Nothing in this tip is measured on the telephone. Do **not** mark GPS, Qi, camera, or speaker **Working** from this description.
+
+The torch HAL land stays `1fc5b8a` (`set_torch_mode` on `led:flash_torch`; evidence `out/qa-torch-20260902/`). Torch QS stays **Working** (measured).
 
 This document does **not** change `README.md`, `system.prop`, powerhint, mixer, `lights.c`, rild, camera XML, or any C++. Those files stay as the owner wrote them.
 
@@ -71,32 +74,35 @@ This document does **not** change `README.md`, `system.prop`, powerhint, mixer, 
 | Older | `2c89f611a2ebe376c3784799e6626c6497e415b4` | 1.5 s A57 input boost with HMP sched boost |
 | Older | `76bdeca2bf2d79ab6e6740f2e58761f863631672` | app duration 15.5 ms; SF stays 5.5 ms |
 | Older | `1fc5b8a9e571a6c2c3740ce67bec6526452be5e0` | QS flashlight `set_torch_mode` on `led:flash_torch` |
-| Documented tip | `4d277af8f3d224ecdfc4a64fe2e00ee8b380d738` | docs: QS flashlight Working on this telephone |
+| Older | `4d277af8f3d224ecdfc4a64fe2e00ee8b380d738` | docs: QS flashlight Working on this telephone |
+| Documented tip | `cb5a3af720aa96ddf0ac6c97140f79d619e637ab` | docs: kernel boot-only items |
 
 ---
 
-## QS flashlight docs (this tip)
+## Kernel boot docs (this tip)
 
-This tip is `README.md` + `changes.md` only. This tip is **not** hardware. This tip is **not** a camera capture land.
+This tip is `changes.md` only. This tip is **not** hardware. This tip is **not** a camera capture land. This tip is **not** a GPS land.
 
-This tip records that Quick Settings flashlight is **Working** on this telephone. This tip does **not** add new `out/qa-*` logs.
+This tip describes kernel `638e2d9a` (MSS / Qi / cci-scan / cpu-boost). Those kernel items are **UNMEASURED**. Nothing in this tip is measured on the telephone.
 
 | Item | Fact |
 |---|---|
-| Files | `README.md` + `changes.md` only |
-| Torch HAL land | `1fc5b8a` (`set_torch_mode` on `led:flash_torch`) |
-| Evidence | `out/qa-torch-20260902/` from tip `1fc5b8a` |
-| Pass 32 | SKIP on `1fc5b8a..4d277af`. `README.md` + `changes.md` only. No C/init/DAC. |
+| Files | `changes.md` only |
+| Kernel | `638e2d9a` (MSS / Qi / cci-scan / cpu-boost) |
+| Status | **UNMEASURED**. No `out/qa-*` logs for this description. |
+| Pass 33 | SKIP on `4d277af..cb5a3af`. `changes.md` only. No C/init/DAC. |
 
-Torch QS stays **Working** (measured). Evidence stays `out/qa-torch-20260902/` from tip `1fc5b8a`.
+Do **not** mark GPS **Working** from the MSS description. Do **not** mark Qi or charge **Working** from the Qi description. Do **not** mark camera **Working** from the cci-scan description. Do **not** mark speaker **Working** from this tip.
 
-Keep the GPU 300 MHz floor as **observed** from tip `7557043`. Keep the A57 1.5 s input boost as **observed** from tip `2c89f61`. Keep one-vsync SF history from tip `2ce6daa`. Keep app duration 15.5 ms and SF 5.5 ms as **observed** from tip `76bdeca`. Keep `MountAngle` 90 / `LaneAssign` 0x0423 / Kernel #28 preview+stills as **observed** from tip `f63634f`. Keep Torch QS **Working** as measured from tip `1fc5b8a`.
+Torch QS stays **Working** (measured from tip `1fc5b8a`, evidence `out/qa-torch-20260902/`). This fold does not change that status.
+
+Keep the GPU 300 MHz floor as **observed** from tip `7557043`. Keep the A57 1.5 s input boost as **observed** from tip `2c89f61`. Keep one-vsync SF history from tip `2ce6daa`. Keep app duration 15.5 ms and SF 5.5 ms as **observed** from tip `76bdeca`. Keep `MountAngle` 90 / `LaneAssign` 0x0423 / Kernel #28 preview+stills as **observed** from tip `f63634f`. Keep Torch QS **Working** as measured from tip `1fc5b8a`. Keep QS flashlight docs from tip `4d277af`.
 
 Do **not** mark P0.4 **Working**. Camera capture stays **Not Working** until `out/qa-*` logs, even if stills are claimed.
 
 Do **not** mark P0.1 or P0.2 **Working**. Working needs `out/qa-*` logs. Keep the observed dumpsys / USB Full claims from tip `dcdd7a4`. GPS (P0.3) stays **Not Working**. Dual SIM remains out of scope.
 
-Speaker stays **Not Working** until `out/qa-*` logs. Draft pull request 8 is userspace TinyHAL. Pull request 8 is **not** rebased onto `4d277af`. The documented tip is `4d277af`.
+Speaker stays **Not Working** until `out/qa-*` logs. Draft pull request 8 is userspace TinyHAL. Pull request 8 is **not** rebased onto `cb5a3af`. The documented tip is `cb5a3af`.
 
 ---
 
@@ -110,11 +116,11 @@ Do not mark any P0 item **Working** without those logs.
 
 Torch QS is **Working** because `out/qa-torch-20260902/` exists. Camera capture is not Torch QS.
 
-| ID | Subsystem | Status at tip `4d277af` | Observed on this telephone | What is still missing for a pass |
+| ID | Subsystem | Status at tip `cb5a3af` | Observed on this telephone | What is still missing for a pass |
 |---|---|---|---|---|
 | P0.1 | Battery UI | Not Working | Live `dumpsys` percent and voltage. Not a hardcoded 50 percent. (Tip `dcdd7a4` claim.) | `out/qa-*` logs |
-| P0.2 | Charge | Not Working | USB cable online. SDP 5 V / 500 mA. Status Full. Qi pad not tested. No inline USB meter. (Tip `dcdd7a4` claim.) | `out/qa-*` logs. Qi pad. |
-| P0.3 | GPS | Not Working | 0 satellites. MPSS offline. | GPSTest `numSvs` more than 0. |
+| P0.2 | Charge | Not Working | USB cable online. SDP 5 V / 500 mA. Status Full. Qi pad not tested. No inline USB meter. (Tip `dcdd7a4` claim.) Kernel `638e2d9a` Qi description is unmeasured. | `out/qa-*` logs. Qi pad. |
+| P0.3 | GPS | Not Working | 0 satellites. MPSS offline. Kernel `638e2d9a` MSS description is unmeasured. | GPSTest `numSvs` more than 0. |
 | P0.4 | Camera capture | Not Working | Kernel #28 Snap live preview and stills (claimed). `MountAngle` 90. `LaneAssign` 0x0423. HAL lists CameraId 0. CCI1 ACK write 0x20 / chip 0x0230. GPU 300 MHz. A57 1.5 s. SF 5.5 / app 15.5. | `out/qa-*` logs |
 | Torch QS | Flashlight | **Working** | `set_torch_mode` writes `led:flash_torch`. | Measured. Evidence `out/qa-torch-20260902/`. |
 
@@ -130,9 +136,9 @@ This section records rebase status only. The pull request is **not** merged. It 
 |---|---|
 | Pull request | [Draft pull request 6](https://github.com/archienz/android_device_msft_talkman/pull/6) |
 | Title | talkman: clamp GNSS debug string and nav message length |
-| Head | `cfd19917653bc35f94870a29f9345ba5f83e961a` (was `13f12d81`) |
+| Head | `97624c70121f1ec503aea13d064c3e6d9b053f69` (was `cfd19917`) |
 | Head branch | `cursor/cve-pass9-hw` |
-| Base | `lineage-18.1-talkman-hw` at `4d277af8f3d224ecdfc4a64fe2e00ee8b380d738` |
+| Base | `lineage-18.1-talkman-hw` at `cb5a3af720aa96ddf0ac6c97140f79d619e637ab` |
 | Size | 2 commits, 3 files |
 | Files | `gnss/1.0/default/GnssDebug.cpp`, `gnss/1.0/default/GnssNavigationMessage.cpp`, `rootdir/etc/init.talkman.rc` |
 | `GnssDebug.cpp` | Uses `std::min` (not `std::max`). Clamps retained. |
@@ -160,9 +166,10 @@ This section records rebase status only. The pull request is **not** merged. It 
 | Pass 30 | SKIP on pull request 8. `mixer_paths.xml` only. No C/init/DAC. Pull request 6 was not rebased for Pass 30. |
 | Pass 31 | SKIP on `76bdeca..1fc5b8a`. Real C++ torch HAL. Bounded sysfs. No DAC. |
 | Pass 32 | SKIP on `1fc5b8a..4d277af`. `README.md` + `changes.md` only. No C/init/DAC. |
-| State | Still draft. Mergeable clean. Not merged. Rebased onto `4d277af`. |
+| Pass 33 | SKIP on `4d277af..cb5a3af`. `changes.md` only. No C/init/DAC. |
+| State | Still draft. Mergeable clean. Not merged. Rebased onto `cb5a3af`. |
 
-The rebase of pull request 6 onto tip `4d277af` **landed**. Head is `cfd19917`. Base is `4d277af`. Previous head was `13f12d81`. Pass 32 is SKIP. Pass 31 SKIP stays. Pass 23 FIX is kept. Pass 11–31 history stays. The pull request is still draft. The pull request is not merged. The pull request is **not** a GPS pass.
+The rebase of pull request 6 onto tip `cb5a3af` **landed**. Head is `97624c70`. Base is `cb5a3af`. Previous head was `cfd19917`. Pass 33 is SKIP. Pass 32 SKIP stays. Pass 31 SKIP stays. Pass 23 FIX is kept. Pass 11–32 history stays. The pull request is still draft. The pull request is not merged. The pull request is **not** a GPS pass.
 
 These clamps already exist on `lineage-18.1-talkman`. On `lineage-18.1-talkman-hw` the clamps stay in this draft only until merge.
 
@@ -188,11 +195,30 @@ This section records draft pull request 8 only. The pull request is **not** merg
 | Voice FE | Unchanged |
 | Kernel | TAS2553 / Quat DT already correct at `4e4b4dda`. This fold is userspace TinyHAL. |
 | Pass 30 | SKIP on pull request 8. `mixer_paths.xml` only. No C/init/DAC. |
-| State | Still draft. Mergeable clean. Not merged. **Not** rebased onto `4d277af`. Base stays `76bdeca`. |
+| State | Still draft. Mergeable clean. Not merged. **Not** rebased onto `cb5a3af`. Base stays `76bdeca`. |
 
-The documented tip is `4d277af`. Pull request 8 stays head `f403414` / base `76bdeca`. Pull request 8 is **not** rebased onto `4d277af`. Kernel TAS2553 / Quat DT already is correct at `4e4b4dda`. Do not re-GO Pass 30.
+The documented tip is `cb5a3af`. Pull request 8 stays head `f403414` / base `76bdeca`. Pull request 8 is **not** rebased onto `cb5a3af`. Kernel TAS2553 / Quat DT already is correct at `4e4b4dda`. Do not re-GO Pass 30.
 
-Speaker stays **Not Working** until `out/qa-*` logs. Camera capture / P0.4 stays **Not Working** until `out/qa-*` logs. Do not mark P0.4 Working.
+Speaker stays **Not Working** until `out/qa-*` logs. Camera capture / P0.4 stays **Not Working** until `out/qa-*` logs. Do not mark P0.4 Working. GPS stays **Not Working**.
+
+---
+
+## History: tip 4d277af (QS flashlight docs)
+
+This tip is `README.md` + `changes.md` only. This tip is **not** hardware. This tip is **not** a camera capture land.
+
+This tip records that Quick Settings flashlight is **Working** on this telephone. This tip does **not** add new `out/qa-*` logs.
+
+| Item | Fact |
+|---|---|
+| Files | `README.md` + `changes.md` only |
+| Torch HAL land | `1fc5b8a` (`set_torch_mode` on `led:flash_torch`) |
+| Evidence | `out/qa-torch-20260902/` from tip `1fc5b8a` |
+| Pass 32 | SKIP on `1fc5b8a..4d277af`. `README.md` + `changes.md` only. No C/init/DAC. |
+
+Parent `1fc5b8a`. Author archienz.
+
+Later tip `cb5a3af` records kernel boot-only items in `changes.md`. See **Kernel boot docs (this tip)**.
 
 ---
 
@@ -211,7 +237,7 @@ Quick Settings flashlight uses `set_torch_mode`. `set_torch_mode` writes `led:fl
 
 Parent `76bdeca`. Author Niaz land. Git author archienz.
 
-Later tip `4d277af` records this Working status in `README.md` and `changes.md`. See **QS flashlight docs (this tip)**.
+Later tip `4d277af` records this Working status in `README.md` and `changes.md`. See **History: tip 4d277af (QS flashlight docs)**.
 
 ---
 
@@ -546,7 +572,7 @@ This is a host verifier fix. It is **not** an NFC pass.
 
 ## History: parent tip 31a5359
 
-These notes stay true on `4d277af`. They landed in `31a5359909e07703770492861d00415a0b619733` (`talkman: health HAL, vendor GPS loc, GPIO torch, CAF compile patches`).
+These notes stay true on `cb5a3af`. They landed in `31a5359909e07703770492861d00415a0b619733` (`talkman: health HAL, vendor GPS loc, GPIO torch, CAF compile patches`).
 
 Tip `f8b2e89` then gates the three pinned `bms` values in `UpdateHealthInfo()`. See **History: tip f8b2e89 (health gate)**.
 
@@ -568,7 +594,9 @@ Tip `76bdeca` then sets app duration 15.5 ms. SF stays 5.5 ms. See **History: ti
 
 Tip `1fc5b8a` then sets Quick Settings flashlight through `set_torch_mode` on `led:flash_torch`. See **History: tip 1fc5b8a (torch HAL)**.
 
-Tip `4d277af` then records that Quick Settings flashlight is Working on this telephone in `README.md` and `changes.md`. See **QS flashlight docs (this tip)**.
+Tip `4d277af` then records that Quick Settings flashlight is Working on this telephone in `README.md` and `changes.md`. See **History: tip 4d277af (QS flashlight docs)**.
+
+Tip `cb5a3af` then records kernel boot-only items (MSS / Qi / cci-scan / cpu-boost) in `changes.md`. Those items are unmeasured. See **Kernel boot docs (this tip)**.
 
 ### Health HAL
 
@@ -677,16 +705,17 @@ An unofficial zip exists on the Steam Deck. That zip is **not** a hardware pass.
 
 ## Still missing
 
-These items are still missing at tip `4d277af`:
+These items are still missing at tip `cb5a3af`:
 
 | Item | Fact |
 |---|---|
-| P0.1 / P0.2 `out/qa-*` | Not in this fold. Observed dumpsys / USB cable facts stay observations from `dcdd7a4`. |
+| P0.1 / P0.2 `out/qa-*` | Not in this fold. Observed dumpsys / USB cable facts stay observations from `dcdd7a4`. Kernel `638e2d9a` Qi description is unmeasured. Do not mark charge or Qi Working. |
+| P0.3 GPS | Not Working. Kernel `638e2d9a` MSS description is unmeasured. Do not mark GPS Working. |
 | P0.4 `out/qa-*` | Not in this fold. Kernel #28 Snap preview and stills stay observations from `f63634f`. Camera capture stays Not Working. |
-| Speaker `out/qa-*` | Not in this fold. Draft pull request 8 routes TinyHAL playback FE to `QUAT_MI2S_RX`. Pull request 8 is not rebased onto `4d277af`. Speaker stays Not Working. |
+| Speaker `out/qa-*` | Not in this fold. Draft pull request 8 routes TinyHAL playback FE to `QUAT_MI2S_RX`. Pull request 8 is not rebased onto `cb5a3af`. Speaker stays Not Working. |
 | CCI ACK | **Measured.** CCI1 write **0x20** / chip **0x0230**. |
 | OIS `.so` | No `libmmcamera_ois_bu24210.so` in the dumps. OIS `.kar` files are in `COPY_FILES`. CAF `msm_ois` does not `request_firmware` those `.kar` files. |
-| MPSS / modem bring-up | Still missing for a GPS pass. |
+| MPSS / modem bring-up | Still missing for a GPS pass. Kernel `638e2d9a` MSS description is unmeasured. |
 
 Camera capture is **Not Working**. GPS is **Not Working**. Speaker is **Not Working**. Torch QS is **Working**. Do not invent `qcom,slave-id`. Dual SIM is out of scope.
 
@@ -705,7 +734,8 @@ Camera capture is **Not Working**. GPS is **Not Working**. Speaker is **Not Work
 ## What you must not do
 
 - Do not mark P0.4 Working. Camera capture stays Not Working until `out/qa-*` logs from the telephone.
-- Do not mark P0.1 or P0.2 Working without `out/qa-*` logs from the telephone.
+- Do not mark GPS / P0.3 Working. Kernel `638e2d9a` MSS description is unmeasured.
+- Do not mark P0.1 or P0.2 Working without `out/qa-*` logs from the telephone. Do not mark Qi Working from this tip.
 - Do not invent `qcom,slave-id`.
 - Do not return a fake battery capacity of 50 percent.
 - Do not edit camera XML, mixer, `lights.c`, rild, health C++, GNSS C++, NFC C++, or any C++ for this document.
