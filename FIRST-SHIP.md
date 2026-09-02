@@ -98,6 +98,8 @@ Do **not** mark P0.4 **Working**. Camera stays **Not Working** until `out/qa-*` 
 
 Do **not** mark P0.1 or P0.2 **Working**. Working needs `out/qa-*` logs. Keep the observed dumpsys / USB Full claims from tip `dcdd7a4`. GPS (P0.3) stays **Not Working**. Dual SIM remains out of scope.
 
+Speaker stays **Not Working** until `out/qa-*` logs. Draft pull request 8 is userspace TinyHAL. It is **not** a camera land. The documented tip stays `76bdeca`.
+
 ---
 
 ## Pass rule
@@ -113,7 +115,9 @@ Do not mark any P0 item **Working** without those logs.
 | P0.1 | Battery UI | Not Working | Live `dumpsys` percent and voltage. Not a hardcoded 50 percent. (Tip `dcdd7a4` claim.) | `out/qa-*` logs |
 | P0.2 | Charge | Not Working | USB cable online. SDP 5 V / 500 mA. Status Full. Qi pad not tested. No inline USB meter. (Tip `dcdd7a4` claim.) | `out/qa-*` logs. Qi pad. |
 | P0.3 | GPS | Not Working | 0 satellites. MPSS offline. | GPSTest `numSvs` more than 0. |
-| P0.4 | Camera | Not Working | Kernel #28 Snap live preview and stills (claimed). `MountAngle` 90. `LaneAssign` 0x0423. HAL lists CameraId 0. CCI1 ACK write 0x20 / chip 0x0230. | `out/qa-*` logs |
+| P0.4 | Camera | Not Working | Kernel #28 Snap live preview and stills (claimed). `MountAngle` 90. `LaneAssign` 0x0423. HAL lists CameraId 0. CCI1 ACK write 0x20 / chip 0x0230. GPU 300 MHz. A57 1.5 s. SF 5.5 / app 15.5. | `out/qa-*` logs |
+
+Speaker stays **Not Working** until `out/qa-*` logs. Do **not** mark P0.4 **Working**.
 
 ---
 
@@ -152,13 +156,40 @@ This section records rebase status only. The pull request is **not** merged. It 
 | Pass 27 | SKIP landed on `7557043..2ce6daa`. `system.prop` only. No chmod/0666/0777. No sepolicy. No C. SF timing is not a DAC/CVE hole. |
 | Pass 28 | SKIP landed on `2ce6daa..2c89f61`. `powerhint.xml` + `init.talkman.power.sh` only. Writes existing cpu-boost sysfs. No chmod/0666/0777. No new sockets. No sepolicy. No C. Not a DAC/CVE hole. |
 | Pass 29 | SKIP landed on `2c89f61..76bdeca`. `system.prop` only. No chmod/0666/0777. No sepolicy. No C. SF timing is not a DAC/CVE hole. |
-| State | Still draft. Mergeable clean. Not merged. |
+| Pass 30 | SKIP on pull request 8. `mixer_paths.xml` only. No C/init/DAC. Pull request 6 is not rebased. |
+| State | Still draft. Mergeable clean. Not merged. Not rebased for this fold. |
 
-The rebase of pull request 6 onto tip `76bdeca` **landed**. Head is `f017afa`. Pass 29 is SKIP. Pass 23 FIX is kept. The pull request is still draft. It is not merged. It is **not** a GPS pass.
+The rebase of pull request 6 onto tip `76bdeca` **landed**. Head is `f017afa`. Base is `76bdeca`. Pass 29 SKIP still stands. Pass 23 FIX is kept. The pull request is still draft. It is not merged. It is **not** a GPS pass. It is not rebased for Pass 30.
 
 These clamps already exist on `lineage-18.1-talkman`. On `lineage-18.1-talkman-hw` they stay in this draft only until merge.
 
 Camera still does not work. Do not mark P0 Working.
+
+---
+
+## Draft pull request 8 (TinyHAL QUAT playback FE)
+
+This section records draft pull request 8 only. The pull request is **not** merged. Speaker stays **Not Working**. This is **not** a camera land.
+
+| Item | Fact |
+|---|---|
+| Pull request | [Draft pull request 8](https://github.com/archienz/android_device_msft_talkman/pull/8) |
+| Title | talkman: route default TinyHAL playback FE to QUAT_MI2S_RX |
+| Head | `f4034143266564ebac9edcf10dcbdc5fa13cef1d` |
+| Head branch | `cursor/quat-tinyhal-playback-fe-2e10` |
+| Base | `lineage-18.1-talkman-hw` at `76bdeca2bf2d79ab6e6740f2e58761f863631672` |
+| Size | 1 commit, 1 file |
+| Files | `audio/mixer_paths.xml` only |
+| Change | Unsuffixed TinyHAL playback FE paths were `SLIMBUS_0_RX` / WCD. They are `QUAT_MI2S_RX` to match suffixed `*` speaker paths. |
+| Paths | tts / deep-buffer / low-latency / ull / compress1–9 |
+| Voice FE | Unchanged |
+| Kernel | TAS2553 / Quat DT already correct at `4e4b4dda`. This fold is userspace TinyHAL. |
+| Pass 30 | SKIP on pull request 8. `mixer_paths.xml` only. No C/init/DAC. |
+| State | Still draft. Mergeable clean. Not merged. |
+
+The documented tip stays `76bdeca`. Pull request 6 stays head `f017afa` / base `76bdeca`. Pass 29 SKIP still stands.
+
+Speaker stays **Not Working** until `out/qa-*` logs. Camera P0.4 stays **Not Working** until `out/qa-*` logs. Do not mark P0 Working.
 
 ---
 
@@ -603,11 +634,12 @@ These items are still missing at tip `76bdeca`:
 |---|---|
 | P0.1 / P0.2 `out/qa-*` | Not in this fold. Observed dumpsys / USB cable facts stay observations from `dcdd7a4`. |
 | P0.4 `out/qa-*` | Not in this fold. Kernel #28 Snap preview and stills stay observations from `f63634f`. Camera stays Not Working. |
+| Speaker `out/qa-*` | Not in this fold. Draft pull request 8 routes TinyHAL playback FE to `QUAT_MI2S_RX`. Speaker stays Not Working. |
 | CCI ACK | **Measured.** CCI1 write **0x20** / chip **0x0230**. |
 | OIS `.so` | No `libmmcamera_ois_bu24210.so` in the dumps. OIS `.kar` files are in `COPY_FILES`. CAF `msm_ois` does not `request_firmware` those `.kar` files. |
 | MPSS / modem bring-up | Still missing for a GPS pass. |
 
-Camera is **Not Working**. GPS is **Not Working**. Do not invent `qcom,slave-id`. Dual SIM is out of scope.
+Camera is **Not Working**. GPS is **Not Working**. Speaker is **Not Working**. Do not invent `qcom,slave-id`. Dual SIM is out of scope.
 
 ---
 
