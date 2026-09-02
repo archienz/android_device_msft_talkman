@@ -4,7 +4,8 @@ This Pages site is the **archienz** device-tree documentation. It is not the And
 
 | Page | What it is |
 |---|---|
-| [Repository README](https://github.com/archienz/android_device_msft_talkman) | Purpose, Progress, Changes |
+| [Repository README](https://github.com/archienz/android_device_msft_talkman) | Purpose, Progress, battery differences compared to the community repository |
+| [Changes](https://github.com/archienz/android_device_msft_talkman/blob/lineage-18.1-talkman-hw/changes.md) | Tree description (not a procedure) |
 | [Install procedure](INSTALL.md) | One physical RM-1104 install (2026-09-02): steps that worked, failures, how to reproduce, how to update this site |
 | [Camera ident notes](CAMERA-IDENT.md) | CCI / sensor lab notes. Rear write address 0x20 / chip 0x0230 is measured |
 
