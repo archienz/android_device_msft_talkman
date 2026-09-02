@@ -112,15 +112,19 @@ persist.dbg.wfc_avail_ovr=0
 # Panel TE is 60 Hz (16.67 ms). That period cannot be shortened.
 # Bullhead 27.6 ms SF+app durations schedule present two vsyncs out (~33 ms
 # extra). SF work on this telephone is ~1.25 ms. Fit app+SF in one vsync:
-# SF 5.5 ms, app 11.0 ms (sum 16.5). GPU at 300 MHz is 8-9 ms; if frames
-# miss, raise app.duration toward 16.67, do not go back to 27.6.
+# SF 5.5 ms. App window measured on this telephone (Settings fling/drag,
+# gfxinfo framestats, A57 boosted): vsync->queueBuffer p50 8.6-9.2 ms,
+# p90 10.7-14.2 ms; 7-15 % of frames exceeded 11.0 ms and presented one TE
+# late (not counted by gfxinfo jank%). >15.5 ms: 0.6-3 %. App 15.5 ms wakes
+# the app 4.3 ms before the vsync (+4.3 ms mean touch latency, no extra TE).
+# Do not go back to 27.6.
 debug.sf.use_phase_offsets_as_durations=1
 debug.sf.late.sf.duration=5500000
-debug.sf.late.app.duration=11000000
+debug.sf.late.app.duration=15500000
 debug.sf.early.sf.duration=5500000
-debug.sf.early.app.duration=11000000
+debug.sf.early.app.duration=15500000
 debug.sf.earlyGl.sf.duration=5500000
-debug.sf.earlyGl.app.duration=11000000
+debug.sf.earlyGl.app.duration=15500000
 
 # RIL
 ro.vendor.extension_library=libqti-perfd-client.so
