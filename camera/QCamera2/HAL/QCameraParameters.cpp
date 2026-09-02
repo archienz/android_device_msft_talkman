@@ -39,6 +39,7 @@
 #include <sys/sysinfo.h>
 #include "QCamera2HWI.h"
 #include "QCameraParameters.h"
+#include "QCameraTorch.h"
 
 #define ASPECT_TOLERANCE 0.001
 
@@ -826,6 +827,7 @@ QCameraParameters::QCameraParameters()
       m_bAeBracketingEnabled(false),
       mFlashValue(CAM_FLASH_MODE_OFF),
       mFlashDaemonValue(CAM_FLASH_MODE_OFF),
+      m_bLedTorchOnly(false),
       mHfrMode(CAM_HFR_MODE_OFF),
       m_bHDRModeSensor(true),
       mOfflineRAW(false),
@@ -929,6 +931,7 @@ QCameraParameters::QCameraParameters(const String8 &params)
     m_bAeBracketingEnabled(false),
     mFlashValue(CAM_FLASH_MODE_OFF),
     mFlashDaemonValue(CAM_FLASH_MODE_OFF),
+    m_bLedTorchOnly(false),
     mHfrMode(CAM_HFR_MODE_OFF),
     m_bHDRModeSensor(true),
     mOfflineRAW(false),
@@ -4997,6 +5000,18 @@ int32_t QCameraParameters::initDefaultParameters()
                PARAM_MAP_SIZE(FLASH_MODES_MAP));
        set(KEY_SUPPORTED_FLASH_MODES, flashValues);
        setFlash(FLASH_MODE_OFF);
+    } else if (QCameraTorch::hasTorch()) {
+        // No flash driver in mm-camera, but the board has a GPIO torch LED.
+        // Advertise off/torch so cameraserver sees a flash unit
+        // (android.flash.info.available) and drive the LED from updateFlash.
+        m_bLedTorchOnly = true;
+        String8 flashValues(FLASH_MODE_OFF);
+        flashValues.append(",");
+        flashValues.append(FLASH_MODE_TORCH);
+        set(KEY_SUPPORTED_FLASH_MODES, flashValues);
+        setFlash(FLASH_MODE_OFF);
+        ALOGI("%s: backend has no flash, using led:flash_torch (%s)",
+                __func__, flashValues.string());
     } else {
         ALOGE("%s: supported flash modes cnt is 0!!!", __func__);
     }
@@ -8439,7 +8454,20 @@ int32_t QCameraParameters::updateFlash(bool commitSettings)
         value = mFlashValue;
     }
 
-    if (value != mFlashDaemonValue) {
+    if (m_bLedTorchOnly) {
+        // mm-camera has no flash driver here; the only real mode is torch on
+        // the GPIO LED. Never send CAM_INTF_PARM_LED_MODE to the daemon.
+        if (value != mFlashDaemonValue) {
+            bool on = (value == CAM_FLASH_MODE_TORCH);
+            CDBG_HIGH("%s: led:flash_torch %s (flash value %d)", __func__,
+                    on ? "on" : "off", value);
+            if (QCameraTorch::setTorch(on) != 0) {
+                ALOGE("%s: failed to drive led:flash_torch", __func__);
+                return BAD_VALUE;
+            }
+            mFlashDaemonValue = value;
+        }
+    } else if (value != mFlashDaemonValue) {
         if (isAFRunning()) {
             CDBG("%s: AF is running, cancel AF before changing flash mode ", __func__);
             m_pCamOpsTbl->ops->cancel_auto_focus(m_pCamOpsTbl->camera_handle);

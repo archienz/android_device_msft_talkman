@@ -117,7 +117,7 @@ P0.1 Battery UI and P0.2 USB cable charge are **Working on this telephone**. P0.
 | P0.2 | Charge | Working on this telephone (USB cable) | USB `online`, SDP 5 V / 500 mA, `charging_enabled`, status Full. No PD | Qi pad not tested. `bms/charge_full` is still a bad health value |
 | P0.3 | GPS | Not Working | GPSTest empty. `loc_eng_start`. 0 satellites. Modem OFFLINE | `numSvs` more than 0. MPSS online |
 | P0.4 | Camera | Working on this telephone (rear preview and stills) | HAL **1** CameraId 0. Probe `mot_imx230`. CCI1 write **0x20** chip **0x0230**. CSI lane map **0x0423**. Snap live view and DCIM stills. CSIPHY stock MISC1 | HAL reported Orientation **0** (`MountAngle` 360). Fix is 90. Front camera not listed. AF / OIS not started |
-| — | Display / Wi-Fi / speaker / GPIO torch | On this telephone | 1440×2560. QCA6174. Loudspeaker. `led:flash_torch` GPIO 12 | Not P0 |
+| — | Display / Wi-Fi / speaker / GPIO torch | On this telephone | 1440×2560. QCA6174. Loudspeaker. `led:flash_torch` GPIO 12. Quick Settings flashlight through camera HAL `set_torch_mode` (`out/qa-torch-20260902/`) | Not P0 |
 | P2 | RIL | Deferred | `ril-daemon` exit 1 | Modem SMD |
 
 Keep QCamera2 MSMB `mot_imx230`. Do not ship CSID test-generator as camera. Rear CSI data lanes on RM-1104 are CSI0 LN2/LN1/LN3/LN0 (`qcom,csi-lane-assign = <0x0423>`), not Clark `0x4320`.

@@ -42,6 +42,7 @@
 
 #include "QCamera2HWI.h"
 #include "QCameraMem.h"
+#include "QCamera2Factory.h"
 
 #define MAP_TO_DRIVER_COORDINATE(val, base, scale, offset) \
   ((int32_t)val * (int32_t)scale / (int32_t)base + (int32_t)offset)
@@ -1026,7 +1027,9 @@ int QCamera2HardwareInterface::close_camera_device(hw_device_t *hw_dev)
         ALOGE("%s: NULL camera device", __func__);
         return BAD_VALUE;
     }
+    int cameraId = (int)hw->mCameraId;
     delete hw;
+    QCamera2Factory::camera_device_closed(cameraId);
 
     ALOGI("[KPI Perf] %s: X",__func__);
     return ret;

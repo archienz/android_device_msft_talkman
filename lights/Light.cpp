@@ -48,7 +48,9 @@ namespace implementation {
  *
  * Torch (GPIO 12, qpnp-flash-led) is not exposed here: light@2.0 Type has no
  * FLASHLIGHT member. It stays on the legacy LIGHT_ID_FLASHLIGHT node in
- * liblight/lights.c, and CameraManager torch goes through QCameraFlash.
+ * liblight/lights.c, and CameraManager torch goes through the camera HAL
+ * set_torch_mode (QCamera2/util/QCameraTorch.cpp). Both write only
+ * led:flash_torch; led:torch_0 is the red indicator.
  */
 
 static const char kLcdFile[] = "/sys/class/leds/lcd-backlight/brightness";

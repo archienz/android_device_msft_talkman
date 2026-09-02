@@ -1043,6 +1043,9 @@ private:
     bool m_bAeBracketingEnabled;
     int32_t mFlashValue;
     int32_t mFlashDaemonValue;
+    // backend reports no flash but the board has a led:flash_torch GPIO LED:
+    // flash-mode is limited to off/torch and driven from the HAL (QCameraTorch)
+    bool m_bLedTorchOnly;
     int32_t mHfrMode;
     bool m_bHDRModeSensor;
     bool mOfflineRAW;
