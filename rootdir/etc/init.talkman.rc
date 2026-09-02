@@ -134,7 +134,14 @@ on property:sys.boot_completed=1
     start vendor.gnss_service
     start qcamerasvr
     start talkman-cci-perm
-    restart cameraserver
+    # No 'restart cameraserver' here. qcamerasvr starts in 'on boot' before
+    # class_start main, and the HAL's get_num_of_cameras() already waits on
+    # CFG_SINIT_PROBE_WAIT_DONE, so the boot-time cameraserver enumerates
+    # camera 0 fine. Restarting it here (and again from
+    # init.talkman.camera.rc) killed it twice within 5s, which hit init's
+    # 5s restart backoff and left no ICameraService for ~15s after boot.
+    # Snap launched in that window got an empty CameraManager.getCameraIdList()
+    # and crashed in PhotoModule.initializeFocusManager (length=0; index=0).
 
 on init
 
@@ -550,12 +557,20 @@ on property:ro.boot.hardware.sku=RM-1104
 on property:ro.boot.hardware.sku=RM-1108
     setprop ro.boot.wificountrycode 00
 
+# Sockets are 0666 (QC init_thermal-engine.rc). The QCamera2 HAL runs inside
+# cameraserver (uid cameraserver, groups audio camera input drmrpc), and
+# libthermalclient's listener thread connect()s to thermal-recv-client. With
+# 0660 system:system that connect fails with EACCES, the thread retries with
+# sleep(5), and thermal_client_unregister_callback() pthread_join()s it, so
+# every closeCamera() stalled 5s ("Unregisteration ... handle:2" 5s after
+# handle:1). cameraserver needed 2 open/close cycles before publishing
+# ICameraService, so it was unreachable for >10s after each start.
 service thermal-engine /vendor/bin/thermal-engine -c /vendor/etc/thermal-engine-8992.conf
     class main
     user root
-    socket thermal-send-client stream 0660 system system
-    socket thermal-recv-client stream 0660 system system
-    socket thermal-recv-passive-client stream 0660 system system
+    socket thermal-send-client stream 0666 system system
+    socket thermal-recv-client stream 0666 system system
+    socket thermal-recv-passive-client stream 0666 system system
     group root radio system
 
 service cnss-daemon /vendor/bin/cnss-daemon -n -l

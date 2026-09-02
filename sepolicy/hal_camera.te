@@ -8,6 +8,10 @@ allow hal_camera perfd_data_file:sock_file write;
 allow hal_camera perfd:unix_stream_socket connectto;
 allow hal_camera scheduling_policy_service:service_manager find;
 
+# QCameraThermalAdapter (libthermalclient) connects to thermal-engine's
+# thermal-recv-client socket from inside cameraserver (passthrough HAL1).
+unix_socket_connect(hal_camera, thermal, thermal-engine)
+
 # access /data/misc/camera
 allow hal_camera camera_data_file:dir create_dir_perms;
 allow hal_camera camera_data_file:file create_file_perms;

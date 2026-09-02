@@ -13,9 +13,11 @@ on post-fs-data
 on boot
     start qcamerasvr
 
+# No 'restart cameraserver' on boot_completed (see init.talkman.rc): the
+# boot-time cameraserver already has camera 0; the restart only created a
+# window with no ICameraService that crashed Snap on an empty camera list.
 on property:sys.boot_completed=1
     start qcamerasvr
-    restart cameraserver
 
 service qcamerasvr /vendor/bin/mm-qcamera-daemon
     class main
