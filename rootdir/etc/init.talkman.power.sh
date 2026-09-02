@@ -130,8 +130,12 @@ get-set-forall /sys/devices/soc.0/qcom,bcl.*/hotplug_mask $bcl_hotplug_mask
 get-set-forall /sys/devices/soc.0/qcom,bcl.*/hotplug_soc_mask $bcl_hotplug_soc_mask
 get-set-forall /sys/devices/soc.0/qcom,bcl.*/mode enable
 
-# set GPU default power level to 5 (180MHz) instead of 4 (305MHz)
-write /sys/class/kgsl/kgsl-3d0/default_pwrlevel 5
+# GPU wake level 4 (300MHz), same as qcom,initial-pwrlevel. bullhead used 5
+# (180MHz) for its 1080p panel; on the 1440x2560 talkman panel Adreno 418 at
+# 180MHz needs 12-14ms per UI frame (dumpsys gfxinfo) and TZ DCVS does not
+# ramp it, so start at 300MHz and let msm-adreno-tz decay it when idle.
+# The power HAL (powerhint.xml Defaults) writes the same value.
+write /sys/class/kgsl/kgsl-3d0/default_pwrlevel 4
 
 # Power HAL runs as system. Nodes it writes (A57 online, interactive created).
 chown system system /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq

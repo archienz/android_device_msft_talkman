@@ -11,6 +11,15 @@
   A57 ceiling is 1824000 kHz. Do not add 1960000 (WOA PEP overclock).
   GPU pwrlevels: msm8992-gpu.dtsi (0=600MHz .. 5=180MHz, 6=27MHz).
   Input boost matches init.talkman.power.sh (0:960000, 40 ms).
+
+  GPU: the panel is 1440x2560 (WQHD). Measured with dumpsys gfxinfo on
+  Settings scrolling: at pwrlevel 5 (180 MHz) the Adreno 418 needs 12-14 ms
+  per UI frame (p50 12 ms) and msm-adreno-tz (TZ DCVS) holds it there at
+  ~60% busy. A 300 MHz floor (pwrlevel 4) drops GPU time to 7-9 ms in every
+  run (janky-frame counts are noisier: 8-19% -> 4-14%). Apply that floor
+  only while the user is touching
+  (INTERACTION / LAUNCH) and wake the GPU at 300 MHz (default_pwrlevel=4,
+  same as qcom,initial-pwrlevel in the DT); idle still decays to 180 MHz.
 -->
 <HintConfigs platform="msm8992">
   <Opp cluster="little" policy_cpu="0">
@@ -43,18 +52,19 @@
   <Defaults>
     <Little min_khz="384000" hispeed_khz="960000"/>
     <Big min_khz="384000" hispeed_khz="1248000" max_khz="1824000"/>
-    <Gpu min_pwrlevel="5" max_pwrlevel="0" default_pwrlevel="5"/>
+    <Gpu min_pwrlevel="5" max_pwrlevel="0" default_pwrlevel="4"/>
     <InputBoost freq="0:960000 4:0" ms="40"/>
   </Defaults>
 
   <Hint name="INTERACTION" duration_ms="1500">
     <Little min_khz="960000"/>
+    <Gpu min_pwrlevel="4"/>
   </Hint>
 
   <Hint name="LAUNCH" duration_ms="2000">
     <Little min_khz="960000"/>
     <Big min_khz="1248000"/>
-    <Gpu max_pwrlevel="0"/>
+    <Gpu min_pwrlevel="4" max_pwrlevel="0"/>
     <InputBoost freq="0:960000 4:1248000" ms="2000"/>
   </Hint>
 
