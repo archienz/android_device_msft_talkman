@@ -29,7 +29,7 @@ Priority work (P0):
 
 Cellular / RIL is **P2**. Do not stop P0 for modem SMD errors.
 
-Do not mark P0 Working without `out/qa-*` logs from the telephone. Do not invent `qcom,slave-id`. Dual SIM RM-1118 is not this product.
+Do not mark P0 Working without `out/qa-*` logs from the telephone. Dual SIM RM-1118 is not this product. Do not invent a slave-id. The rear IMX230 write address on this telephone is **0x20** (chip **0x0230**), measured by CCI scan.
 
 ---
 
@@ -103,22 +103,20 @@ Qi GPIOs match 4VM_08r: `wc-en` GPIO **2**, `wc-det` GPIO **14**.
 
 Source in Git is not a pass. A pass is a physical talkman log in `out/qa-*`.
 
-Unofficial zip `lineage-18.1-20260901-UNOFFICIAL-talkman` is installed on one RM-1104. The telephone boots to the home screen. Procedure (steps that worked, failures, reproduce, Pages update): [`docs/INSTALL.md`](docs/INSTALL.md) and https://archienz.github.io/android_device_msft_talkman/INSTALL.html. Capture: workspace `out/qa-pre-steamos-20260902/` (not in Git).
+Unofficial zip `lineage-18.1-20260901-UNOFFICIAL-talkman` is installed on one RM-1104. The telephone boots to the home screen. Procedure: [`docs/INSTALL.md`](docs/INSTALL.md) and https://archienz.github.io/android_device_msft_talkman/INSTALL.html.
 
 Host: Steam Deck SteamOS, ext4 `/home/deck/android/los-18.1`. Do not `repo sync` onto NTFS.
 
-No P0 item is **Working**. Dual SIM RM-1118 is not this product. There is no `qcom,slave-id`. There is no `CONFIG_MSM_OIS`. CCI scan never ran (flashed DTB has no scan node).
-
-The Microsoft service schematic is for implementation only. It is not published.
+No P0 item is **Working**. Dual SIM RM-1118 is not this product. There is no `CONFIG_MSM_OIS`. The Microsoft service schematic is for implementation only. It is not published.
 
 | ID | Subsystem | Status | What is on the telephone | What is still missing |
 |---|---|---|---|---|
-| P0.0 | Rebuild LOS 18.1 | Built and flashed | `lineage_talkman-userdebug` zip 2026-09-01. SteamOS ext4 `/home/deck/android/los-18.1` | Next bacon with camera DT + VINTF + no LifeTimer |
-| P0.1 | Battery UI | Not Working | `dumpsys battery` 66 percent, 4.030 V, 41 °C, Li-ion. Not 50 percent | USB-meter log |
+| P0.0 | Rebuild LOS 18.1 | Built and flashed | `lineage_talkman-userdebug` zip 2026-09-01. Later **boot-only** flashes. Kernel `#21` 2026-09-02 | Next bacon for vendor/system |
+| P0.1 | Battery UI | Not Working | Live percent and voltage. Not 50 percent | USB-meter log |
 | P0.2 | Charge | Not Working | USB powered, ~500 mA in the log. No PD | USB-meter proof that SoC increases |
-| P0.3 | GPS | Not Working | GPSTest installed. `loc_eng_start`. 0 satellites. `ril-daemon` restarts | `numSvs` more than 0. MPSS online |
-| P0.4 | Camera | Not Working | Daemon now probes **`mot_imx230`** only (was imx377). `msm_sensor_match_id: mot_imx230: read id failed`, CCI MASTER_1 no ACK. 0 devices. GPIO torch works | CCI ACK of Sony `0x0230` on the bus `qcom,camera@0` uses, then JPEG |
-| — | Display / Wi-Fi / speaker | On this telephone | 1440×2560. QCA6174 factory MAC. Loudspeaker `STREAM_MUSIC` | Not P0 |
+| P0.3 | GPS | Not Working | GPSTest empty. `loc_eng_start`. 0 satellites. Modem OFFLINE | `numSvs` more than 0. MPSS online |
+| P0.4 | Camera | Not Working | HAL **1** device (`dumpsys media.camera` CameraId 0). Probe `mot_imx230`. CCI1 ACK write **0x20** chip **0x0230**. Snap `openCamera` rc 0. Preview **fails** (`startPreview`, ISP `sensor resolution: 0x0`) | JPEG on `/sdcard/DCIM` |
+| — | Display / Wi-Fi / speaker / GPIO torch | On this telephone | 1440×2560. QCA6174. Loudspeaker. `led:flash_torch` GPIO 12 | Not P0 |
 | P2 | RIL | Deferred | `ril-daemon` exit 1 | Modem SMD |
 
 Keep QCamera2 MSMB `mot_imx230`. EpicLPer HAL1 “preview” is CSID test-generator, not live CSI. Do not ship TG.
@@ -134,7 +132,7 @@ This section is a description of the tree. It is not a procedure.
 - Procedure: [`docs/INSTALL.md`](docs/INSTALL.md). Pages: https://archienz.github.io/android_device_msft_talkman/INSTALL.html. How to update Pages is in that file.
 - `manifest.xml` does not list health 2.1, power 1.0, or vibrator 1.0. Those HALs ship `vintf_fragments`. A duplicate list made `hwservicemanager` reject the device manifest (`HAL vibrator has a conflict`). SurfaceFlinger then aborted `gralloc-mapper is missing` (black screen).
 - Do not package `LifeTimerService`. The APK is a bullhead leftover. PackageManager whitelist crash loops `system_server`.
-- Snap `CameraLauncher` is disabled when the HAL has 0 cameras. That hides the icon. The crash is `PhotoModule.initializeFocusManager` index 0 on an empty list.
+- Snap `CameraLauncher` is disabled when the HAL has 0 cameras. That hid the icon on first boot. The HAL now reports **1** camera. First Snap open can still hit `PhotoModule.initializeFocusManager` index 0 on an empty list. Second open: `startPreview failed` (`isp_util_map_streams` sensor resolution **0x0**, iface→ISP link). No JPEG.
 - Lights HIDL must write **only** `led:flash_torch` (GPIO 12). A write to `led:torch_0` can light the red indicator. The QS tile uses CameraManager, not this sysfs.
 - The daemon probed **imx377** while the XML said `mot_imx230` because
   `sensor_init_probe()` in `libmmcamera2_sensor_modules.so` does not read the XML.
@@ -179,12 +177,26 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - Framework overlay `config_gpsParameters` matches that file: SUPL 2.0 MSB, NTP `pool.ntp.org`, XTRA `xtra3grc.bin`. There is no `GPS_LOCK`. There is no MSA.
 - Vendor `sap.conf` (`e65e4b2`) uses NDK names ICM-206xx Accelerometer / Gyroscope, AK09912 Magnetometer, ZPA2326 Pressure / Temperature. `SENSOR_PROVIDER=2`. Not nanohub. Not SSC.
 
+### Camera (2026-09-02, after first boot)
+
+- CCI scan on the telephone: rear CSI0 / CCI **master 1** ACK write **0x20**,
+  id **0x0230**. That is IMX230. Master 0 sid **0x30** chip **0x0250** is not the
+  pixel array. Kernel DT `qcom,slave-id = <0x20 0x0016 0x0230>` is that
+  measurement. It is not an invented id.
+- Clark `libmmcamera2_sensor_modules.so` is on `/vendor` (list includes
+  `mot_imx230`). Linker also needs `libflash_sky81296.so` and
+  `libmotocalibration.so` at load. XML still has no FlashName / OisName /
+  ActuatorName / EepromName. Torch is GPIO 12.
+- Kernel `#21`: HAL **1** camera. `openCamera` rc 0. Snap preview still fails
+  (ISP `sensor resolution: 0x0`). CSID ioctls seen: INIT and RELEASE. No
+  `CSID_CFG` before the ISP error. No JPEG.
+
 ### Camera
 
 - XML `SensorName` is `mot_imx230` for CameraId 0.
 - Snap overlay is CameraId 0 `mot_imx230` HAL1. `support_camera_api_v2` is false. There is no Dual SIM CameraId 1.
 - There is no CameraId 1. Front sensor name is not known. Iris `qcom,camera@2` is disabled. No iris XML.
-- CAMERA-IDENT: CCI master 1 is a bus index. It is not `qcom,slave-id`.
+- CAMERA-IDENT: CCI master 1 is a bus index. Rear `qcom,slave-id` is the **measured** CCI1 ACK: write **0x20**, id register **0x0016**, chip **0x0230**. Clark blob still sends revision I2C to **0x34**; the kernel uses **0x20**.
 - `BOARD_QTI_CAMERA_32BIT_ONLY` is true. `USE_CAMERA_STUB` is false.
 - `system.prop` and `vendor.prop` force HAL1: `persist.camera.HAL3.enabled=0`. `vendor.prop` also sets IS type 4, TNR off, EIS enable (unused while HAL3 is off).
 - Media profiles: rear 3840×2160 at 30 fps, H.264 (IMX230). No HEVC encode. No 4K60.

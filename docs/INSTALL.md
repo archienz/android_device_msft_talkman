@@ -12,7 +12,7 @@ Vocabulary follows **ASD-STE100** Simplified Technical English (Issue 9) style. 
 
 Install `lineage_talkman-userdebug` on a telephone that already runs Windows 11 ARM (WOA). Keep factory DPP WLAN/BT. Keep EFS dumps.
 
-Do not use a stub camera. Do not invent `qcom,slave-id`. Do not mark P0 Working without `out/qa-*` logs.
+Do not use a stub camera. Do not invent a slave-id (rear write **0x20** / chip **0x0230** is measured). Do not mark P0 Working without `out/qa-*` logs.
 
 ---
 
@@ -33,8 +33,8 @@ The telephone boots LineageOS 18.1 to the home screen. Identity on this telephon
 | Battery UI | `dumpsys battery` live percent and voltage. Not 50% | **Not Working** (no USB-meter pass) |
 | Charge | USB ~500 mA in the log. No PD | **Not Working** |
 | GPS | `loc_eng_start`. 0 satellites. `ril-daemon` restarts. MPSS offline | **Not Working** |
-| Camera | Snap APK is present. Icon was hidden. Open then crash. HAL now probes **`mot_imx230`** only, but CCI gives no ACK. 0 devices | **Not Working** |
-| QS flashlight | Text "camera in use" | GPIO torch `led:flash_torch` works. Tile uses CameraManager |
+| Camera | HAL **1** device, probe `mot_imx230`, CCI1 ACK 0x20 / 0x0230. Snap `openCamera` rc 0. Preview fails (`startPreview`, ISP 0x0). No JPEG | **Not Working** |
+| QS flashlight | GPIO torch `led:flash_torch` works. Tile still uses CameraManager | Torch sysfs works |
 | RIL | `ril-daemon` exit 1 | P2 |
 
 Logs: workspace `out/qa-firstboot-*`, `out/qa-gps-camera`, `out/qa-camera/snap-launch.log`, `out/qa-pre-steamos-20260902/` (not in Git).
@@ -378,11 +378,23 @@ msm_sensor_match_id: mot_imx230: read id failed
 msm_cci_irq:1090 MASTER_1 error 0x40000000
 ```
 
-One probe, and it is the XML name. No imx377 and no ov5693. Still 0 devices: the
-sensor does not answer on the CCI master that `qcom,camera@0` uses. That is a
-kernel DT / pinctrl question, not a blob question. Do not invent
-`qcom,slave-id`. Do not ship a stub camera. Next: a CCI ACK of Sony `0x0230` on
-the bus the rear node uses.
+One probe, and it is the XML name. No imx377 and no ov5693.
+
+Later the same day (boot-only flashes, kernel `#21`): CCI1 **does** ACK. Rear
+write address **0x20**, Sony chip **0x0230** at register **0x0016**. CAF first
+cell is the 8-bit write address. Clark revision I2C still sends **0x34**; the
+kernel uses **0x20**. `dumpsys media.camera` shows **1** device. `openCamera`
+returns rc 0.
+
+Snap is still **Not Working**:
+
+1. First open: `PhotoModule.initializeFocusManager` `length=0; index=0`.
+2. Second open: `startPreview failed`. Daemon:
+   `isp_util_map_streams: failed: sensor resolution: 0x0` then
+   `Only session stream can be linked before ISP res allocation`.
+
+No JPEG. Do not ship a stub camera. Next: a live preview and a still on
+`/sdcard/DCIM`.
 
 ### 13. Enter TWRP after Android is installed
 
@@ -470,7 +482,8 @@ Build host: SteamOS ext4 `/home/deck/android/los-18.1`. This Windows host cannot
 1. Land kernel DT `talkman-camera.dtsi` (`qcom,sensor-name = "mot_imx230"`, no slave-id) in the **built** `Image.gz-dtb`. Confirm the DTB strings contain `mot_imx230` and talkman-cci-scan **before** flash.
 2. Keep `manifest.xml` without health / power / vibrator HAL blocks.
 3. Do not install LifeTimerService.
-4. Lights: write `led:flash_torch` only. QS flashlight should use ILight, not CameraManager, until a camera device exists.
+4. Lights: write `led:flash_torch` only.
+5. Camera next: ISP still reports sensor resolution **0x0**. HAL already has CameraId 0. Do not mark Working without a JPEG.
 5. `lunch lineage_talkman-userdebug` then `mka bacon`.
 6. Copy the zip to the Windows installer PC. Do not `repo sync` onto NTFS.
 7. If Android GPT already exists: **do not** run `installer.bat` or stock `partition.sh`. Keep userdata. Flash the new zip from TWRP, or flash only `boot.img` if the change is kernel/DT.
