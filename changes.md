@@ -12,6 +12,7 @@ Purpose, Progress, and battery differences compared to the community repository 
 - HAL1 parameters: when the backend has 0 flash modes and the LED node exists, `flash-mode-values` is `off,torch` and `updateFlash` drives the LED. `CAM_INTF_PARM_LED_MODE` is never sent to the daemon in that mode, so preview and ZSL are unchanged.
 - Result: tile ON → `led:flash_torch` 255, `torch_0` 0, `Device 0 is closed`. Tile OFF → 0. Snap open → LED 0 and tile **Camera in use** (correct). Snap close → tile available. Snap preview frames present at 30 fps before and after (SurfaceFlinger latency). `screencap` shows the MDP YUV overlay as black with the old HAL too; it is not a regression.
 - `liblight/lights.c` `LIGHT_ID_FLASHLIGHT` also writes only `led:flash_torch`. `led:torch_0` is the red indicator.
+- Owner confirmed 2026-09-02: Quick Settings flashlight works. Keep `1fc5b8a`.
 - `cmd statusbar click-tile` / `remove-tile` crash SystemUI (`CustomTile.toSpec` NPE, a custom tile with a null component in the tile list). Not fixed here. Use `input tap`.
 
 ### Install and first boot (2026-09-02)
