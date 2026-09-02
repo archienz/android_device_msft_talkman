@@ -30,8 +30,8 @@ The telephone boots LineageOS 18.1 to the home screen. Identity on this telephon
 | USB ADB | `g_android`, `androidboot.usbconfigfs=0` | Works |
 | Wi-Fi | QCA6174 PCIe, factory MAC from DPP, DHCP, ping 8.8.8.8 / 1.1.1.1 | Works on this telephone. Not a campaign claim |
 | Loudspeaker | `STREAM_MUSIC` device speaker, volume 11/15, ringtone plays | Works on this telephone |
-| Battery UI | `dumpsys battery` live percent and voltage. Not 50% | **Not Working** (no USB-meter pass) |
-| Charge | USB ~500 mA in the log. No PD | **Not Working** |
+| Battery UI | `dumpsys battery` live percent and voltage. Not 50% | **Working on this telephone** |
+| Charge | USB SDP 5 V / 500 mA, charging enabled, status Full. No PD | **Working on this telephone** (USB cable). Qi pad not tested |
 | GPS | `loc_eng_start`. 0 satellites. `ril-daemon` restarts. MPSS offline | **Not Working** |
 | Camera | HAL **1** device, probe `mot_imx230`, CCI1 ACK 0x20 / 0x0230. Snap `openCamera` rc 0. Preview fails (`startPreview`, ISP 0x0). No JPEG | **Not Working** |
 | QS flashlight | GPIO torch `led:flash_torch` works. Tile still uses CameraManager | Torch sysfs works |
@@ -335,7 +335,7 @@ PowerShell on the PC: do not nest `adb shell "... \"$n=\""` (quote parse fails).
 
 QS tile still uses `CameraManager.setTorchMode` because `android.hardware.camera.flash` is advertised. 0 camera devices → text "camera in use". That is not a GPIO failure.
 
-**Battery (log only).** `dumpsys battery` on this telephone: live percent, ~4.0 V, USB charging ~500 mA, Li-ion. Not a hardcoded 50%. Still **Not Working** as P0 (no USB-meter pass).
+**Battery UI and USB charge.** `dumpsys battery` on this telephone: live percent and voltage, Li-ion, USB `online`, SDP 5 V / 500 mA, `charging_enabled`, status Full. Not a hardcoded 50%. **Working on this telephone.** Qi pad is not tested. `bms/charge_full` is still a bad health value; that is not the charge path.
 
 **GPS (failed).** Sideload `GPSTest-osmdroid-v3.10.6.apk`. Status empty. `loc_eng_start` / inject_time run. 0 SV / CN0. `mTopHalCapabilities=0x0`. `ril-daemon` restarts. Subsys: venus / AR6320 / adsp / modem — modem **OFFLINE**. Wi-Fi stays up without MPSS. GPS needs MPSS.
 

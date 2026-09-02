@@ -107,13 +107,13 @@ Unofficial zip `lineage-18.1-20260901-UNOFFICIAL-talkman` is installed on one RM
 
 Host: Steam Deck SteamOS, ext4 `/home/deck/android/los-18.1`. Do not `repo sync` onto NTFS.
 
-No P0 item is **Working**. Dual SIM RM-1118 is not this product. There is no `CONFIG_MSM_OIS`. The Microsoft service schematic is for implementation only. It is not published.
+P0.1 Battery UI and P0.2 USB cable charge are **Working on this telephone**. GPS and camera are not. Dual SIM RM-1118 is not this product. There is no `CONFIG_MSM_OIS`. The Microsoft service schematic is for implementation only. It is not published.
 
 | ID | Subsystem | Status | What is on the telephone | What is still missing |
 |---|---|---|---|---|
 | P0.0 | Rebuild LOS 18.1 | Built and flashed | `lineage_talkman-userdebug` zip 2026-09-01. Later **boot-only** flashes. Kernel `#21` 2026-09-02 | Next bacon for vendor/system |
-| P0.1 | Battery UI | Not Working | Live percent and voltage. Not 50 percent | USB-meter log |
-| P0.2 | Charge | Not Working | USB powered, ~500 mA in the log. No PD | USB-meter proof that SoC increases |
+| P0.1 | Battery UI | Working on this telephone | `dumpsys battery` live percent and voltage (now 100 percent, 4.27 V). Not 50 percent | — |
+| P0.2 | Charge | Working on this telephone (USB cable) | USB `online`, SDP 5 V / 500 mA, `charging_enabled`, status Full. No PD | Qi pad not tested. `bms/charge_full` is still a bad health value |
 | P0.3 | GPS | Not Working | GPSTest empty. `loc_eng_start`. 0 satellites. Modem OFFLINE | `numSvs` more than 0. MPSS online |
 | P0.4 | Camera | Not Working | HAL **1** device (`dumpsys media.camera` CameraId 0). Probe `mot_imx230`. CCI1 ACK write **0x20** chip **0x0230**. Snap `openCamera` rc 0. Preview **fails** (`startPreview`, ISP `sensor resolution: 0x0`) | JPEG on `/sdcard/DCIM` |
 | — | Display / Wi-Fi / speaker / GPIO torch | On this telephone | 1440×2560. QCA6174. Loudspeaker. `led:flash_torch` GPIO 12 | Not P0 |
