@@ -5,6 +5,7 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := \
     util/QCameraCmdThread.cpp \
     util/QCameraQueue.cpp \
+    util/QCameraTorch.cpp \
     QCamera2Hal.cpp \
     QCamera2Factory.cpp
 
@@ -46,6 +47,7 @@ endif
 LOCAL_CFLAGS += -DDEFAULT_DENOISE_MODE_ON -DHAL3
 
 LOCAL_C_INCLUDES := \
+    $(LOCAL_PATH) \
     $(LOCAL_PATH)/stack/common \
     frameworks/native/include/media/hardware \
     frameworks/native/include/media/openmax \

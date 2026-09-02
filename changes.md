@@ -4,6 +4,16 @@ This file is a description of the tree. It is not a procedure.
 
 Purpose, Progress, and battery differences compared to the community repository stay in [`README.md`](README.md).
 
+### Quick Settings flashlight (2026-09-02)
+
+- Measured on the telephone (`out/qa-torch-20260902/`): the tile said **Camera in use** with no camera client. `dumpsys media.camera` said `Has a flash unit: false`. SystemUI `FlashlightControllerImpl` had `mCameraId=null`, `mTorchAvailable=false`. The tile shows that string whenever `mTorchAvailable` is false; it never reached `setTorchMode`. There was no `CAMERA_IN_USE` and no held device.
+- Cause: mm-camera has no flash driver for this board (no `FlashName`, no sky81296, `flash subdev id = -1`, `led flash is not supported for this sensor`). HAL1 then set no `flash-mode-values`, so cameraserver `DeviceInfo1` saw no torch and `FLASH_INFO_AVAILABLE` was false. The module was API 2.3 with `set_torch_mode = NULL`.
+- Fix in `camera/QCamera2`: `util/QCameraTorch.cpp` writes **only** `/sys/class/leds/led:flash_torch/brightness` (0 or `max_brightness`). The module is API **2.4** with `QCamera2Factory::set_torch_mode`. It returns `-EBUSY` while a device is open and sends `torch_mode_status_change`. `open()` turns the LED off and sends `NOT_AVAILABLE`; `close()` sends `AVAILABLE_OFF`. `getCameraInfo` sets `resource_cost` 100 (API 2.4 makes it HAL-owned).
+- HAL1 parameters: when the backend has 0 flash modes and the LED node exists, `flash-mode-values` is `off,torch` and `updateFlash` drives the LED. `CAM_INTF_PARM_LED_MODE` is never sent to the daemon in that mode, so preview and ZSL are unchanged.
+- Result: tile ON → `led:flash_torch` 255, `torch_0` 0, `Device 0 is closed`. Tile OFF → 0. Snap open → LED 0 and tile **Camera in use** (correct). Snap close → tile available. Snap preview frames present at 30 fps before and after (SurfaceFlinger latency). `screencap` shows the MDP YUV overlay as black with the old HAL too; it is not a regression.
+- `liblight/lights.c` `LIGHT_ID_FLASHLIGHT` also writes only `led:flash_torch`. `led:torch_0` is the red indicator.
+- `cmd statusbar click-tile` / `remove-tile` crash SystemUI (`CustomTile.toSpec` NPE, a custom tile with a null component in the tile list). Not fixed here. Use `input tap`.
+
 ### Install and first boot (2026-09-02)
 
 - Procedure: [`docs/INSTALL.md`](docs/INSTALL.md). Pages: https://archienz.github.io/android_device_msft_talkman/INSTALL.html. How to update Pages is in that file.
@@ -100,7 +110,7 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - Duke AMOLED is command-mode. LAB/IBB mode is amoled at 4.6 V. Always-on display is false. Pickup pulse is false.
 - Recents is SystemUI `OverviewProxyRecentsImpl` on the software 3-button navbar. There is no capacitive APP_SWITCH.
 - Overlay `config_deviceHardwareKeys` is 96 (CAMERA plus VOLUME). Wake keys are the same. There is no APP_SWITCH key.
-- Light HIDL 2.0 writes lcd-backlight and RGB sysfs. Torch writes `led:flash_torch` and `led:torch_0` (`d92e6c3`). Torch GPIO is **12**. HIDL 2.0 has no `Type::FLASHLIGHT` enum; torch stays on the liblight `LIGHT_ID_FLASHLIGHT` path and `QCameraFlash` GPIO LED backend. Kernel `flash.dtsi` is PMI8994 qpnp-flash-led with that GPIO. sepolicy `hal_light` sysfs_leds matches those names (`6a8f621`). There is no leftover `led::flash_torch`.
+- Light HIDL 2.0 writes lcd-backlight and RGB sysfs. Torch writes only `led:flash_torch` (`d92e6c3` also wrote `led:torch_0`; that is the red indicator). Torch GPIO is **12**. HIDL 2.0 has no `Type::FLASHLIGHT` enum; torch stays on the liblight `LIGHT_ID_FLASHLIGHT` path and the `QCameraTorch` GPIO LED backend in the camera HAL. Kernel `flash.dtsi` is PMI8994 qpnp-flash-led with that GPIO. sepolicy `hal_light` sysfs_leds matches those names (`6a8f621`). There is no leftover `led::flash_torch`.
 - Rear torch is MSM GPIO 12 into flash driver IC N1400 TORCH pin. I2C address is not on the drawing. There is no `qcom,slave-id`.
 
 ### Other

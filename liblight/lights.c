@@ -63,7 +63,6 @@ static const char RED_TRIGGER_FILE[] = "/sys/class/leds/red/trigger";
 static const char GREEN_TRIGGER_FILE[] = "/sys/class/leds/green/trigger";
 static const char BLUE_TRIGGER_FILE[] = "/sys/class/leds/blue/trigger";
 static const char FLASH_TORCH_FILE[] = "/sys/class/leds/led:flash_torch/brightness";
-static const char TORCH_0_FILE[] = "/sys/class/leds/led:torch_0/brightness";
 
 struct led_config {
     unsigned int colorRGB;
@@ -226,12 +225,7 @@ static int set_light_backlight(struct light_device_t *dev __unused,
 
 static int write_torch(int brightness)
 {
-    int e1 = write_int(FLASH_TORCH_FILE, brightness);
-    int e2 = write_int(TORCH_0_FILE, brightness);
-
-    if (e1 == 0 || e2 == 0)
-        return 0;
-    return e1 ? e1 : e2;
+    return write_int(FLASH_TORCH_FILE, brightness);
 }
 
 static int set_light_flashlight(struct light_device_t *dev __unused,

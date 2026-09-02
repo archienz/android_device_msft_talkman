@@ -49,6 +49,7 @@
 #include "QCamera3Channel.h"
 #include "QCamera3PostProc.h"
 #include "QCamera3VendorTags.h"
+#include "QCamera2Factory.h"
 #include <cutils/properties.h>
 
 using namespace android;
@@ -7485,7 +7486,9 @@ int QCamera3HardwareInterface::close_camera_device(struct hw_device_t* device)
         ALOGE("NULL camera device");
         return BAD_VALUE;
     }
+    int cameraId = (int)hw->mCameraId;
     delete hw;
+    QCamera2Factory::camera_device_closed(cameraId);
 
     CDBG("%s: X", __func__);
     return ret;
