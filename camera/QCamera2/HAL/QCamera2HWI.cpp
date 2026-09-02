@@ -43,6 +43,7 @@
 #include "QCamera2HWI.h"
 #include "QCameraMem.h"
 #include "QCamera2Factory.h"
+#include "QCameraTorch.h"
 
 #define MAP_TO_DRIVER_COORDINATE(val, base, scale, offset) \
   ((int32_t)val * (int32_t)scale / (int32_t)base + (int32_t)offset)
@@ -61,6 +62,19 @@
 #define INDEFINITE_DURATION     0
 
 #define HDR_CONFIDENCE_THRESHOLD 0.4
+
+// talkman led:flash_torch software strobe (ledStrobeStart):
+// flash-mode auto fires when the preview AEC is out of headroom, i.e. the
+// exposure time is at the 30 fps frame time (~33 ms, compared with margin)
+// and the gain is at least 4x base (ISO >= 400). EV100 ~ 4.7 at f/1.9, dim
+// indoor light. Both values come from CAM_INTF_META_AEC_INFO in preview
+// metadata, the same ones written to EXIF.
+#define LED_STROBE_AUTO_EXP_TIME  0.030f
+#define LED_STROBE_AUTO_ISO       400
+// The frame being exposed when the LED is written is only partly lit; the
+// next frame is the first fully lit one and its AEC statistics arrive one
+// frame later. AEC reports older than this cannot show the LED.
+#define LED_STROBE_MIN_FRAMES     2U
 
 namespace qcamera {
 
@@ -677,6 +691,11 @@ int QCamera2HardwareInterface::take_picture(struct camera_device *device)
     hw->lockAPI();
     qcamera_api_result_t apiResult;
 
+    /* talkman: flash-mode on/auto on the GPIO LED. Light the scene and let
+     * the AEC settle before any capture frame is requested below. Failure
+     * only means no flash; the capture still goes ahead. */
+    hw->ledStrobeStart();
+
    /** Added support for Retro-active Frames:
      *  takePicture() is called before preparing Snapshot to indicate the
      *  mm-camera-channel to pick up legacy frames even
@@ -1165,6 +1184,10 @@ QCamera2HardwareInterface::QCamera2HardwareInterface(uint32_t cameraId)
     pthread_mutex_init(&m_int_lock, NULL);
     pthread_cond_init(&m_int_cond, NULL);
 
+    memset(&mLedStrobe, 0, sizeof(mLedStrobe));
+    pthread_mutex_init(&m_ledStrobeLock, NULL);
+    pthread_cond_init(&m_ledStrobeCond, NULL);
+
     memset(m_channels, 0, sizeof(m_channels));
     memset(&mExifParams, 0, sizeof(mm_jpeg_exif_params_t));
 
@@ -1212,6 +1235,8 @@ QCamera2HardwareInterface::~QCamera2HardwareInterface()
     pthread_cond_destroy(&m_evtCond);
     pthread_mutex_destroy(&m_parm_lock);
     pthread_mutex_destroy(&m_int_lock);
+    pthread_mutex_destroy(&m_ledStrobeLock);
+    pthread_cond_destroy(&m_ledStrobeCond);
     pthread_cond_destroy(&m_int_cond);
 }
 
@@ -1356,6 +1381,10 @@ int QCamera2HardwareInterface::closeCamera()
     }
     ALOGI("[KPI Perf] %s: E PROFILE_CLOSE_CAMERA camera id %d",
         __func__, mCameraId);
+
+    // the LED must be off once the camera is closed (QCamera2Factory then
+    // reports the torch as available again)
+    ledStrobeStop();
 
     pthread_mutex_lock(&m_parm_lock);
 
@@ -2336,6 +2365,7 @@ int QCamera2HardwareInterface::stopPreview()
 {
     ATRACE_CALL();
     CDBG_HIGH("%s: E", __func__);
+    ledStrobeStop();
     // stop preview stream
     stopChannel(QCAMERA_CH_TYPE_ZSL);
     stopChannel(QCAMERA_CH_TYPE_PREVIEW);
@@ -3102,6 +3132,21 @@ int QCamera2HardwareInterface::takePicture()
                         mCameraHandle->camera_handle,
                         pZSLChannel->getMyHandle());
             }
+            pthread_mutex_lock(&m_ledStrobeLock);
+            bool ledStrobe = mLedStrobe.on;
+            uint32_t litFrameIdx = mLedStrobe.frame_idx + 1;
+            pthread_mutex_unlock(&m_ledStrobeLock);
+            if (ledStrobe) {
+                // The ZSL queue holds look-back frames exposed before the LED
+                // came on (or before the AEC settled on it). Drop them and let
+                // the channel deliver the first frame newer than the last
+                // AEC report seen while waiting in ledStrobeStart. The flush
+                // and the request below go through the same channel command
+                // queue, so their order is kept.
+                CDBG_HIGH("%s: led strobe: flush ZSL queue, expect frame >= %u",
+                        __func__, litFrameIdx);
+                pZSLChannel->flushSuperbuffer(litFrameIdx);
+            }
             rc = pZSLChannel->takePicture(numSnapshots, numRetroSnapshots);
             if (rc != NO_ERROR) {
                 ALOGE("%s: cannot take ZSL picture, stop pproc", __func__);
@@ -3436,6 +3481,9 @@ int QCamera2HardwareInterface::stopCaptureChannel(bool destroy)
  *==========================================================================*/
 int QCamera2HardwareInterface::cancelPicture()
 {
+    // capture over or aborted (also the longshot end): LED must not stay on
+    ledStrobeStop();
+
     waitDefferedWork(mReprocJob);
 
     //stop post processor
@@ -3498,6 +3546,224 @@ void QCamera2HardwareInterface::captureDone()
     } else {
         ALOGE("%s: No memory for ZSL capture done event", __func__);
     }
+}
+
+/*===========================================================================
+ * FUNCTION   : ledStrobeStart
+ *
+ * DESCRIPTION: talkman photo flash. mm-camera has no flash driver for this
+ *              board, so for flash-mode on/auto the HAL lights the GPIO LED
+ *              led:flash_torch itself. Called on the API thread from
+ *              take_picture() before any capture frame is requested. Blocks
+ *              until the AEC has adapted to the lit scene or the time cap
+ *              has passed, then returns so the capture proceeds lit.
+ *
+ *              Convergence is judged on the AEC report the daemon puts in
+ *              every preview/ZSL metadata frame (ledStrobeAecUpdate):
+ *              - the report must be LED_STROBE_MIN_FRAMES newer than the
+ *                frame during which the LED was written;
+ *              - exposure time or ISO must have changed since the LED went
+ *                on (the AEC saw the extra light) and be unchanged from the
+ *                previous report (it stopped moving);
+ *              - the AEC must report settled.
+ *              The wait is capped at getBurstLEDOnPeriod() ms, the CAF
+ *              zsl-burst-led-on-period (300 ms unless the app or
+ *              persist.camera.led.on.period sets it). In a bright scene the
+ *              LED changes nothing measurable and the cap ends the wait.
+ *
+ * PARAMETERS : none
+ *
+ * RETURN     : int32_t type of status
+ *              NO_ERROR      -- LED lit, or no strobe requested
+ *              UNKNOWN_ERROR -- LED could not be lit; capture goes on unlit
+ *==========================================================================*/
+int32_t QCamera2HardwareInterface::ledStrobeStart()
+{
+    int32_t mode = mParameters.getLedStrobeMode();
+    if (mode == CAM_FLASH_MODE_OFF) {
+        return NO_ERROR;
+    }
+    if (mParameters.getRecordingHintValue()) {
+        // live snapshot during video: the LED would be off for the rest of
+        // the recording anyway; video light is flash-mode torch
+        CDBG_HIGH("%s: led strobe: skipped for live snapshot", __func__);
+        return NO_ERROR;
+    }
+
+    pthread_mutex_lock(&m_ledStrobeLock);
+    if (mLedStrobe.on) {
+        // longshot: one strobe covers the whole burst, ended in cancelPicture
+        pthread_mutex_unlock(&m_ledStrobeLock);
+        return NO_ERROR;
+    }
+
+    if (mode == CAM_FLASH_MODE_AUTO) {
+        bool dark = mLedStrobe.valid &&
+                (mLedStrobe.exp_time >= LED_STROBE_AUTO_EXP_TIME) &&
+                (mLedStrobe.iso >= LED_STROBE_AUTO_ISO);
+        // mFlashNeeded is the daemon AEC's own request (CAM_INTF_META_AEC_INFO)
+        if (!dark && !mFlashNeeded) {
+            ALOGI("%s: led strobe auto: not needed (exp %.4f s, iso %d, "
+                    "aec valid %d, flash_needed %d)", __func__,
+                    mLedStrobe.exp_time, mLedStrobe.iso, mLedStrobe.valid,
+                    mFlashNeeded);
+            pthread_mutex_unlock(&m_ledStrobeLock);
+            return NO_ERROR;
+        }
+    }
+
+    int32_t rc = QCameraTorch::setTorch(true);
+    if (rc != 0) {
+        ALOGE("%s: led strobe: cannot light led:flash_torch (%d)", __func__, rc);
+        pthread_mutex_unlock(&m_ledStrobeLock);
+        return UNKNOWN_ERROR;
+    }
+    mLedStrobe.on = true;
+    mLedStrobe.pending = mParameters.getNumOfSnapshots();
+    mLedStrobe.on_frame_idx = mLedStrobe.frame_idx;
+    mLedStrobe.on_exp_time = mLedStrobe.exp_time;
+    mLedStrobe.on_iso = mLedStrobe.iso;
+    mLedStrobe.reacted = false;
+    mLedStrobe.stable = false;
+
+    int capMs = mParameters.getBurstLEDOnPeriod();
+    ALOGI("%s: led strobe on (mode %d) at frame %u, exp %.4f s, iso %d, "
+            "%d snapshots, wait <= %d ms for AEC", __func__, mode,
+            mLedStrobe.on_frame_idx, mLedStrobe.on_exp_time, mLedStrobe.on_iso,
+            mLedStrobe.pending, capMs);
+
+    // same deadline construction as checkIntPicPending
+    struct timespec ts;
+    struct timeval tp;
+    gettimeofday(&tp, NULL);
+    ts.tv_sec = tp.tv_sec + (capMs / 1000);
+    ts.tv_nsec = ((long)tp.tv_usec * 1000L) + ((long)(capMs % 1000) * 1000000L);
+    if (ts.tv_nsec >= 1000000000L) {
+        ts.tv_sec += 1;
+        ts.tv_nsec -= 1000000000L;
+    }
+
+    int waitRc = 0;
+    bool converged = false;
+    while (true) {
+        converged = mLedStrobe.valid &&
+                (mLedStrobe.frame_idx >=
+                        mLedStrobe.on_frame_idx + LED_STROBE_MIN_FRAMES) &&
+                mLedStrobe.reacted && mLedStrobe.stable &&
+                (mLedStrobe.settled != 0);
+        // also leave if something (stopPreview, close) ended the strobe
+        if (converged || (waitRc == ETIMEDOUT) || !mLedStrobe.on) {
+            break;
+        }
+        waitRc = pthread_cond_timedwait(&m_ledStrobeCond, &m_ledStrobeLock, &ts);
+    }
+    ALOGI("%s: led strobe: capture after %s, last AEC frame %u, exp %.4f s, "
+            "iso %d, settled %u, reacted %d", __func__,
+            converged ? "AEC converged" : "time cap", mLedStrobe.frame_idx,
+            mLedStrobe.exp_time, mLedStrobe.iso, mLedStrobe.settled,
+            mLedStrobe.reacted);
+    pthread_mutex_unlock(&m_ledStrobeLock);
+    return NO_ERROR;
+}
+
+/*===========================================================================
+ * FUNCTION   : ledStrobeStop
+ *
+ * DESCRIPTION: switch the strobe LED off if this strobe lit it. Called when
+ *              the capture frame(s) arrived (ledStrobeFrameReceived), from
+ *              cancelPicture (capture end, cancel, longshot end), stopPreview
+ *              and closeCamera. If the app selected flash-mode torch in the
+ *              meantime, updateFlash owns the LED and it stays on.
+ *
+ * PARAMETERS : none
+ *
+ * RETURN     : none
+ *==========================================================================*/
+void QCamera2HardwareInterface::ledStrobeStop()
+{
+    pthread_mutex_lock(&m_ledStrobeLock);
+    bool wasOn = mLedStrobe.on;
+    mLedStrobe.on = false;
+    mLedStrobe.pending = 0;
+    pthread_mutex_unlock(&m_ledStrobeLock);
+
+    if (wasOn) {
+        if (mParameters.isLedTorchLit()) {
+            ALOGI("%s: led strobe done, torch selected: LED stays on", __func__);
+        } else if (QCameraTorch::setTorch(false) != 0) {
+            ALOGE("%s: led strobe: cannot switch led:flash_torch off", __func__);
+        } else {
+            ALOGI("%s: led strobe off", __func__);
+        }
+    }
+}
+
+/*===========================================================================
+ * FUNCTION   : ledStrobeFrameReceived
+ *
+ * DESCRIPTION: a capture super buffer (snapshot YUV/raw + metadata) has been
+ *              received from the ZSL or capture channel. Once the requested
+ *              number of frames is in, the LED goes off; JPEG encoding does
+ *              not need light. Longshot keeps the LED on for the burst.
+ *
+ * PARAMETERS : none
+ *
+ * RETURN     : none
+ *==========================================================================*/
+void QCamera2HardwareInterface::ledStrobeFrameReceived()
+{
+    bool off = false;
+
+    pthread_mutex_lock(&m_ledStrobeLock);
+    if (mLedStrobe.on) {
+        if (mLedStrobe.pending > 0) {
+            mLedStrobe.pending--;
+        }
+        off = (mLedStrobe.pending == 0) && !mLongshotEnabled;
+        CDBG_HIGH("%s: led strobe: capture frame in, %d pending, off %d",
+                __func__, mLedStrobe.pending, off);
+    }
+    pthread_mutex_unlock(&m_ledStrobeLock);
+
+    if (off) {
+        ledStrobeStop();
+    }
+}
+
+/*===========================================================================
+ * FUNCTION   : ledStrobeAecUpdate
+ *
+ * DESCRIPTION: record the AEC report of a metadata frame for the strobe
+ *              (called from metadata_stream_cb_routine on every frame) and
+ *              wake ledStrobeStart if it is waiting.
+ *
+ * PARAMETERS :
+ *   @frame_idx : frame id of the metadata buffer
+ *   @ae        : CAM_INTF_META_AEC_INFO payload
+ *
+ * RETURN     : none
+ *==========================================================================*/
+void QCamera2HardwareInterface::ledStrobeAecUpdate(uint32_t frame_idx,
+        const cam_3a_params_t &ae)
+{
+    pthread_mutex_lock(&m_ledStrobeLock);
+    if (mLedStrobe.on) {
+        mLedStrobe.stable = (ae.exp_time == mLedStrobe.exp_time) &&
+                (ae.iso_value == mLedStrobe.iso);
+        if ((ae.exp_time != mLedStrobe.on_exp_time) ||
+                (ae.iso_value != mLedStrobe.on_iso)) {
+            mLedStrobe.reacted = true;
+        }
+    }
+    mLedStrobe.valid = true;
+    mLedStrobe.frame_idx = frame_idx;
+    mLedStrobe.exp_time = ae.exp_time;
+    mLedStrobe.iso = ae.iso_value;
+    mLedStrobe.settled = ae.settled;
+    if (mLedStrobe.on) {
+        pthread_cond_broadcast(&m_ledStrobeCond);
+    }
+    pthread_mutex_unlock(&m_ledStrobeLock);
 }
 
 /*===========================================================================
@@ -3903,6 +4169,7 @@ int QCamera2HardwareInterface::cancelLiveSnapshot()
 {
     int rc = NO_ERROR;
 
+    ledStrobeStop();
     unconfigureAdvancedCapture();
     if (!mLongshotEnabled) {
         m_perfLock.lock_rel();

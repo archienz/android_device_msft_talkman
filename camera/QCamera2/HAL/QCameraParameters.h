@@ -660,6 +660,12 @@ public:
     bool isAutoHDREnabled();
     int32_t stopAEBracket();
     int32_t updateFlash(bool commitSettings);
+    // talkman led:flash_torch: flash mode the HAL must realise itself for the
+    // next still capture (CAM_FLASH_MODE_ON / _AUTO), else CAM_FLASH_MODE_OFF
+    int32_t getLedStrobeMode();
+    // true while updateFlash keeps led:flash_torch on for flash-mode torch
+    bool isLedTorchLit() {return m_bLedTorchOnly &&
+            (mFlashDaemonValue == CAM_FLASH_MODE_TORCH);};
     int32_t updateRAW(cam_dimension_t max_dim);
     bool isAVTimerEnabled();
     bool isDISEnabled();
@@ -1044,7 +1050,9 @@ private:
     int32_t mFlashValue;
     int32_t mFlashDaemonValue;
     // backend reports no flash but the board has a led:flash_torch GPIO LED:
-    // flash-mode is limited to off/torch and driven from the HAL (QCameraTorch)
+    // flash-mode is off/auto/on/torch, all driven from the HAL (QCameraTorch).
+    // torch: updateFlash keeps the LED on. on/auto: QCamera2HWI strobes the
+    // LED around the still capture (ledStrobeStart / ledStrobeStop).
     bool m_bLedTorchOnly;
     int32_t mHfrMode;
     bool m_bHDRModeSensor;

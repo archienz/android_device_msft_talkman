@@ -5002,10 +5002,17 @@ int32_t QCameraParameters::initDefaultParameters()
        setFlash(FLASH_MODE_OFF);
     } else if (QCameraTorch::hasTorch()) {
         // No flash driver in mm-camera, but the board has a GPIO torch LED.
-        // Advertise off/torch so cameraserver sees a flash unit
-        // (android.flash.info.available) and drive the LED from updateFlash.
+        // Advertise off/auto/on/torch so cameraserver sees a flash unit
+        // (android.flash.info.available). torch is driven from updateFlash;
+        // on/auto are a software strobe around the still capture in
+        // QCamera2HardwareInterface::ledStrobeStart (auto decides from the
+        // AEC exposure/ISO the daemon reports in preview metadata).
         m_bLedTorchOnly = true;
         String8 flashValues(FLASH_MODE_OFF);
+        flashValues.append(",");
+        flashValues.append(FLASH_MODE_AUTO);
+        flashValues.append(",");
+        flashValues.append(FLASH_MODE_ON);
         flashValues.append(",");
         flashValues.append(FLASH_MODE_TORCH);
         set(KEY_SUPPORTED_FLASH_MODES, flashValues);
@@ -8455,13 +8462,17 @@ int32_t QCameraParameters::updateFlash(bool commitSettings)
     }
 
     if (m_bLedTorchOnly) {
-        // mm-camera has no flash driver here; the only real mode is torch on
-        // the GPIO LED. Never send CAM_INTF_PARM_LED_MODE to the daemon.
+        // mm-camera has no flash driver here. Only torch keeps the GPIO LED
+        // on during preview; on/auto leave it off here and are strobed by
+        // QCamera2HWI at capture time. Never send CAM_INTF_PARM_LED_MODE to
+        // the daemon. Write the LED only when its steady state changes so a
+        // mode switch between off/auto/on cannot cut a strobe short.
         if (value != mFlashDaemonValue) {
             bool on = (value == CAM_FLASH_MODE_TORCH);
+            bool wasOn = (mFlashDaemonValue == CAM_FLASH_MODE_TORCH);
             CDBG_HIGH("%s: led:flash_torch %s (flash value %d)", __func__,
                     on ? "on" : "off", value);
-            if (QCameraTorch::setTorch(on) != 0) {
+            if ((on != wasOn) && (QCameraTorch::setTorch(on) != 0)) {
                 ALOGE("%s: failed to drive led:flash_torch", __func__);
                 return BAD_VALUE;
             }
@@ -8491,6 +8502,34 @@ int32_t QCameraParameters::updateFlash(bool commitSettings)
     }
 
     return rc;
+}
+
+/*===========================================================================
+ * FUNCTION   : getLedStrobeMode
+ *
+ * DESCRIPTION: flash mode the HAL has to realise itself on led:flash_torch
+ *              for the next still capture. Only meaningful on boards where
+ *              mm-camera has no flash driver (m_bLedTorchOnly). Uses the same
+ *              exclusions as updateFlash: bracketing captures never flash.
+ *
+ * PARAMETERS : none
+ *
+ * RETURN     : CAM_FLASH_MODE_ON or CAM_FLASH_MODE_AUTO when the LED must be
+ *              strobed, CAM_FLASH_MODE_OFF otherwise (flash off, torch
+ *              already lit by updateFlash, or a bracketing mode)
+ *==========================================================================*/
+int32_t QCameraParameters::getLedStrobeMode()
+{
+    if (!m_bLedTorchOnly ||
+            isHDREnabled() || m_bAeBracketingEnabled || m_bAFBracketingOn ||
+            m_bOptiZoomOn || m_bReFocusOn) {
+        return CAM_FLASH_MODE_OFF;
+    }
+    if ((mFlashValue == CAM_FLASH_MODE_ON) ||
+            (mFlashValue == CAM_FLASH_MODE_AUTO)) {
+        return mFlashValue;
+    }
+    return CAM_FLASH_MODE_OFF;
 }
 
 /*===========================================================================

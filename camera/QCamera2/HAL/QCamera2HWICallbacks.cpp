@@ -133,6 +133,8 @@ void QCamera2HardwareInterface::zsl_channel_cb(mm_camera_super_buf_t *recvd_fram
 
     /* indicate the parent that capture is done */
     pme->captureDone();
+    /* talkman: the lit ZSL frame is in; the strobe LED may go off now */
+    pme->ledStrobeFrameReceived();
     // save a copy for the superbuf
     mm_camera_super_buf_t* frame =
                (mm_camera_super_buf_t *)malloc(sizeof(mm_camera_super_buf_t));
@@ -400,6 +402,8 @@ void QCamera2HardwareInterface::capture_channel_cb_routine(mm_camera_super_buf_t
         ALOGE("%s: Capture channel doesn't exist, return here", __func__);
         return;
     }
+    /* talkman: non-ZSL snapshot frame is in; the strobe LED may go off now */
+    pme->ledStrobeFrameReceived();
     // save a copy for the superbuf
     mm_camera_super_buf_t* frame =
                (mm_camera_super_buf_t *)malloc(sizeof(mm_camera_super_buf_t));
@@ -1748,6 +1752,8 @@ void QCamera2HardwareInterface::metadata_stream_cb_routine(mm_camera_super_buf_t
         pme->mExifParams.cam_3a_params = *ae_params;
         pme->mExifParams.cam_3a_params_valid = TRUE;
         pme->mFlashNeeded = ae_params->flash_needed;
+        /* talkman: exposure/ISO/settled feed the led:flash_torch strobe */
+        pme->ledStrobeAecUpdate(frame->frame_idx, *ae_params);
         pme->mExifParams.cam_3a_params.brightness = (float) pme->mParameters.getBrightness();
         qcamera_sm_internal_evt_payload_t *payload =
                 (qcamera_sm_internal_evt_payload_t *)
