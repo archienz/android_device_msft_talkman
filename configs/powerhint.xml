@@ -10,7 +10,17 @@
 
   A57 ceiling is 1824000 kHz. Do not add 1960000 (WOA PEP overclock).
   GPU pwrlevels: msm8992-gpu.dtsi (0=600MHz .. 5=180MHz, 6=27MHz).
-  Input boost matches init.talkman.power.sh (0:960000, 40 ms).
+  Input boost matches init.talkman.power.sh: kernel cpu-boost
+  input_boost_freq "0:960000 4:1248000 5:1248000", input_boost_ms 1500,
+  sched_boost_on_input=Y (HMP moves UI threads onto the A57s for the window).
+  Measured during a Settings fling (scrolltest2.sh, framestats last 120
+  frames): with the bullhead 40 ms LITTLE-only boost cpu4 sat at 384 MHz 82%
+  of the time, dequeueBuffer stalled 10 ms at p90 and 16-46 frames were over
+  16.7 ms; with the 1.5 s A57 1248000 boost + sched boost dequeue p90 is
+  0.35 ms and 0 frames were over budget in two runs. 1824000 measured the
+  same as 1248000, so the lower A57 floor is used. Without sched boost 8
+  frames were over budget. Screen off (INTERACTIVE_OFF) falls back to the
+  40 ms LITTLE-only boost.
 
   GPU: the panel is 1440x2560 (WQHD). Measured with dumpsys gfxinfo on
   Settings scrolling: at pwrlevel 5 (180 MHz) the Adreno 418 needs 12-14 ms
@@ -53,11 +63,12 @@
     <Little min_khz="384000" hispeed_khz="960000"/>
     <Big min_khz="384000" hispeed_khz="1248000" max_khz="1824000"/>
     <Gpu min_pwrlevel="5" max_pwrlevel="0" default_pwrlevel="4"/>
-    <InputBoost freq="0:960000 4:0" ms="40"/>
+    <InputBoost freq="0:960000 4:1248000 5:1248000" ms="1500"/>
   </Defaults>
 
   <Hint name="INTERACTION" duration_ms="1500">
     <Little min_khz="960000"/>
+    <Big min_khz="1248000"/>
     <Gpu min_pwrlevel="4"/>
   </Hint>
 
@@ -65,7 +76,7 @@
     <Little min_khz="960000"/>
     <Big min_khz="1248000"/>
     <Gpu min_pwrlevel="4" max_pwrlevel="0"/>
-    <InputBoost freq="0:960000 4:1248000" ms="2000"/>
+    <InputBoost freq="0:960000 4:1248000 5:1248000" ms="2000"/>
   </Hint>
 
   <Hint name="VIDEO_ENCODE">

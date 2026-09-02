@@ -101,9 +101,17 @@ write /sys/devices/system/cpu/cpu5/online 1
 # Restore CPU 4 max freq from msm_performance
 write /sys/module/msm_performance/parameters/cpu_max_freq "4:4294967295 5:4294967295"
 
-# input boost configuration
-write /sys/module/cpu_boost/parameters/input_boost_freq "0:960000"
-write /sys/module/cpu_boost/parameters/input_boost_ms 40
+# input boost configuration (kernel cpu-boost, fires on every touch event).
+# bullhead's 40 ms LITTLE-only boost left the A57s at 384 MHz for 82% of a
+# Settings fling on talkman and the app stalled ~10 ms in dequeueBuffer at
+# p90. 1.5 s of A57 >= 1248000 plus HMP sched boost (UI threads migrate to
+# cpu4/5 for the window) measured 0 frames over 16.7 ms; 1824000 measured
+# the same as 1248000. The power HAL (powerhint.xml Defaults/INTERACTION)
+# writes the same input_boost values and drops back to 40 ms LITTLE-only
+# when the screen is off.
+write /sys/module/cpu_boost/parameters/input_boost_freq "0:960000 4:1248000 5:1248000"
+write /sys/module/cpu_boost/parameters/input_boost_ms 1500
+write /sys/module/cpu_boost/parameters/sched_boost_on_input Y
 
 # Setting B.L scheduler parameters
 write /proc/sys/kernel/sched_migration_fixup 1
