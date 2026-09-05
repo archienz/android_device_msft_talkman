@@ -140,6 +140,10 @@ PRODUCT_COPY_FILES += \
     frameworks/av/services/audiopolicy/config/r_submix_audio_policy_configuration.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/r_submix_audio_policy_configuration.xml \
     frameworks/av/services/audiopolicy/config/usb_audio_policy_configuration.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/usb_audio_policy_configuration.xml \
     frameworks/av/services/audiopolicy/config/default_volume_tables.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/default_volume_tables.xml \
+    frameworks/av/services/audiopolicy/config/a2dp_audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/a2dp_audio_policy_configuration.xml \
+    frameworks/av/services/audiopolicy/config/r_submix_audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/r_submix_audio_policy_configuration.xml \
+    frameworks/av/services/audiopolicy/config/usb_audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/usb_audio_policy_configuration.xml \
+    frameworks/av/services/audiopolicy/config/default_volume_tables.xml:$(TARGET_COPY_OUT_VENDOR)/etc/default_volume_tables.xml \
 
 # Bluetooth HAL — QCA Rome (qcom.bluetooth.soc=rome).
 # btfw32.tlv / btnv32.bin are talkman rampatch_tlv_3.2.tlv / nvm_tlv_3.2.bin
@@ -382,8 +386,8 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     android.hardware.renderscript@1.0-impl
 
-# leftover MATCH 8a6a665: librmnetctl/rmnetcli vendor rmnet_data QMI.
-# Not rild. Dual SIM no. Do not PRODUCT_PACKAGES rild.
+# librmnetctl/rmnetcli vendor rmnet_data QMI. rild itself comes from
+# build/make/target/product/telephony_vendor.mk. Single SIM (RM-1104).
 PRODUCT_PACKAGES += \
     telephony-ext \
     qti-telephony-hidl-wrapper \
@@ -407,6 +411,7 @@ PRODUCT_PACKAGES += \
 
 # Shims
 PRODUCT_PACKAGES += \
+    libaudioclient_shim \
     libcutils_shim
 
 # TimeKeep
