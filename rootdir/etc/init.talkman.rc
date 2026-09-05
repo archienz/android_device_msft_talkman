@@ -557,19 +557,17 @@ on property:ro.boot.hardware.sku=RM-1104
 on property:ro.boot.hardware.sku=RM-1108
     setprop ro.boot.wificountrycode 00
 
-# Sockets are 0666 (QC init_thermal-engine.rc). The QCamera2 HAL runs inside
-# cameraserver (uid cameraserver, groups audio camera input drmrpc), and
-# libthermalclient's listener thread connect()s to thermal-recv-client. With
-# 0660 system:system that connect fails with EACCES, the thread retries with
-# sleep(5), and thermal_client_unregister_callback() pthread_join()s it, so
-# every closeCamera() stalled 5s ("Unregisteration ... handle:2" 5s after
-# handle:1). cameraserver needed 2 open/close cycles before publishing
-# ICameraService, so it was unreachable for >10s after each start.
+# CAF init_thermal-engine.rc: send-client and recv-passive-client are 0666;
+# thermal-recv-client stays 0660 (command/register path, not world-writable).
+# QCamera2 HAL in cameraserver (groups audio camera input drmrpc) connect()s
+# that recv-client socket. 0660 system:system is EACCES; 0666 would let any
+# UID talk to thermal-engine on permissive SELinux. 0660 system camera keeps
+# the CAF recv-client mode and lets cameraserver in.
 service thermal-engine /vendor/bin/thermal-engine -c /vendor/etc/thermal-engine-8992.conf
     class main
     user root
     socket thermal-send-client stream 0666 system system
-    socket thermal-recv-client stream 0666 system system
+    socket thermal-recv-client stream 0660 system camera
     socket thermal-recv-passive-client stream 0666 system system
     group root radio system
 
