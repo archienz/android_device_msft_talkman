@@ -34,7 +34,7 @@ Purpose, Progress, and differences compared to the community repository stay in 
 
 - Pairing uses QCA6174 Rome. Media stayed on the TAS.
 - Cause: `/vendor/etc/audio_policy_configuration.xml` includes `a2dp_audio_policy_configuration.xml` by relative path, so it is looked up in `/vendor/etc`. The zip put that file only in `/system/etc`. `AudioFlinger` loaded primary, usb and r_submix, never a2dp.
-- Fix: `device.mk` copies `a2dp_`, `r_submix_`, `usb_audio_policy_configuration.xml` and `default_volume_tables.xml` to `$(TARGET_COPY_OUT_VENDOR)/etc` as well. Pushed by ADB on 2026-09-05: `loadHwModule() Loaded a2dp audio interface`, ports `BT A2DP Out / Headphones / Speaker`. Owner listening test pending.
+- Fix: `device.mk` copies `a2dp_`, `r_submix_`, `usb_audio_policy_configuration.xml` and `default_volume_tables.xml` to `$(TARGET_COPY_OUT_VENDOR)/etc` as well. Pushed by ADB on 2026-09-05: `loadHwModule() Loaded a2dp audio interface`, ports `BT A2DP Out / Headphones / Speaker`. Owner confirmed media plays on the Bluetooth device.
 - The earlier note that Android 11 needs `audio.bluetooth.default` was a tree read without ADB and is withdrawn; `audio.a2dp.default` is what this HAL loads.
 - `persist.vendor.bt.a2dp_offload_cap` still claims DSP offload the MSM8992 HAL does not have; unchanged.
 
