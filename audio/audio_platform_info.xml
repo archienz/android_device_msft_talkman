@@ -59,6 +59,17 @@
         Override interface to QUAT_MI2S_RX and acdb to 14 (same as SPEAKER).
         Mixer file is mixer_paths.xml, not mixer_paths_wcd9330.xml
         (msm8226-tomtom only).
+
+        Headphones / line / voice-headphones carry no backend tag on purpose.
+        A "headphones" tag selects HEADPHONE_BACKEND in hal/msm8974/platform.c,
+        whose mixer controls are hard-coded to "SLIM_6_RX Format" and
+        "SLIM_6_RX SampleRate". The mmo msm8994 kernel has no SLIMBUS_5_RX or
+        SLIMBUS_6_RX back end; HPHL/HPHR are fed from SLIMBUS_0_RX (tomtom_rx1)
+        like the earpiece, and the kernel exposes only "SLIM_0_RX Format" /
+        "SLIM_0_RX SampleRate". Untagged devices use DEFAULT_CODEC_BACKEND,
+        which is those controls. Speaker combos keep their tag so the
+        "speaker-and-headphones" mixer paths enable both QUAT_MI2S_RX and
+        SLIMBUS_0_RX.
     -->
     <backend_names>
         <device name="SND_DEVICE_OUT_SPEAKER" backend="speaker" interface="QUAT_MI2S_RX"/>
@@ -68,19 +79,12 @@
         <device name="SND_DEVICE_OUT_VOICE_SPEAKER" backend="speaker" interface="QUAT_MI2S_RX"/>
         <device name="SND_DEVICE_OUT_VOICE_SPEAKER_PROTECTED" backend="speaker" interface="QUAT_MI2S_RX"/>
         <device name="SND_DEVICE_OUT_VOICE_SPEAKER_HFP" backend="speaker" interface="QUAT_MI2S_RX"/>
-        <device name="SND_DEVICE_OUT_HEADPHONES" backend="headphones" interface="SLIMBUS_5_RX"/>
-        <device name="SND_DEVICE_OUT_LINE" backend="headphones" interface="SLIMBUS_5_RX"/>
-        <device name="SND_DEVICE_OUT_SPEAKER_AND_HEADPHONES" backend="speaker-and-headphones" interface="QUAT_MI2S_RX-and-SLIMBUS_5_RX"/>
-        <device name="SND_DEVICE_OUT_SPEAKER_SAFE_AND_HEADPHONES" backend="speaker-and-headphones" interface="QUAT_MI2S_RX-and-SLIMBUS_5_RX"/>
-        <device name="SND_DEVICE_OUT_SPEAKER_AND_LINE" backend="speaker-and-headphones" interface="QUAT_MI2S_RX-and-SLIMBUS_5_RX"/>
-        <device name="SND_DEVICE_OUT_SPEAKER_SAFE_AND_LINE" backend="speaker-and-headphones" interface="QUAT_MI2S_RX-and-SLIMBUS_5_RX"/>
+        <device name="SND_DEVICE_OUT_SPEAKER_AND_HEADPHONES" backend="speaker-and-headphones" interface="QUAT_MI2S_RX-and-SLIMBUS_0_RX"/>
+        <device name="SND_DEVICE_OUT_SPEAKER_SAFE_AND_HEADPHONES" backend="speaker-and-headphones" interface="QUAT_MI2S_RX-and-SLIMBUS_0_RX"/>
+        <device name="SND_DEVICE_OUT_SPEAKER_AND_LINE" backend="speaker-and-headphones" interface="QUAT_MI2S_RX-and-SLIMBUS_0_RX"/>
+        <device name="SND_DEVICE_OUT_SPEAKER_SAFE_AND_LINE" backend="speaker-and-headphones" interface="QUAT_MI2S_RX-and-SLIMBUS_0_RX"/>
         <device name="SND_DEVICE_OUT_SPEAKER_AND_BT_SCO" backend="speaker-and-bt-sco" interface="QUAT_MI2S_RX-and-SEC_AUX_PCM_RX"/>
         <device name="SND_DEVICE_OUT_SPEAKER_AND_BT_SCO_WB" backend="speaker-and-bt-sco-wb" interface="QUAT_MI2S_RX-and-SEC_AUX_PCM_RX"/>
-        <device name="SND_DEVICE_OUT_VOICE_HEADPHONES" backend="headphones" interface="SLIMBUS_5_RX"/>
-        <device name="SND_DEVICE_OUT_VOICE_HEADSET" backend="headphones" interface="SLIMBUS_5_RX"/>
-        <device name="SND_DEVICE_OUT_VOICE_LINE" backend="headphones" interface="SLIMBUS_5_RX"/>
-        <device name="SND_DEVICE_OUT_VOICE_TTY_FULL_HEADPHONES" backend="headphones" interface="SLIMBUS_5_RX"/>
-        <device name="SND_DEVICE_OUT_VOICE_TTY_VCO_HEADPHONES" backend="headphones" interface="SLIMBUS_5_RX"/>
     </backend_names>
     <config_params>
         <!-- If sound card name is not known, remove this entry -->
