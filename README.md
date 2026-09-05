@@ -126,22 +126,37 @@ Keep QCamera2 MSMB `mot_imx230`. Do not ship CSID test-generator as camera. Rear
 
 ---
 
-## Battery differences compared to the community repository
+## Differences compared to the community repository
 
 Community source: [Android4Lumia950/android_device_msft_talkman](https://github.com/Android4Lumia950/android_device_msft_talkman), branch `lineage-18.1-talkman`.
 
-The status-bar percent is the **same path** on both trees: `qpnp-fg` (`bms`) to `qpnp-smbcharger` (`battery/capacity`) to Health autodectect. This tree does not hardcode 50 percent. A stock BV-T5E on the community ROM can show a live percent. A third-party pack can stick at 50 percent (fuel-gauge profile / battery ID, not the Health HAL).
+This tree is a personal fork for RM-1104 / board **4VM_08r**. The community tree is the start point. Dual SIM RM-1118 is not this product.
 
-| Item | Community | This tree |
+A function is **Working on this telephone** only with `out/qa-*` logs. The community column is the public tree. It is not a log from this RM-1104.
+
+| Function | Community tree | This tree on this telephone |
 |---|---|---|
-| Percent, voltage, status | Generic `android.hardware.health@2.1-impl`. Autodetect `battery` | Same autodectect for those fields |
-| Health HAL extra | No `health/` directory | `health/HealthImpl.cpp` (`android.hardware.health@2.1-impl-talkman`) pins `bms/charge_full`, `charge_full_design`, `cycle_count`, and energy from `charge_now` × `voltage_now` |
-| Settings Battery Health | Off | On, those three `bms` nodes. On this telephone `charge_full` is still a bad value |
+| Rear camera | Clark CSI map **0x4320**. Bullhead sensor libraries (`imx377`, `ov5693`) in the probe list. No `mot_imx230` match. Snap has no live view | Clark `mot_imx230`. CSI map **0x0423**. Mount-angle **90**. Snap live view and DCIM stills. **Working on this telephone** |
+| Front camera | No CameraId 1. Module name not measured in that tree | CCI0 write **0x20**, Ducati module **0x2140**, die **0x03BB**. No CameraId 1. No `qcom,slave-id` |
+| AF / OIS | No BU24210 driver. Bullhead `lc898212xd` is a wrong bind | CCI1 write **0x7c** is BU24210. No `lc898212xd`. Lens does not move |
+| Flashlight | HAL has no flash unit. The Quick Settings tile shows Camera in use | `set_torch_mode` writes `led:flash_torch` (GPIO 12). **Working on this telephone** |
+| Speaker | TAS2553 on QUAT_MI2S in later community files. Some mixer files still name WCD speaker-prot | TAS2553 on QUAT_MI2S. PGA **11 dB**. Playback works. The gain is lower than Windows (brownout at 15 dB) |
+| Bluetooth media | QCA6174 pair | Pair works. Media stays on the speaker. The Android 11 `audio.bluetooth` HAL is not in the package list |
+| Battery percent | `qpnp-fg` → `qpnp-smbcharger` → Health autodectect. No hardcoded 50 percent | Same path. No hardcoded 50 percent. **Working on this telephone** |
+| Battery Health | Generic `android.hardware.health@2.1-impl`. No `health/` | `HealthImpl.cpp` pins `bms/charge_full`, `charge_full_design`, `cycle_count`. `charge_full` is still a bad value |
+| Charge (USB) | Cable charge through smbcharger | USB SDP 5 V / 500 mA. **Working on this telephone**. Qi pad not tested. UI strings are 5 V 1.8 A and Qi 900 mA. No PD |
 | `power_profile.xml` | Bullhead **2700** mAh | BV-T5E **3000** mAh (BatteryStats only) |
-| Charge UI | Default “Charging” | “Charging (5V 1.8A)” / “Wireless charging (Qi 900mA)”. No PD. Fast threshold 15 W |
-| Kernel (not this repo) | Battery-data phandle on **charger** only. FG cutoff 2800 mV, vbatt-low 4200 mV | Phandle also on **FG**. Cutoff 3200 mV, vbatt-low 3500 mV (WOA). CAF 3.10 `qpnp-fg.c` does not parse that phandle; it searches for a node named `qcom,battery-data` after the FG node. Charger parses the phandle on both trees |
+| Fuel-gauge kernel | Phandle on the **charger** node. Cutoff 2800 mV. vbatt-low 4200 mV | Phandle also on **FG**. Cutoff 3200 mV. vbatt-low 3500 mV (WOA). This change is in `kernel/mmo/msm8994`. It is not on the community kernel GitHub |
+| GPS | `loc_eng_start`. 0 satellites when MPSS is OFFLINE | Same. Modem stays OFFLINE until `rild` loads |
+| RIL | `ril-daemon` does not stay up | Measured miss: `AudioSystem::setErrorCallback` in `libril-qc-qmi-1.so`. Shim is not in the installed zip |
+| Display / touch | 1440×2560 at 60 Hz | Same panel. GPU floor **300 MHz** and A57 **1248 MHz** for 1.5 s after touch |
+| USB | CAF `g_android` | `g_android`. No USB_CONFIGFS. No PD |
+| LifeTimer | Bullhead APK. PackageManager crash loop | Not in the package list |
+| CSID test-generator | Not a camera | Do not ship |
 
-Kernel fuel-gauge work is local on `kernel/mmo/msm8994`. It is not on the community kernel GitHub.
+The status-bar percent uses the **same** fuel-gauge path on both trees. A stock BV-T5E shows a live percent. A third-party pack shows 50 percent when the fuel-gauge profile does not match. That is not the Health HAL.
+
+CAF 3.10 `qpnp-fg.c` does not parse the battery-data phandle. It searches for a node named `qcom,battery-data` after the FG node. The charger parses the phandle on both trees.
 
 ---
 

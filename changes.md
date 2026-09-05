@@ -2,7 +2,7 @@
 
 This file is a description of the tree. It is not a procedure.
 
-Purpose, Progress, and battery differences compared to the community repository stay in [`README.md`](README.md).
+Purpose, Progress, and differences compared to the community repository stay in [`README.md`](README.md).
 
 ### Front camera ident (2026-09-02, measured, not in HAL)
 
@@ -90,7 +90,7 @@ These live in `android_kernel_mmo_msm8994` and need only a `boot.img` flash. Non
 
 ### Battery and charge
 
-Compared to the community repository: [`README.md` Battery differences](README.md#battery-differences-compared-to-the-community-repository).
+Compared to the community repository: [`README.md` Differences](README.md#differences-compared-to-the-community-repository).
 
 - `power_profile.xml` uses battery capacity **3000** (BV-T5E). The bullhead value 2700 is not used.
 - Overlay warning levels are 15 percent and 5 percent.
