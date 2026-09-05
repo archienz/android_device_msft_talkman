@@ -4,6 +4,43 @@ This file is a description of the tree. It is not a procedure.
 
 Purpose, Progress, and battery differences compared to the community repository stay in [`README.md`](README.md).
 
+### Front camera ident (2026-09-02, measured, not in HAL)
+
+- Logs: `out/qa-cam-20260902/` (`FRONT-SENSOR-ID.md`, `front-smia-regs.txt`, `front-hm5040-check.txt`). Scanner holds L17 + MCLK2 and releases `CAM_FRONT_RES_N` GPIO **104**.
+- CCI **master 0**, 7-bit `0x10`, write **0x20**. Scan: `model=0x2140 chip=0x03bb`.
+- SMIA module: `MODEL_ID` **0x2140**, `MANUFACTURER_ID` **0x0A**, SMIA 1.0. That is Nokia/Microsoft **Ducati** (DCC `0A214000` / `0A214001`). It is **not** Sony IMX214 (`SENSOR_MODEL_ID` would be `0x0214`).
+- Die: `SENSOR_MODEL_ID` **0x03BB**, sensor manufacturer `0x0019` = `0x01`, native array **2600×1952** RAW10 CSI-2. Public Linux CCS tables have no `0x03BB`. MediaTek `HM5040_SENSOR_ID` is `0x03BB` at Himax `0x2016`; on this telephone `0x2016` reads **0x0000**. HM5040 is **not** confirmed. Do not name a part in DT or XML.
+- No CameraId 1. No front `qcom,slave-id`. Do not bind `libmmcamera_ov5693` or IMX214 as front.
+
+### Rear AF / OIS (2026-09-03, lab)
+
+- Companion on CCI1 write **0x7c** is Mitsumi **BU24210**. Rear module NVM / SMIA header: model `0xEACA`, manufacturer `0x0A`, rev major **5** → DCC **10454105** → firmware `bu24210_dl_ds1_8x1_rev17_2_Trial_Mitsumi_ST-Karma.kar`.
+- Windows ARM32 `qccamrearsensor_primarySMIApp8992.sys` protocol (static): DTI pages through `0x0581` / `0x0583` / `0x0584` (64-byte max), then OIS_INIT at `0x0550`. AF position is a later write after firmware. Report: `out/qa-ois-re/BU24210-PROTOCOL.md`.
+- On the telephone: DTI page writes ACK. `0x0524` stays `0x01`. First `0x0550` write NAKs and the chip leaves the bus. Same on rev11 / bu24214 / Mersu rev52. SMIA AF descriptor `0x1B04` / `0x1B40` is empty cold (`focus-mode: fixed` until a real 0x7c driver exists).
+- Do not bind `libactuator_lc898212xd`. No `libmmcamera_ois_bu24210.so`. No `CONFIG_MSM_OIS`. Kernel `talkman-cci-scan` `ois` / `i2c` / `power` commands are the lab path.
+
+### Photo strobe (Git `d3597bc`, not in the 2026-09-01 zip)
+
+- HAL1 still capture can light `led:flash_torch` (GPIO 12) around `take_picture`, wait for AEC, then off. Modes `off,auto,on,torch`. `led:torch_0` is never written. Live snapshot during video does not strobe. EXIF Flash still says not fired.
+- Quick Settings torch path is unchanged (`1fc5b8a`).
+
+### GPU / touch (2026-09-02, measured `out/qa-gpu-touch-20260902-1749/`)
+
+- Panel is 60 Hz TE (16.67 ms). Touch report ~113 Hz. Do not invent 90/120 Hz.
+- `powerhint.xml` + `init.talkman.power.sh`: GPU wake/floor **300 MHz**, A57 input boost **1248 MHz** for 1.5 s, `sched_boost_on_input`. SurfaceFlinger `debug.sf.*.sf.duration=5.5 ms`, app **15.5 ms**.
+- Synaptics S3708 F01 report-rate bit is ignored by firmware.
+
+### Bluetooth media (2026-09-05, tree read, no ADB)
+
+- Pairing uses QCA6174 Rome. Media stays on the TAS.
+- Tree ships `audio.a2dp.default` and `a2dp_audio_policy_configuration.xml`. Android 11 needs `audio.bluetooth.default` and `android.hardware.bluetooth.audio@2.0-impl` plus `bluetooth_audio_policy_configuration.xml`.
+- `persist.vendor.bt.a2dp_offload_cap=sbc-aptx-aptxtws-aptxhd-aac-ldac` claims DSP offload. MSM8992 HAL has no `AUDIO_FEATURE_ENABLED_A2DP_OFFLOAD`. Not measured on the telephone this day.
+
+### RIL (2026-09-02, measured, shim not in the zip)
+
+- `ril-daemon` restarts: `dlopen failed: cannot locate symbol AudioSystem::setErrorCallback` from `libril-qc-qmi-1.so`. MPSS stays OFFLINE because rild never votes `subsystem_get("modem")`. GPS 0 satellites follows.
+- Bullhead-style `libaudioclient_shim` maps `setErrorCallback` → `addErrorCallback`. Needs a **system** image (linker64 `TARGET_LD_SHIM_LIBS`). Boot-only cannot prove it.
+
 ### Kernel boot-only items (2026-09-02, kernel `2b59cf6d3f6`, not yet on the telephone)
 
 These live in `android_kernel_mmo_msm8994` and need only a `boot.img` flash. None is measured yet.

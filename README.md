@@ -71,10 +71,11 @@ The local git user on this repository is now **archienz**. New commits use `arch
 | GPU | Adreno 418 |
 | PMIC | PM8994 + PMI8994 |
 | Battery pack | BV-T5E, 3000 mAh |
-| Rear camera | Sony IMX230 (DCC 104541, chip 0x0230 on paper). First SMIA `0x0016` decides IMX230 vs IMX278 |
-| Front camera | SMIApp, name not known. EpicLPer dump `0x2140` is a lab note, not our scan |
-| OIS | Mitsumi bu24210 (DCC `.kar` MCU image). No `libmmcamera_ois_bu24210.so` |
-| Speaker | TAS2553 on QUAT_MI2S. PGA default **0x12** (11 dB) |
+| Rear camera | Sony IMX230. CCI1 write **0x20**, SMIA `0x0016` chip **0x0230**. Module header `0xEACA`, manufacturer **0x0A**, rev major **5** → Windows DCC **10454105** (Karma). CSI `0x0423`. Mount-angle **90** |
+| Front camera | Nokia/Microsoft **Ducati** SMIA module. CCI0 write **0x20**, `MODEL_ID` **0x2140**, manufacturer **0x0A**, `SENSOR_MODEL_ID` **0x03BB**, array 2600×1952 RAW10. Not IMX214 (`0x0214`). Die part not proven (`0x2016` = `0x0000`, HM5040 not confirmed). No CameraId 1. No `qcom,slave-id` |
+| OIS / AF | Mitsumi **BU24210** on CCI1 write **0x7c** (sid `0x3e`, model `0x6500`). Firmware is DCC `.kar` (this module: `rev17_2` Karma). No `libmmcamera_ois_bu24210.so`. Do not bind `lc898212xd` |
+| Speaker | TAS2553 on QUAT_MI2S. PGA **0x12** (11 dB). Chip default 15 dB brownouts an old BV-T5E |
+| Bluetooth | QCA6174 Rome UART. Pairing works. Media A2DP does not (Android 11 `audio.bluetooth` HAL not packaged; leftover `a2dp_offload_cap` claims DSP offload this SoC does not have) |
 | NFC | NXP PN547 `/dev/pn547`. Kernel `nq-nci`: 250 ms I2C timeout, no `read_mutex` across IRQ, VEN without eSE |
 | WLAN | QCA6174 |
 | USB-C | HD3SS460 + iCE5LP2K. No USB Power Delivery |
@@ -92,7 +93,7 @@ NFC GPIOs match DT: IRQ 29, VEN 30, DWL 94.
 
 Dual SIM RM-1118 / **4VM_08d** is ignored. The Microsoft service schematic is for implementation only. It is **not** published.
 
-Hill ident candidates **0x20** / **0x7c** / **0x22** are lab notes in `CAMERA-IDENT.md`. They are not DT.
+Measured CCI addresses live in [`docs/CAMERA-IDENT.md`](docs/CAMERA-IDENT.md). They are not XML CameraId 1 and not a front `qcom,slave-id`.
 
 Iris `qcom,camera@2` is **disabled** (CSI2 / CCI0 GPIO 14 / 102). No iris slave-id. No XML CameraId for iris.
 
@@ -100,27 +101,28 @@ Qi GPIOs match 4VM_08r: `wc-en` GPIO **2**, `wc-det` GPIO **14**.
 
 ---
 
-## Progress (2026-09-02)
+## Progress (2026-09-05)
 
 Source in Git is not a pass. A pass is a physical talkman log in `out/qa-*`.
 
 Unofficial zip `lineage-18.1-20260901-UNOFFICIAL-talkman` is installed on one RM-1104. The telephone boots to the home screen. Procedure: [`docs/INSTALL.md`](docs/INSTALL.md) and https://archienz.github.io/android_device_msft_talkman/INSTALL.html.
 
-Host: Steam Deck SteamOS, ext4 `/home/deck/android/los-18.1`. Do not `repo sync` onto NTFS.
+Host: Steam Deck SteamOS, ext4 `/home/deck/android/los-18.1`. Do not `repo sync` onto NTFS. Do not Ubuntu Distrobox.
 
-P0.1 Battery UI and P0.2 USB cable charge are **Working on this telephone**. P0.4 rear camera **live preview and stills** are on this telephone (kernel `#29`). Quick Settings flashlight is **Working on this telephone**. GPS is not. Dual SIM RM-1118 is not this product. There is no `CONFIG_MSM_OIS`. The Microsoft service schematic is for implementation only. It is not published.
+P0.1 Battery UI and P0.2 USB cable charge are **Working on this telephone**. P0.4 rear camera **live preview and stills** are on this telephone (kernel `#29`). Quick Settings flashlight is **Working on this telephone**. GPS is not. Front camera is measured and is **not** in the HAL. AF / OIS firmware load is **not** a lens move. Dual SIM RM-1118 is not this product. There is no `CONFIG_MSM_OIS`. The Microsoft service schematic is for implementation only. It is not published.
 
 | ID | Subsystem | Status | What is on the telephone | What is still missing |
 |---|---|---|---|---|
-| P0.0 | Rebuild LOS 18.1 | Built and flashed | `lineage_talkman-userdebug` zip 2026-09-01. Later **boot-only** flashes. Kernel `#29` 2026-09-02 17:33 AEST | Next bacon for vendor/system (carries flashlight HAL) |
+| P0.0 | Rebuild LOS 18.1 | Built and flashed | `lineage_talkman-userdebug` zip 2026-09-01. Later **boot-only** flashes. Kernel `#29` 2026-09-02 17:33 AEST (camera preview). Later AF lab images are local only | Next bacon for vendor/system (flashlight HAL, photo strobe, RIL shim, Bluetooth audio HAL) |
 | P0.1 | Battery UI | Working on this telephone | `dumpsys battery` live percent and voltage. Not 50 percent | — |
 | P0.2 | Charge | Working on this telephone (USB cable) | USB `online`, SDP 5 V / 500 mA, `charging_enabled`, status Full. No PD | Qi pad not tested. `bms/charge_full` is still a bad health value |
-| P0.3 | GPS | Not Working | GPSTest empty. `loc_eng_start`. 0 satellites. Modem OFFLINE | `numSvs` more than 0. MPSS online |
-| P0.4 | Camera | Working on this telephone (rear preview and stills) | HAL **1** CameraId 0. Probe `mot_imx230`. CCI1 write **0x20** chip **0x0230**. CSI lane map **0x0423**. Mount-angle **90**. Snap live view and DCIM stills | Front camera not listed. AF / OIS not started. No photo strobe |
-| — | Display / Wi-Fi / speaker / flashlight | Working on this telephone (QS torch) | 1440×2560. QCA6174. Loudspeaker. QS flashlight → HAL `set_torch_mode` → GPIO 12 `led:flash_torch` (`out/qa-torch-20260902/`). Owner confirmed 2026-09-02. Snap open turns the lamp off | Photo strobe (`flash_0`) not wired. Not P0 |
-| P2 | RIL | Deferred | `ril-daemon` exit 1 | Modem SMD |
+| P0.3 | GPS | Not Working | GPSTest empty. `loc_eng_start`. 0 satellites. Modem OFFLINE | `numSvs` more than 0. MPSS online. `rild` must load first |
+| P0.4 | Camera | Working on this telephone (rear preview and stills) | HAL **1** CameraId 0. Probe `mot_imx230`. CCI1 write **0x20** chip **0x0230**. CSI lane map **0x0423**. Mount-angle **90**. Snap live view and DCIM stills. QS torch on GPIO 12 | Front not listed (Ducati `0x2140` / die `0x03BB` measured; no XML). AF fixed until BU24210 moves. Photo strobe is in Git, not in the 2026-09-01 zip |
+| — | Display / Wi-Fi / speaker / flashlight | Working on this telephone (QS torch) | 1440×2560 at 60 Hz. QCA6174. Loudspeaker at TAS PGA **11 dB**. QS flashlight → `set_torch_mode` → `led:flash_torch` (`out/qa-torch-20260902/`). Touch input boost: A57 1248 MHz + GPU 300 MHz for 1.5 s | Speaker is quieter than Windows on purpose (brownout). Bluetooth media stays on the speaker |
+| — | Bluetooth audio | Not Working (media) | Pair / LE connect on QCA6174 | A2DP: package `audio.bluetooth.default` + `android.hardware.bluetooth.audio@2.0-impl`. Drop fake `a2dp_offload_cap` |
+| P2 | RIL | Deferred | `ril-daemon` exit 1 every 5 s: `libril-qc-qmi-1.so` missing `AudioSystem::setErrorCallback` | `libaudioclient_shim` in system image. Then MPSS vote |
 
-Keep QCamera2 MSMB `mot_imx230`. Do not ship CSID test-generator as camera. Rear CSI data lanes on RM-1104 are CSI0 LN2/LN1/LN3/LN0 (`qcom,csi-lane-assign = <0x0423>`), not Clark `0x4320`.
+Keep QCamera2 MSMB `mot_imx230`. Do not ship CSID test-generator as camera. Rear CSI data lanes on RM-1104 are CSI0 LN2/LN1/LN3/LN0 (`qcom,csi-lane-assign = <0x0423>`), not Clark `0x4320`. Do not bind `libactuator_lc898212xd`. Do not add CameraId 1 until a front HAL exists for die `0x03BB`.
 
 ---
 
@@ -152,6 +154,8 @@ The Changes list is [`changes.md`](changes.md).
 ## What you must not do
 
 - Do not invent a CCI slave ID.
+- Do not add CameraId 1 or a front `qcom,slave-id` until a HAL exists for die `0x03BB`.
+- Do not bind `libactuator_lc898212xd` or name the front die HM5040 in DT.
 - Do not mark P0 Working without `out/qa-*` logs from the telephone.
 - Do not return a fake battery capacity of 50 percent.
 - Do not count a black camera buffer as success.
@@ -165,16 +169,17 @@ The Changes list is [`changes.md`](changes.md).
 
 ## How to build (procedure)
 
-If you do not have WSL Ubuntu 22.04 and 250 GB or more of ext4, stop.
+Build on SteamOS ext4 (`/home/deck/android/los-18.1`). Do not Ubuntu Distrobox. Do not `repo sync` onto NTFS.
 
-1. Install WSL Ubuntu 22.04.
-2. Clone LineageOS 18.1 with the talkman local manifest.
-3. Put this tree at `device/msft/talkman`.
-4. Put the kernel at `kernel/mmo/msm8994`.
-5. Put vendor at `vendor/msft/talkman` (branch `lineage-18.1-julian`).
-6. Run `source build/envsetup.sh`.
-7. Run `lunch lineage_talkman-userdebug`.
-8. Run `mka bacon`.
+1. Clone LineageOS 18.1 with the talkman local manifest.
+2. Put this tree at `device/msft/talkman`.
+3. Put the kernel at `kernel/mmo/msm8994` (branch `lineage-18.1-talkman`).
+4. Put vendor at `vendor/msft/talkman` (branch `lineage-18.1-julian`).
+5. Run `source build/envsetup.sh`.
+6. Run `lunch lineage_talkman-userdebug`.
+7. Run `mka bacon`.
+
+Flash **boot only** on a black LK2ND screen (`18D1:D00D`). Do not EDL. Do not wipe userdata. Strings in `boot.img` must include `mot_imx230` and `talkman-cci-scan`.
 
 Do a check of `docs/QA-CHECKLIST.md` after the first boot.
 
@@ -188,4 +193,4 @@ Do a check of `docs/QA-CHECKLIST.md` after the first boot.
 | [archienz/android_vendor_msft_talkman](https://github.com/archienz/android_vendor_msft_talkman) | Vendor copy files |
 | [archienz/android_kernel_mmo_msm8994](https://github.com/archienz/android_kernel_mmo_msm8994) | Personal kernel fork (`lineage-18.1-talkman`). Do not push `origin` (Android4Lumia950) |
 
-Workspace notes on the build host: `C:\users\Archie\desktop\phone\docs\`.
+Workspace notes on the build host: `/home/deck/Desktop/phone/docs/` (local). The Microsoft service schematic stays there. It is not in this repository.
