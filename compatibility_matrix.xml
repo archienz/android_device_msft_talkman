@@ -1,11 +1,12 @@
 <!-- Talkman DEVICE_MATRIX (type=device): HALs this vendor requires from
-     the framework. MATCH leftover 55b29f2: do not list
-     android.hardware.radio, android.hardware.radio.deprecated, or
-     android.hardware.biometrics.fingerprint. No rild, no FPC.
+     the framework. Do not list android.hardware.radio,
+     android.hardware.radio.deprecated (vendor HALs served by rild; they
+     live on DEVICE_MANIFEST manifest.xml) or
+     android.hardware.biometrics.fingerprint (no FPC).
 
-     GNSS 1.0, vibrator 1.0, and camera.provider 2.4 are vendor HALs on
-     DEVICE_MANIFEST (manifest.xml + vintf fragments). They do not belong
-     here. Do not edit manifest.xml. -->
+     GNSS 1.0, vibrator 1.0, radio 1.1 and camera.provider 2.4 are vendor
+     HALs on DEVICE_MANIFEST (manifest.xml + vintf fragments). They do not
+     belong here. -->
 <compatibility-matrix version="1.0" type="device">
     <hal format="hidl" optional="false">
         <name>android.frameworks.schedulerservice</name>

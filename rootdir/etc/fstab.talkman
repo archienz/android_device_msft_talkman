@@ -5,7 +5,8 @@
 #
 # GPT names: installer partition.sh androidPartitions only.
 # firmware_class.path=/vendor/firmware is the vendor ext4 (cmdline). Do not mount
-# GPT modem over /vendor/firmware.
+# GPT modem over /vendor/firmware. Kernel fw_path also searches /firmware/image
+# so PIL can load mba.b00 / modem.mdt for MSS.
 # persist: /persist/wlan_mac.bin (provision.sh).
 # No bullhead sbl1/tz/imgdata/keymaster/*bak. WP SBL1/TZ stay on GPT, not here.
 

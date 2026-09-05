@@ -14,8 +14,10 @@
 
 LOCAL_PATH := $(call my-dir)
 
-# Leftover unused bullhead Make shims are gone:
-#   libaudioclient_shim (AudioSystem::setErrorCallback) — no talkman audio blob
+# Leftover unused bullhead Make shim is gone:
 #   slim_shim empty SensorEventQueue stubs — never-sim; slim_daemon uses NDK SAP
 # Camera (QCamera2) and GNSS HIDL are rebuilt in-tree — no camera/gps .so shims.
-# Real shim is Soong libcutils/Android.bp (strdup16to8 / strdup8to16).
+# Real shims are Soong:
+#   libcutils/Android.bp (strdup16to8 / strdup8to16) for ATFWD/cnd/libcne
+#   libaudioclient/Android.bp (AudioSystem::setErrorCallback) for the RIL blob
+#   /vendor/lib64/libril-qc-qmi-1.so — measured: rild dlopen fails without it.

@@ -1,5 +1,6 @@
-# leftover MATCH 125a191 unused: rild domain policy (bullhead).
-# No PRODUCT_PACKAGES rild. RIL is P2. Do not add rild. Dual SIM no.
+# rild domain policy (bullhead). rild is installed by
+# build/make/target/product/telephony_vendor.mk (/vendor/bin/hw/rild,
+# rild.legacy.rc) and loads /vendor/lib64/libril-qc-qmi-1.so. Single SIM.
 # Do not flip enforcing. init.te unchanged.
 # radio_data_file allows commented: they pull radio neverallow.
 

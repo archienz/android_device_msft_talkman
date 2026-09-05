@@ -215,7 +215,8 @@ TARGET_LD_SHIM_LIBS := \
     /vendor/bin/ATFWD-daemon|libcutils_shim.so \
     /vendor/bin/cnd|libcutils_shim.so \
     /vendor/lib/libcne.so|libcutils_shim.so \
-    /vendor/lib64/libcne.so|libcutils_shim.so
+    /vendor/lib64/libcne.so|libcutils_shim.so \
+    /vendor/lib64/libril-qc-qmi-1.so|libaudioclient_shim.so
 
 
 # Telephony
