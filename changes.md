@@ -172,6 +172,20 @@ Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not 
 - Light HIDL 2.0 writes lcd-backlight and RGB sysfs. Torch writes only `led:flash_torch` (`d92e6c3` also wrote `led:torch_0`; that is the red indicator). Torch GPIO is **12**. HIDL 2.0 has no `Type::FLASHLIGHT` enum; torch stays on the liblight `LIGHT_ID_FLASHLIGHT` path and the `QCameraTorch` GPIO LED backend in the camera HAL. Kernel `flash.dtsi` is PMI8994 qpnp-flash-led with that GPIO. sepolicy `hal_light` sysfs_leds matches those names (`6a8f621`). There is no leftover `led::flash_torch`.
 - Rear torch is MSM GPIO 12 into flash driver IC N1400 TORCH pin. I2C address is not on the drawing. There is no `qcom,slave-id`.
 
+### Loudspeaker (TAS2553 battery guard, 2026-09-05, kernel `e65984971a3`, not yet on the telephone)
+
+- Reference: TI TAS2553 datasheet SLAS978B (Sept 2013, rev. Feb 2014), sections 7.3.10 Battery Tracking AGC, 7.5.4, 7.5.13-7.5.17, 7.5.20, 7.5.27, 8.3 Initialization, 9.3 Boost Supply Details. TAS2552 SLAS898B checked for the 0x0D init value.
+- Root cause of the PMIC power-cycle at 15 dB: the codec probe wrote CONFIG2 = 0xE3, which leaves LIM_EN (register 0x02 bit 2, "Battery Tracking AGC Enable") clear. Nothing limited the boost input current (peak 2.5 A) on a sagging pack. Gain 0x12 (11 dB) was the workaround.
+- Driver `sound/soc/codecs/tas2552.c` now takes optional DT properties; without them the registers stay at chip defaults:
+  - `ti,limiter-enable` sets LIM_EN.
+  - `ti,battery-guard-inflection-mv` writes register 0x0B INFLECTION (0x6D = 3.00 V, 17.33 mV per step, 0xFE = 5.50 V).
+  - `ti,battery-guard-slope-mv-per-v` writes register 0x0C SLOPE (0x00 = 1.2 V/V, 37.3 mV/V per step).
+  - `ti,limiter-attack-us-per-db` writes 0x0E ATTACK_TIME[2:0] (20 µs/dB, then 350 µs/dB per step).
+  - `ti,limiter-release-ms-per-db` writes 0x0F REL_TIME[3:0] (50 ms/dB, then 105 ms/dB per step).
+- talkman `audio.dtsi` values: inflection 3600 mV → 0x0B = 0x90; slope 6000 mV/V → 0x0C = 0x81 (chip default is 0x80 = 5.97 V/V); attack 20 µs/dB → 0x0E[2:0] = 0; release 575 ms/dB → 0x0F[3:0] = 5 (register default). `ti,pga-gain` is back to the chip default 0x16 (15 dB, PGA_GAIN = N − 7 dB). If the telephone still resets at full volume with the guard on, go back to `<0x12>`.
+- Register 0x0D initialisation value is now the TAS2553 one, 0xA9 (SLAS978B 8.3). The driver had the TAS2552 value 0xC0 (SLAS898B). Both datasheets call 0x0D reserved; the summary table names it "Limiter Level Control", so there is no separate user limiter level register on this part.
+- Check on the telephone: `cat /sys/bus/i2c/devices/*-0040/vbat_mv` during playback gives the amplifier's own VBAT reading (register 0x19, 0x50 = 2.5 V, 17.33 mV per LSB). It reads 0 while the amplifier is in software shutdown. Compare with `/sys/class/power_supply/battery/voltage_now`. dmesg at probe prints `silicon version 0x8` for a TAS2553 and the four guard registers.
+
 ### Other
 
 - NFC node is `/dev/pn547`. Firmware matches WOA `nxppn547fw.dat`. Sony 8.1 dump is leftover. `libpn547_fw.so` path is `/system/vendor/firmware` (`749c1c0`). Kernel `nq-nci` already has 250 ms timeout and VEN without eSE. GPIOs: IRQ 29, VEN 30, DWL 94. `sepolicy/nfc.te` is PN547 (no FeliCa).
