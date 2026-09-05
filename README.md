@@ -115,11 +115,11 @@ P0.1 Battery UI and P0.2 USB cable charge are **Working on this telephone**. P0.
 |---|---|---|---|---|
 | P0.0 | Rebuild LOS 18.1 | Built and flashed | `lineage_talkman-userdebug` zip 2026-09-01. Later **boot-only** flashes. Kernel `#29` 2026-09-02 17:33 AEST (camera preview). Later AF lab images are local only | Next bacon for vendor/system (flashlight HAL, photo strobe, RIL shim, Bluetooth audio HAL) |
 | P0.1 | Battery UI | Working on this telephone | `dumpsys battery` live percent and voltage. Not 50 percent | — |
-| P0.2 | Charge | Working on this telephone (USB cable) | USB `online`, SDP 5 V / 500 mA, `charging_enabled`, status Full. No PD | Qi pad not tested. `bms/charge_full` is still a bad health value |
+| P0.2 | Charge | Working on this telephone (USB cable), with one kernel fix pending flash | USB `online`, SDP 5 V / 500 mA, `charging_enabled`. No PD | Measured 2026-09-05: after days on a 500 mA SDP the PMI8994 **safety timer** (768 min) fired and latched the charger off (MISC `RT_STS` bit 2, battery a flat −16 mA, status Discharging at 3.70 V). Only VBUS removal clears it. Kernel `7339221a798` sets `charging-timeout-mins = 0`. Qi pad not tested. `bms/charge_full` is still a bad health value |
 | P0.3 | GPS | Not Working | GPSTest empty. `loc_eng_start`. 0 satellites. Modem OFFLINE | `numSvs` more than 0. MPSS online. `rild` must load first |
 | P0.4 | Camera | Working on this telephone (rear preview and stills) | HAL **1** CameraId 0. Probe `mot_imx230`. CCI1 write **0x20** chip **0x0230**. CSI lane map **0x0423**. Mount-angle **90**. Snap live view and DCIM stills. QS torch on GPIO 12 | Front not listed (Ducati `0x2140` / die `0x03BB` measured; no XML). AF fixed until BU24210 moves. Photo strobe is in Git, not in the 2026-09-01 zip |
 | — | Display / Wi-Fi / speaker / flashlight | Working on this telephone (QS torch) | 1440×2560 at 60 Hz. QCA6174. Loudspeaker at TAS PGA **11 dB**. QS flashlight → `set_torch_mode` → `led:flash_torch` (`out/qa-torch-20260902/`). Touch input boost: A57 1248 MHz + GPU 300 MHz for 1.5 s | Speaker is quieter than Windows on purpose (brownout). Bluetooth media stays on the speaker |
-| — | Bluetooth audio | Not Working (media) | Pair / LE connect on QCA6174 | A2DP: package `audio.bluetooth.default` + `android.hardware.bluetooth.audio@2.0-impl`. Drop fake `a2dp_offload_cap` |
+| — | Bluetooth audio | A2DP HAL loads on this telephone (2026-09-05) | Pair / LE connect on QCA6174. `AudioFlinger: Loaded a2dp audio interface` with `BT A2DP Out` ports after `a2dp_audio_policy_configuration.xml` was put in `/vendor/etc` | The 2026-09-01 zip has the file only in `/system/etc`; the vendor `audio_policy_configuration.xml` includes it from `/vendor/etc`, so the A2DP module never loaded. `device.mk` now copies it to vendor (next bacon). Owner listening test pending |
 | P2 | RIL | Deferred | `ril-daemon` exit 1 every 5 s: `libril-qc-qmi-1.so` missing `AudioSystem::setErrorCallback` | `libaudioclient_shim` in system image. Then MPSS vote |
 
 Keep QCamera2 MSMB `mot_imx230`. Do not ship CSID test-generator as camera. Rear CSI data lanes on RM-1104 are CSI0 LN2/LN1/LN3/LN0 (`qcom,csi-lane-assign = <0x0423>`), not Clark `0x4320`. Do not bind `libactuator_lc898212xd`. Do not add CameraId 1 until a front HAL exists for die `0x03BB`.
@@ -141,7 +141,8 @@ A function is **Working on this telephone** only with `out/qa-*` logs. The commu
 | AF / OIS | No BU24210 driver. Bullhead `lc898212xd` is a wrong bind | CCI1 write **0x7c** is BU24210. No `lc898212xd`. Lens does not move |
 | Flashlight | HAL has no flash unit. The Quick Settings tile shows Camera in use | `set_torch_mode` writes `led:flash_torch` (GPIO 12). **Working on this telephone** |
 | Speaker | TAS2553 on QUAT_MI2S in later community files. Some mixer files still name WCD speaker-prot | TAS2553 on QUAT_MI2S. PGA **11 dB**. Playback works. The gain is lower than Windows (brownout at 15 dB) |
-| Bluetooth media | QCA6174 pair | Pair works. Media stays on the speaker. The Android 11 `audio.bluetooth` HAL is not in the package list |
+| Bluetooth media | QCA6174 pair. `a2dp_audio_policy_configuration.xml` only in `/system/etc`; the vendor policy file includes it from `/vendor/etc`, so the A2DP module does not load | Same file also copied to `/vendor/etc`. A2DP module loads with `BT A2DP Out` ports (measured 2026-09-05) |
+| Charge safety timer | `charging-timeout-mins = 768`. The PMI8994 latches the charger off after 12.8 h without termination; a 500 mA SDP with the screen on cannot terminate in that time | `charging-timeout-mins = 0` (kernel `7339221a798`). Termination is iterm 100 mA plus the fuel gauge |
 | Battery percent | `qpnp-fg` → `qpnp-smbcharger` → Health autodectect. No hardcoded 50 percent | Same path. No hardcoded 50 percent. **Working on this telephone** |
 | Battery Health | Generic `android.hardware.health@2.1-impl`. No `health/` | `HealthImpl.cpp` pins `bms/charge_full`, `charge_full_design`, `cycle_count`. `charge_full` is still a bad value |
 | Charge (USB) | Cable charge through smbcharger | USB SDP 5 V / 500 mA. **Working on this telephone**. Qi pad not tested. UI strings are 5 V 1.8 A and Qi 900 mA. No PD |
@@ -157,6 +158,29 @@ A function is **Working on this telephone** only with `out/qa-*` logs. The commu
 The status-bar percent uses the **same** fuel-gauge path on both trees. A stock BV-T5E shows a live percent. A third-party pack shows 50 percent when the fuel-gauge profile does not match. That is not the Health HAL.
 
 CAF 3.10 `qpnp-fg.c` does not parse the battery-data phandle. It searches for a node named `qcom,battery-data` after the FG node. The charger parses the phandle on both trees.
+
+### Public claims compared to this telephone
+
+The community ROM has two public status lists: the XDA thread [[ROM][UNOFFICIAL] LineageOS 18.1 for Lumia 950 (talkman)](https://xdaforums.com/t/rom-unofficial-lineageos-18-1-for-lumia-950-talkman.4689984/) (first post, last edit 2025-08-25) and the `what-works.html` page in `Android4Lumia950/Android4Lumia950.github.io` ("85 %"). The two lists do not agree with each other (the XDA post says Speaker and Torch are not working; the web page says both work).
+
+This table is what the same community tree does on **this** RM-1104, measured with ADB and kernel logs, before this fork changed it. "Not reproduced" means the tree as published cannot do it; it is not a statement about the authors.
+
+| Claim | Where | Measured on this RM-1104 with the community tree |
+|---|---|---|
+| Charging: "cable also works" | XDA, web | Cable charge starts on SDP 5 V / 500 mA. `charging-timeout-mins = 768` lets the PMI8994 safety timer latch the charger off after 12.8 h; the telephone then sits at −16 mA with USB `online = 1` and status Discharging until the cable is pulled. The kernel commit `73fe86913b4` "charging altogether" adds a 30 s `EN_BAT_CHG` toggle loop; it does not clear this latch |
+| Charging: "Wireless works", "9 W max" | XDA, web | Not reproduced from the tree. `qcom,dc-psy-type = "Wireless"` and the 900 mA string exist, but WLC_EN (PM8994 GPIO 2) and WLC_DET (GPIO 14) had no pin configuration. This fork adds both (`3e26130a4f0`); a pad test is still open |
+| Battery display: "Partially working, only with stock battery" | web | Consistent. Same fuel-gauge path. XDA users report 50 percent; that is a profile mismatch, not a HAL |
+| Bluetooth: "Fully works" | XDA, web | Pairing works. A2DP media does not route: `a2dp_audio_policy_configuration.xml` is copied to `/system/etc` only, the vendor policy file includes it from `/vendor/etc`, so `AudioFlinger` never loads the a2dp module. Fixed in this fork by a vendor copy |
+| Speakers: "Both speakers work" | web | Loudspeaker (TAS2553) plays. Earpiece not measured here. The XDA post itself lists Speaker under not working |
+| Torch / Flashlight: "Works" | web | Quick Settings tile shows "Camera in use"; the camera HAL has no flash unit. This fork wires `set_torch_mode` to `led:flash_torch` (GPIO 12) |
+| GPU: "Acceleration works" | XDA, web | Rendering works. `qcom,gpubw` devfreq `cur_freq = 0`: the GPU never votes DDR bandwidth, and the Adreno sits at 300 MHz for 90 percent of uptime |
+| Power management: "Working" | web | `lpm_levels.sleep_disabled=1` is on the kernel command line; the SoC never enters deep sleep while the screen is off |
+| Sensors: "Working" | web | Not measured on this telephone yet |
+| GPS: "Partially working" | web | Not reproduced. `qcom,not-loadable` on `smd-modem` and `disable-pil-loading` on the IPC router: nothing loads MPSS, the modem is OFFLINE, GPSTest shows 0 satellites |
+| RIL: "Not working" | XDA, web | Consistent. `ril-daemon` exits every 5 s on a missing `AudioSystem::setErrorCallback` |
+| Camera: "Not working" | XDA, web | Consistent for the community tree. This fork has rear preview and stills (kernel `#29`) |
+| Boot, Wi-Fi, Touch, USB ADB | XDA | Consistent |
+| NFC, SD card, 3.5 mm jack, earpiece, microphone, MTP | XDA | Not measured on this telephone yet |
 
 ---
 

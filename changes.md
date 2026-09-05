@@ -30,11 +30,13 @@ Purpose, Progress, and differences compared to the community repository stay in 
 - `powerhint.xml` + `init.talkman.power.sh`: GPU wake/floor **300 MHz**, A57 input boost **1248 MHz** for 1.5 s, `sched_boost_on_input`. SurfaceFlinger `debug.sf.*.sf.duration=5.5 ms`, app **15.5 ms**.
 - Synaptics S3708 F01 report-rate bit is ignored by firmware.
 
-### Bluetooth media (2026-09-05, tree read, no ADB)
+### Bluetooth media (2026-09-05, measured)
 
-- Pairing uses QCA6174 Rome. Media stays on the TAS.
-- Tree ships `audio.a2dp.default` and `a2dp_audio_policy_configuration.xml`. Android 11 needs `audio.bluetooth.default` and `android.hardware.bluetooth.audio@2.0-impl` plus `bluetooth_audio_policy_configuration.xml`.
-- `persist.vendor.bt.a2dp_offload_cap=sbc-aptx-aptxtws-aptxhd-aac-ldac` claims DSP offload. MSM8992 HAL has no `AUDIO_FEATURE_ENABLED_A2DP_OFFLOAD`. Not measured on the telephone this day.
+- Pairing uses QCA6174 Rome. Media stayed on the TAS.
+- Cause: `/vendor/etc/audio_policy_configuration.xml` includes `a2dp_audio_policy_configuration.xml` by relative path, so it is looked up in `/vendor/etc`. The zip put that file only in `/system/etc`. `AudioFlinger` loaded primary, usb and r_submix, never a2dp.
+- Fix: `device.mk` copies `a2dp_`, `r_submix_`, `usb_audio_policy_configuration.xml` and `default_volume_tables.xml` to `$(TARGET_COPY_OUT_VENDOR)/etc` as well. Pushed by ADB on 2026-09-05: `loadHwModule() Loaded a2dp audio interface`, ports `BT A2DP Out / Headphones / Speaker`. Owner listening test pending.
+- The earlier note that Android 11 needs `audio.bluetooth.default` was a tree read without ADB and is withdrawn; `audio.a2dp.default` is what this HAL loads.
+- `persist.vendor.bt.a2dp_offload_cap` still claims DSP offload the MSM8992 HAL does not have; unchanged.
 
 ### RIL (2026-09-02, measured, shim not in the zip)
 
@@ -102,6 +104,13 @@ Compared to the community repository: [`README.md` Differences](README.md#differ
 - `sepolicy/dumpstate.te` lets `dumpstate` read `sysfs_batteryinfo`. SELinux stays permissive.
 
 Kernel fuel-gauge and charger drivers live in `android_kernel_mmo_msm8994`, not in this repository.
+
+#### Charger safety-timer latch (2026-09-05, measured)
+
+- Symptom: USB `online = 1`, `charging_enabled = 1`, `battery_charging_enabled = 1`, 3.70 V, 10 percent, status **Discharging**, `current_now` a constant **−16 mA** with the screen on or off and with the input limit at 500 or 1500 mA. The system runs from VBUS; the battery path is off in hardware.
+- Registers (SID 2): `CHGR_STS` `0x100E = 0x80` (charge type none, no hold-off), `CHGR_RT_STS` `0x1010 = 0x00` (no TCC, no inhibit), `BAT_IF_RT_STS = 0x00`, `CMD_CHG = 0x00` (enabled), `CHGR_CFG2 = 0x42`, `SFT_CFG` `0x10FD = 0x1B` (timer on, 768 min), **`MISC_RT_STS` `0x1610 = 0x05`**. Bit 2 is the third MISC interrupt, `safety-timeout` in `msm-pmi8994.dtsi`.
+- Runtime `EN_BAT_CHG` toggles (the community `discharge_while_plugged` loop and a 4 s manual pulse), a USB input-suspend cycle, and `safety_timer_enabled = 0` (`SFT_CFG` → `0x3B`) do not clear the latch. VBUS removal is the only reset.
+- Fix: kernel `7339221a798` `qcom,charging-timeout-mins = <0>` → `SFT_TIMER_DISABLE_BIT` at `hw_init`. Termination stays iterm 100 mA plus the fuel gauge. Boot-only flash.
 
 ### GPS
 
