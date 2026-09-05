@@ -75,7 +75,7 @@ The local git user on this repository is now **archienz**. New commits use `arch
 | Front camera | Nokia/Microsoft **Ducati** SMIA module. CCI0 write **0x20**, `MODEL_ID` **0x2140**, manufacturer **0x0A**, `SENSOR_MODEL_ID` **0x03BB**, array 2600×1952 RAW10. Not IMX214 (`0x0214`). Die part not proven (`0x2016` = `0x0000`, HM5040 not confirmed). No CameraId 1. No `qcom,slave-id` |
 | OIS / AF | Mitsumi **BU24210** on CCI1 write **0x7c** (sid `0x3e`, model `0x6500`). Firmware is DCC `.kar` (this module: `rev17_2` Karma). No `libmmcamera_ois_bu24210.so`. Do not bind `lc898212xd` |
 | Speaker | TAS2553 on QUAT_MI2S. PGA **0x12** (11 dB). Chip default 15 dB brownouts an old BV-T5E |
-| Bluetooth | QCA6174 Rome UART. Pairing works. Media A2DP does not (Android 11 `audio.bluetooth` HAL not packaged; leftover `a2dp_offload_cap` claims DSP offload this SoC does not have) |
+| Bluetooth | QCA6174 Rome UART. Pairing and A2DP media **Working on this telephone** (2026-09-05) once `a2dp_audio_policy_configuration.xml` is in `/vendor/etc`. Leftover `a2dp_offload_cap` still claims DSP offload this SoC does not have |
 | NFC | NXP PN547 `/dev/pn547`. Kernel `nq-nci`: 250 ms I2C timeout, no `read_mutex` across IRQ, VEN without eSE |
 | WLAN | QCA6174 |
 | USB-C | HD3SS460 + iCE5LP2K. No USB Power Delivery |
@@ -109,7 +109,7 @@ Unofficial zip `lineage-18.1-20260901-UNOFFICIAL-talkman` is installed on one RM
 
 Host: Steam Deck SteamOS, ext4 `/home/deck/android/los-18.1`. Do not `repo sync` onto NTFS. Do not Ubuntu Distrobox.
 
-P0.1 Battery UI and P0.2 USB cable charge are **Working on this telephone**. P0.4 rear camera **live preview and stills** are on this telephone (kernel `#29`). Quick Settings flashlight is **Working on this telephone**. GPS is not. Front camera is measured and is **not** in the HAL. AF / OIS firmware load is **not** a lens move. Dual SIM RM-1118 is not this product. There is no `CONFIG_MSM_OIS`. The Microsoft service schematic is for implementation only. It is not published.
+P0.1 Battery UI and P0.2 USB cable charge are **Working on this telephone**. P0.4 rear camera **live preview and stills** are on this telephone (kernel `#29`). Quick Settings flashlight is **Working on this telephone**. Bluetooth A2DP media is **Working on this telephone** (2026-09-05, after the vendor A2DP policy file; in Git, not yet in the installed zip). GPS is not. Front camera is measured and is **not** in the HAL. AF / OIS firmware load is **not** a lens move. Dual SIM RM-1118 is not this product. There is no `CONFIG_MSM_OIS`. The Microsoft service schematic is for implementation only. It is not published.
 
 | ID | Subsystem | Status | What is on the telephone | What is still missing |
 |---|---|---|---|---|
@@ -119,7 +119,7 @@ P0.1 Battery UI and P0.2 USB cable charge are **Working on this telephone**. P0.
 | P0.3 | GPS | Not Working | GPSTest empty. `loc_eng_start`. 0 satellites. Modem OFFLINE | `numSvs` more than 0. MPSS online. `rild` must load first |
 | P0.4 | Camera | Working on this telephone (rear preview and stills) | HAL **1** CameraId 0. Probe `mot_imx230`. CCI1 write **0x20** chip **0x0230**. CSI lane map **0x0423**. Mount-angle **90**. Snap live view and DCIM stills. QS torch on GPIO 12 | Front not listed (Ducati `0x2140` / die `0x03BB` measured; no XML). AF fixed until BU24210 moves. Photo strobe is in Git, not in the 2026-09-01 zip |
 | — | Display / Wi-Fi / speaker / flashlight | Working on this telephone (QS torch) | 1440×2560 at 60 Hz. QCA6174. Loudspeaker at TAS PGA **11 dB**. QS flashlight → `set_torch_mode` → `led:flash_torch` (`out/qa-torch-20260902/`). Touch input boost: A57 1248 MHz + GPU 300 MHz for 1.5 s | Speaker is quieter than Windows on purpose (brownout). Bluetooth media stays on the speaker |
-| — | Bluetooth audio | A2DP HAL loads on this telephone (2026-09-05) | Pair / LE connect on QCA6174. `AudioFlinger: Loaded a2dp audio interface` with `BT A2DP Out` ports after `a2dp_audio_policy_configuration.xml` was put in `/vendor/etc` | The 2026-09-01 zip has the file only in `/system/etc`; the vendor `audio_policy_configuration.xml` includes it from `/vendor/etc`, so the A2DP module never loaded. `device.mk` now copies it to vendor (next bacon). Owner confirmed media plays on the Bluetooth device (2026-09-05) |
+| — | Bluetooth audio | Working on this telephone (A2DP media, 2026-09-05) | Pair / LE connect on QCA6174. `AudioFlinger: Loaded a2dp audio interface` with `BT A2DP Out` ports after `a2dp_audio_policy_configuration.xml` was put in `/vendor/etc` | The 2026-09-01 zip has the file only in `/system/etc`; the vendor `audio_policy_configuration.xml` includes it from `/vendor/etc`, so the A2DP module never loaded. `device.mk` now copies it to vendor (next bacon). Owner confirmed media plays on the Bluetooth device (2026-09-05) |
 | P2 | RIL | Deferred | `ril-daemon` exit 1 every 5 s: `libril-qc-qmi-1.so` missing `AudioSystem::setErrorCallback` | `libaudioclient_shim` in system image. Then MPSS vote |
 
 Keep QCamera2 MSMB `mot_imx230`. Do not ship CSID test-generator as camera. Rear CSI data lanes on RM-1104 are CSI0 LN2/LN1/LN3/LN0 (`qcom,csi-lane-assign = <0x0423>`), not Clark `0x4320`. Do not bind `libactuator_lc898212xd`. Do not add CameraId 1 until a front HAL exists for die `0x03BB`.
