@@ -1,0 +1,10 @@
+// Talkman Vulkan 1.0 triangle SPIR-V headers (pregenerated .spv.h).
+// Consumers: header_libs: ["talkman-vk-shaders"] then
+//   #include "talkman_tri.vert.spv.h" / "talkman_tri.frag.spv.h"
+// Do not regenerate SPIR-V unless those headers are missing.
+// Not a PRODUCT_PACKAGES module. HWUI stays GLES.
+
+cc_library_headers {
+    name: "talkman-vk-shaders",
+    export_include_dirs: ["."],
+}

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 The LineageOS Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+
+     Names from frameworks/base/core/res/res/values/colors.xml.
+     Invert the stock light template (dark text on #ffffffff).
+-->
+<resources>
+    <color name="notification_material_background_color">#ff111111</color>
+    <color name="notification_action_list">#ff1a1a1a</color>
+    <color name="notification_primary_text_color_light">#ffe8e8e8</color>
+    <color name="notification_secondary_text_color_light">#99e8e8e8</color>
+    <color name="notification_progress_background_color">#33ffffff</color>
+    <color name="notification_default_color_light">#ffe8e8e8</color>
+
+    <!-- Stock accent is material_deep_teal. QS tiles read android.R.attr.colorAccent. -->
+    <color name="accent_material_light">#ffe8e8e8</color>
+    <color name="accent_material_dark">#ffe8e8e8</color>
+    <color name="accent_device_default_light">#ffe8e8e8</color>
+    <color name="accent_device_default_dark">#ffe8e8e8</color>
+    <color name="accent_device_default">#ffe8e8e8</color>
+
+    <!-- Theme.DeviceDefault.QuickSettings is Light. Inactive tiles read
+         textColorSecondary / textColorTertiary = #8a000000. On a void shade
+         that is invisible. Keep off tiles as visible ink like the mock. -->
+    <color name="secondary_text_default_material_light">#ffe8e8e8</color>
+    <color name="secondary_text_default_material_dark">#ffe8e8e8</color>
+    <color name="primary_text_default_material_light">#ffe8e8e8</color>
+    <color name="tertiary_text_dark">#ffe8e8e8</color>
+
+    <!-- QSTileImpl active icon tint is colorPrimary = this on QuickSettings Light. -->
+    <color name="primary_device_default_settings_light">#ffe8e8e8</color>
+    <color name="primary_material_settings_light">#ffe8e8e8</color>
+</resources>

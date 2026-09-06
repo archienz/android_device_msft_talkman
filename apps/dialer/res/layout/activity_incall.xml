@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ff000000">
+
+    <view
+        class="com.talkman.ui.StarfieldView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingTop="96dp">
+
+        <TextView
+            android:id="@+id/incall_number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-thin"
+            android:gravity="center"
+            android:textColor="#ffe8e8e8"
+            android:textSize="36sp" />
+
+        <TextView
+            android:id="@+id/incall_state"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:letterSpacing="0.22"
+            android:paddingTop="12dp"
+            android:textAllCaps="true"
+            android:textColor="#99e8e8e8"
+            android:textSize="13sp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingBottom="32dp">
+
+            <Button
+                android:id="@+id/btn_mute"
+                android:layout_width="120dp"
+                android:layout_height="48dp"
+                android:layout_margin="8dp"
+                android:background="@drawable/key_hairline"
+                android:text="@string/mute"
+                android:textAllCaps="true"
+                android:textColor="#ffe8e8e8" />
+
+            <Button
+                android:id="@+id/btn_speaker"
+                android:layout_width="120dp"
+                android:layout_height="48dp"
+                android:layout_margin="8dp"
+                android:background="@drawable/key_hairline"
+                android:text="@string/speaker"
+                android:textAllCaps="true"
+                android:textColor="#ffe8e8e8" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_end"
+            android:layout_width="160dp"
+            android:layout_height="56dp"
+            android:layout_marginBottom="48dp"
+            android:background="@drawable/call_hairline"
+            android:text="@string/end_call"
+            android:textAllCaps="true"
+            android:textColor="#ffe8e8e8" />
+    </LinearLayout>
+</FrameLayout>

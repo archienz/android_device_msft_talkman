@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item component="ComponentInfo{com.android.dialer}" drawable="ic_phone" />
+    <item component="ComponentInfo{com.android.messaging}" drawable="ic_messages" />
+    <item component="ComponentInfo{org.lineageos.jelly}" drawable="ic_browser" />
+    <item component="ComponentInfo{org.lineageos.snap}" drawable="ic_camera" />
+    <item component="ComponentInfo{com.android.contacts}" drawable="ic_contacts" />
+    <item component="ComponentInfo{com.android.deskclock}" drawable="ic_clock" />
+    <item component="ComponentInfo{org.lineageos.etar}" drawable="ic_calendar" />
+    <item component="ComponentInfo{com.android.gallery3d}" drawable="ic_gallery" />
+    <item component="ComponentInfo{org.lineageos.eleven}" drawable="ic_music" />
+    <item component="ComponentInfo{com.android.calculator2}" drawable="ic_calculator" />
+    <item component="ComponentInfo{org.lineageos.recorder}" drawable="ic_recorder" />
+    <item component="ComponentInfo{com.android.documentsui}" drawable="ic_files" />
+    <item component="ComponentInfo{com.android.settings}" drawable="ic_settings" />
+    <item component="ComponentInfo{com.android.chrome}" drawable="ic_chrome" />
+    <item component="ComponentInfo{com.aurora.store}" drawable="ic_aurora" />
+    <item component="ComponentInfo{com.google.android.youtube}" drawable="ic_youtube" />
+    <item component="ComponentInfo{com.android.gpstest.osmdroid}" drawable="ic_gps" />
+    <item component="ComponentInfo{net.sourceforge.opencamera}" drawable="ic_opencamera" />
+    <item component="ComponentInfo{com.caf.fmradio}" drawable="ic_fm" />
+    <item component="ComponentInfo{org.lineageos.audiofx}" drawable="ic_audiofx" />
+    <item component="ComponentInfo{com.google.android.gms}" drawable="ic_microg" />
+    <item component="ComponentInfo{com.google.android.gms/org.microg.gms.ui.SettingsActivity}" drawable="ic_microg" />
+    <item component="ComponentInfo{com.android.dialer/com.android.dialer.main.impl.MainActivity}" drawable="ic_phone" />
+    <item component="ComponentInfo{com.android.messaging/com.android.messaging.ui.conversationlist.ConversationListActivity}" drawable="ic_messages" />
+    <item component="ComponentInfo{org.lineageos.jelly/org.lineageos.jelly.MainActivity}" drawable="ic_browser" />
+    <item component="ComponentInfo{org.lineageos.snap/com.android.camera.CameraLauncher}" drawable="ic_camera" />
+    <item component="ComponentInfo{org.lineageos.snap/com.android.camera.CameraActivity}" drawable="ic_camera" />
+    <item component="ComponentInfo{com.android.contacts/com.android.contacts.activities.PeopleActivity}" drawable="ic_contacts" />
+    <item component="ComponentInfo{com.android.deskclock/com.android.deskclock.DeskClock}" drawable="ic_clock" />
+    <item component="ComponentInfo{org.lineageos.etar/com.android.calendar.AllInOneActivity}" drawable="ic_calendar" />
+    <item component="ComponentInfo{com.android.gallery3d/com.android.gallery3d.app.GalleryActivity}" drawable="ic_gallery" />
+    <item component="ComponentInfo{org.lineageos.eleven/org.lineageos.eleven.ui.activities.HomeActivity}" drawable="ic_music" />
+    <item component="ComponentInfo{com.android.calculator2/com.android.calculator2.Calculator}" drawable="ic_calculator" />
+    <item component="ComponentInfo{org.lineageos.recorder/org.lineageos.recorder.RecorderActivity}" drawable="ic_recorder" />
+    <item component="ComponentInfo{com.android.documentsui/com.android.documentsui.LauncherActivity}" drawable="ic_files" />
+    <item component="ComponentInfo{com.android.settings/com.android.settings.Settings}" drawable="ic_settings" />
+    <item component="ComponentInfo{com.android.chrome/com.google.android.apps.chrome.Main}" drawable="ic_chrome" />
+    <item component="ComponentInfo{com.aurora.store/com.aurora.store.ComposeActivity}" drawable="ic_aurora" />
+    <item component="ComponentInfo{org.lineageos.snap/com.android.camera.CameraLauncher}" drawable="ic_camera" />
+    <item component="ComponentInfo{com.google.android.youtube/com.google.android.youtube.app.honeycomb.Shell$HomeActivity}" drawable="ic_youtube" />
+    <item component="ComponentInfo{com.android.gpstest.osmdroid/com.android.gpstest.ui.MainActivity}" drawable="ic_gps" />
+    <item component="ComponentInfo{net.sourceforge.opencamera/net.sourceforge.opencamera.MainActivity}" drawable="ic_opencamera" />
+    <item component="ComponentInfo{com.caf.fmradio/com.caf.fmradio.FMRadio}" drawable="ic_fm" />
+    <item component="ComponentInfo{org.lineageos.audiofx/org.lineageos.audiofx.activity.ActivityMusic}" drawable="ic_audiofx" />
+</resources>

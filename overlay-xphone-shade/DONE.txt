@@ -1,0 +1,8 @@
+TalkmanXPhoneShadeOverlay v2 — target com.android.systemui.
+
+v1: void shade + plate colors, tracked section header.
+v2 (2026-09-06, on this telephone):
+  config_showNotificationShelf = false
+    (collapsed QS white pill was the shelf)
+
+Installed versionCode 2. Screens: out/qa-xphone-systemui-20260906/

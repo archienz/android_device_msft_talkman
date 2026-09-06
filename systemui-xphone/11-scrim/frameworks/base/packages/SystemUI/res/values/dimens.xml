@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 The LineageOS Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+
+     Overlay only. Names from SystemUI res/values/dimens.xml.
+     Do not replace ScrimView (12-shade-window owns super_notification_shade.xml).
+     No SystemUI bool exists for lock scrim (bools.xml is QS user-switcher only).
+     shutdown_scrim_behind_alpha stays stock; 09-power owns the power menu.
+-->
+<resources>
+    <!-- Stock 0.62. Unused by current ScrimController (KEYGUARD_SCRIM_ALPHA is the lock dim). -->
+    <item name="scrim_behind_alpha" format="float" type="dimen">0.08</item>
+</resources>

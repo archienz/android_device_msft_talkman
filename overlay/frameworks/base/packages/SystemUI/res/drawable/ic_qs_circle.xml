@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     talkman SystemUI overlay. QSTileBaseView uses framework config_icon_mask,
+     not this drawable. Tuner still references it. 4 dp corners, not a squircle.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M4,0 L36,0 Q40,0 40,4 L40,36 Q40,40 36,40 L4,40 Q0,40 0,36 L0,4 Q0,0 4,0 Z" />
+</vector>

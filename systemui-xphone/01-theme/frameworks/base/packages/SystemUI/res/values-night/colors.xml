@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     talkman SystemUI overlay — same void palette at night.
+     Stock values-night remaps shade / QS / cards to GM2 greys.
+     Names from frameworks/base/packages/SystemUI/res/values/colors.xml
+     (and the values-night subset of those names).
+-->
+<resources>
+    <color name="system_bar_background_opaque">#ff000000</color>
+    <color name="notification_panel_solid_background">#ff000000</color>
+    <color name="notification_shade_background_color">#ff000000</color>
+    <color name="notification_divider_color">#33ffffff</color>
+    <color name="notification_section_header_label_color">#ffe8e8e8</color>
+    <color name="notification_section_clear_all_btn_color">#99e8e8e8</color>
+    <color name="notification_channel_dialog_separator">#33ffffff</color>
+
+    <color name="notification_material_background_color">#ff111111</color>
+    <color name="notification_material_background_dimmed_color">#e6111111</color>
+    <color name="notification_material_background_dark_color">#ff000000</color>
+    <color name="notification_legacy_background_color">#ff111111</color>
+
+    <color name="qs_customize_background">#ff000000</color>
+    <color name="qs_customize_decoration">#ff111111</color>
+</resources>

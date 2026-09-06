@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">talkman-glass-demo</string>
+    <string name="qs_title">QUICK SETTINGS</string>
+    <string name="glass_stub">GLASS STUB</string>
+    <string name="glass_live">GLASS LIVE</string>
+</resources>

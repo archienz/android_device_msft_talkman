@@ -1,0 +1,23 @@
+talkman glass/core — 2026-09-06 lens rewrite
+
+Convex slab + rim IOR, RGB split, two-octave flow (uTime/uWarp).
+Kawase is one half-res frost only (quarter pass hid the warp).
+Defaults: ior 1.78, dispersion 1.35, warp 1.35, bevel 28 dp.
+
+Android.bp
+DONE.txt
+shaders/glass.vert.glsl
+shaders/glass.frag.glsl
+shaders/kawase.vert.glsl
+shaders/kawase.frag.glsl
+src/com/talkman/glass/core/TalkmanGlassView.java
+src/com/talkman/glass/core/GlassRenderer.java
+src/com/talkman/glass/core/DualKawaseBlur.java
+src/com/talkman/glass/core/Glsl.java
+
+Soong: libtalkman-glass (java_library, installable: false).
+Depend: static_libs: ["libtalkman-glass"]
+Package: com.talkman.glass.core
+Host attach: new TalkmanGlassView(activity); setOverlayCompositing(true);
+setContentView(view); setWallpaper(bitmap); onResume/onPause.
+Do not mka from this directory. Do not replace SystemUI.apk.

@@ -1,0 +1,47 @@
+--- a/src/com/android/systemui/statusbar/notification/row/ActivatableNotificationView.java	2026-09-06 00:07:47.711301491 +1000
++++ b/src/com/android/systemui/statusbar/notification/row/ActivatableNotificationView.java	2026-09-06 00:07:47.741346530 +1000
+@@ -87,6 +87,9 @@
+      */
+     protected static final int NO_COLOR = 0;
+ 
++    /** Resource-miss fallback. Never 0xffffffff — that paints a white plate. */
++    private static final int FALLBACK_BACKGROUND_COLOR = 0xff111111;
++
+     private static final Interpolator ACTIVATE_INVERSE_INTERPOLATOR
+             = new PathInterpolator(0.6f, 0, 0.5f, 1);
+     private static final Interpolator ACTIVATE_INVERSE_ALPHA_INTERPOLATOR
+@@ -167,13 +170,27 @@
+     }
+ 
+     private void updateColors() {
+-        mNormalColor = mContext.getColor(R.color.notification_material_background_color);
+-        mTintedRippleColor = mContext.getColor(
+-                R.color.notification_ripple_tinted_color);
+-        mNormalRippleColor = mContext.getColor(
+-                R.color.notification_ripple_untinted_color);
+-        mDimmedAlpha = Color.alpha(mContext.getColor(
+-                R.color.notification_material_background_dimmed_color));
++        mNormalColor = colorFromResource(R.color.notification_material_background_color,
++                FALLBACK_BACKGROUND_COLOR);
++        mTintedRippleColor = colorFromResource(R.color.notification_ripple_tinted_color,
++                FALLBACK_BACKGROUND_COLOR);
++        mNormalRippleColor = colorFromResource(R.color.notification_ripple_untinted_color,
++                FALLBACK_BACKGROUND_COLOR);
++        mDimmedAlpha = Color.alpha(colorFromResource(
++                R.color.notification_material_background_dimmed_color,
++                FALLBACK_BACKGROUND_COLOR));
++    }
++
++    private int colorFromResource(int resId, int fallback) {
++        Context ctx = mContext != null ? mContext : getContext();
++        if (ctx == null) {
++            return fallback;
++        }
++        try {
++            return ctx.getColor(resId);
++        } catch (RuntimeException ignored) {
++            return fallback;
++        }
+     }
+ 
+     private void initDimens() {

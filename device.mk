@@ -17,9 +17,10 @@
 #
 # Everything in this directory will become public
 
-# Boot animation
+# Boot animation — X-phone mark, not LineageOS generated zip
 TARGET_SCREEN_HEIGHT := 2560
 TARGET_SCREEN_WIDTH := 1440
+TARGET_BOOTANIMATION := $(LOCAL_PATH)/bootanimation/bootanimation.zip
 
 # setup dalvik vm configs.
 $(call inherit-product, frameworks/native/build/phone-xhdpi-2048-dalvik-heap.mk)
@@ -284,6 +285,7 @@ PRODUCT_PACKAGES += \
     init.talkman.misc.rc
 
 PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/rootdir/etc/rild.legacy.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/rild.legacy.rc \
     $(LOCAL_PATH)/rootdir/etc/init.qcom.devwait.sh:$(TARGET_COPY_OUT_VENDOR)/bin/init.qcom.devwait.sh \
     $(LOCAL_PATH)/rootdir/etc/init.qcom.devstart.sh:$(TARGET_COPY_OUT_VENDOR)/bin/init.qcom.devstart.sh \
     $(LOCAL_PATH)/recovery.fstab:recovery/root/system/etc/recovery.fstab
@@ -298,6 +300,13 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/rootdir/etc/fstab.talkman:$(TARGET_COPY_OUT_ROOT)/fstab.talkman \
     $(LOCAL_PATH)/rootdir/etc/fstab.talkman:$(TARGET_COPY_OUT_RAMDISK)/fstab.talkman
 endif
+# m37 lab first-stage ramdisk (boot.img only). /force_debuggable makes
+# first-stage copy /adb_debug.prop → /debug_ramdisk/adb_debug.prop;
+# second-stage loads that last and overrides system ro.adb.secure=1.
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/rootdir/lab-default.prop:$(TARGET_COPY_OUT_RAMDISK)/adb_debug.prop \
+    $(LOCAL_PATH)/rootdir/lab-default.prop:$(TARGET_COPY_OUT_RAMDISK)/default.prop \
+    $(LOCAL_PATH)/rootdir/force_debuggable:$(TARGET_COPY_OUT_RAMDISK)/force_debuggable
 #    $(LOCAL_PATH)/rootdir/etc/init.msm8992.sensor.sh:$(TARGET_COPY_OUT_VENDOR)/bin/init.msm8992.sensor.sh
 
 # Keylayout / keychars
@@ -363,8 +372,14 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/nfc/nfcee_access.xml:system/etc/nfcee_access.xml
 
 # Overlay
+# Default wallpaper: frameworks overlay drawable-nodpi/default_wallpaper.png
+# (X Phone void 1440x2560). Source copy: prebuilts/wallpaper/default_wallpaper.png.
+# WallpaperManager uses com.android.internal.R.drawable.default_wallpaper.
 DEVICE_PACKAGE_OVERLAYS := \
     $(LOCAL_PATH)/overlay
+
+# X-phone UI RROs + glass demo. Sideload / next bacon. Do not replace SystemUI.apk.
+$(call inherit-product, device/msft/talkman/talkman-xphone-ui.mk)
 
 # Privapp Whitelist
 PRODUCT_COPY_FILES += \
@@ -442,6 +457,14 @@ endif
 PRODUCT_PACKAGES += \
     android.hardware.usb@1.0-service
 
+# m37 lab ramdisk (default.prop). WITH_ADB_INSECURE in lineage_talkman.mk
+# is the one that wins ro.adb.secure=0. These keep persist on adb and
+# ask for ro.secure=0 (post-process adds adb when adb.secure!=1).
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
+    ro.adb.secure=0 \
+    ro.secure=0 \
+    persist.sys.usb.config=adb
+
 # OEM Unlock reporting
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
     ro.oem_unlock_supported=1
@@ -501,6 +524,7 @@ endif
 
 $(call inherit-product-if-exists, hardware/qcom/msm8994/msm8992.mk)
 $(call inherit-product-if-exists, vendor/qcom/gpu/msm8994/msm8994-gpu-vendor.mk)
+$(call inherit-product, device/msft/talkman/talkman-vulkan.mk)
 # DSP/OIS/camera XML COPY_FILES stay in the vendor fragments.
 ifneq ($(wildcard vendor/msft/talkman/talkman-dsp.mk),)
 $(call inherit-product, vendor/msft/talkman/talkman-dsp.mk)

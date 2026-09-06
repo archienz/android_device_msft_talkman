@@ -1,0 +1,15 @@
+frameworks/base/packages/SystemUI/res/layout/global_actions_column.xml
+frameworks/base/packages/SystemUI/res/layout/global_actions_grid.xml
+frameworks/base/packages/SystemUI/res/layout/global_actions_grid_v2.xml
+frameworks/base/packages/SystemUI/res/layout/global_actions_grid_item.xml
+frameworks/base/packages/SystemUI/res/layout/global_actions_grid_item_v2.xml
+frameworks/base/packages/SystemUI/res/layout/global_actions_item.xml
+frameworks/base/packages/SystemUI/res/layout/global_actions_power_dialog.xml
+frameworks/base/packages/SystemUI/res/layout/global_actions_power_item.xml
+frameworks/base/packages/SystemUI/res/drawable/global_actions_plate.xml
+frameworks/base/packages/SystemUI/res/drawable/global_actions_divider.xml
+frameworks/base/packages/SystemUI/res/values/colors.xml
+frameworks/base/packages/SystemUI/res/values-night/colors.xml
+frameworks/base/packages/SystemUI/res/values/styles.xml
+frameworks/base/packages/SystemUI/res/values-night/styles.xml
+DONE.txt

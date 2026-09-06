@@ -4,6 +4,39 @@ This file is a description of the tree. It is not a procedure.
 
 Purpose, Progress, and differences compared to the community repository stay in [`README.md`](README.md).
 
+### Modem / MBA (2026-09-06, measured, MPSS not ONLINE)
+
+- Product is RM-1104 / 4VM_08r / MSM8992. Flash is boot-only on LK2ND `18D1:D00D`. Do not publish the Microsoft service schematic.
+- Stay-up `#26` (`out/qa-m26-live-20260906.txt`, serial `9523fa36`, `boot_completed=1`, ~20 min): MBA **DEBUG 7**, hash paddr **0x0CC00334** (packed+0x334, unaligned vs `p_align` 0x1000), `RMB_MBA_STATUS` **-3**, metadata mapped at **0x0CC00000** (mdt 11304 packed 8028 mapped 16384), `SHARE_MEMORY` rc **-22**. `subsys3` modem **OFFLINE**. Venus OFFLINE; AR6320 and ADSP ONLINE. `ril-daemon` running after `libaudioclient_shim`.
+- Lab **m35** ram-boot `#67` (`out/qa-m19-mba.txt`): `lab_identity=0`, win_hash kept PH01 `p_paddr=0x0CA00000`, `align_ok=1`, reloc **07000000 → 07400000**, MBA **STATUS=1 DEBUG=0** (MBA ready, pre-META). Preload segments 3–6; slice ended at seg 6 `0x075c0000`. No “ringing META” / “after META poll”. Kernel dies at about 7 s. MPSS still OFFLINE.
+- Lab **m36** sent `pil_msa.lab_load_before_auth=0` (META before the hive preload). After-META STATUS/DEBUG was not captured (`adb` / `logd`). Do not claim META=3.
+- Lab **m38** kernel `#70` (`pr_emerg` after-META): 4ee7 at about 8 s, `adb` authorizing, no shell. After-META not captured. MPSS ONLINE not claimed.
+- `modem.mdt` on this tree is 11304 bytes, 24 PHDRs, hash PH01 `p_paddr=0x0CA00000` filesz `0x1c28`. Windows AUTH filesz sum is `0x02BD3367`. That is a file read, not a network pass.
+- Do not bind `lc898212xd`. Rear camera IMX230 preview/stills stay as in Progress. AF at write **0x7c** is still not a lens move.
+
+### X-phone QS line-art icons (2026-09-06)
+
+- Shade tiles were still stock filled Material. SystemUI tints `com.android.internal.R.drawable.ic_qs_*` and `ic_wifi_signal_*`, plus a few SystemUI-local names (`ic_hotspot`, `ic_swap_vert`, `ic_qs_wifi_*`).
+- Hairline stroke + empty middle, same language as the desktop pack. Tile wells use framework `config_qsTileStrokeWidth*` (the SystemUI copy of that name does nothing).
+- Live RROs: `com.talkman.overlay.xphone.notif` v5 (android), `com.talkman.overlay.xphone.qs` v5 (SystemUI). Not marked Working until a shade screenshot in `out/qa-*`.
+
+### X-phone boot CA pulse (2026-09-05)
+
+- `gen-doom-melt.py` part1 was 24 identical white frames (`c 0 0`), so the mark sat still.
+- part1 is now a 60-frame pulse: RGB split, scanline tears, fringe streaks, brightness 0.74–1.0. Interruptible (`p 0 0`) so the Doom melt still runs after boot-complete.
+- Fade-in also ramps CA. Zip on the telephone: `/system/media/bootanimation.zip`. Next reboot shows it. Previews: `out/qa-bootanim-ca-20260905/`.
+
+
+### X-phone lock screen overlay (2026-09-05)
+
+- New late overlay `overlay-xphone` (PRODUCT_PACKAGE_OVERLAYS). Does not edit `overlay/`.
+- SystemUI: Roboto Thin lock clock, tracked all-caps date (`EEEddMMM`), `SWIPE UP` hint, no lock glyph, no camera/phone shortcuts.
+- Needs a SystemUI rebuild to show on the telephone. Not marked Working until `out/qa-*` lock screenshot.
+
+- Live path is RRO `TalkmanXPhoneLockOverlay` (`com.talkman.overlay.xphone.lock`), not a SystemUI.apk replace. Enabled on this telephone 2026-09-05: date all-caps, padlock gone. Screenshot `out/qa-xphone-lock-20260905/lock-rro.png`.
+
+
+
 ### Front camera ident (2026-09-02, measured, not in HAL)
 
 - Logs: `out/qa-cam-20260902/` (`FRONT-SENSOR-ID.md`, `front-smia-regs.txt`, `front-hm5040-check.txt`). Scanner holds L17 + MCLK2 and releases `CAM_FRONT_RES_N` GPIO **104**.

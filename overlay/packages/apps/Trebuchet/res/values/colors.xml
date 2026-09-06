@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Neutral X-phone chrome. No accent-colored folders or tutorial blues. -->
+<resources>
+    <color name="focused_background">#40FFFFFF</color>
+    <color name="spring_loaded_panel_color">#26FFFFFF</color>
+    <color name="spring_loaded_highlighted_panel_border_color">#99FFFFFF</color>
+
+    <color name="icon_background">#FF1A1A1A</color>
+
+    <color name="all_apps_bg_hand_fill">#FF2A2A2A</color>
+    <color name="all_apps_bg_hand_fill_dark">#FF8A8A8A</color>
+</resources>

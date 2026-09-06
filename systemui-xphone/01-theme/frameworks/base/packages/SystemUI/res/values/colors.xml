@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     talkman SystemUI overlay — X-phone palette.
+     Void #ff000000, ink #ffe8e8e8, hairline #33ffffff, card #ff111111.
+     Names from frameworks/base/packages/SystemUI/res/values/colors.xml.
+-->
+<resources>
+    <!-- Status / navigation chrome -->
+    <color name="system_bar_background_opaque">#ff000000</color>
+    <color name="status_bar_clock_color">#ffe8e8e8</color>
+
+    <!-- Shade slab -->
+    <color name="notification_panel_solid_background">#ff000000</color>
+    <color name="notification_shade_background_color">#ff000000</color>
+    <color name="notification_divider_color">#33ffffff</color>
+    <color name="notification_section_header_label_color">#ffe8e8e8</color>
+    <color name="notification_section_clear_all_btn_color">#99e8e8e8</color>
+    <color name="notification_channel_dialog_separator">#33ffffff</color>
+
+    <!-- Notification cards (stock material aliases the framework white plate) -->
+    <color name="notification_material_background_color">#ff111111</color>
+    <color name="notification_material_background_dimmed_color">#e6111111</color>
+    <color name="notification_material_background_dark_color">#ff000000</color>
+    <color name="notification_legacy_background_color">#ff111111</color>
+
+    <!-- QS colors (not drawables). qs_background_dark is not in stock. -->
+    <color name="qs_tile_divider">#33ffffff</color>
+    <color name="qs_subhead">#ffe8e8e8</color>
+    <color name="qs_detail_button">#ffe8e8e8</color>
+    <color name="qs_detail_button_white">#ffe8e8e8</color>
+    <color name="qs_detail_transition">#66ffffff</color>
+    <color name="qs_user_detail_icon_muted">#ffe8e8e8</color>
+    <color name="qs_tile_disabled_color">#66e8e8e8</color>
+    <color name="qs_customize_background">#ff000000</color>
+    <color name="qs_customize_decoration">#ff111111</color>
+    <color name="qs_batterymeter_frame_color">#33ffffff</color>
+
+    <!-- Dual-tone status-bar icons (public SystemUI color names only) -->
+    <color name="light_mode_icon_color_dual_tone_background">#4de8e8e8</color>
+    <color name="light_mode_icon_color_dual_tone_fill">#ffe8e8e8</color>
+    <color name="dark_mode_icon_color_dual_tone_background">#3d000000</color>
+    <color name="dark_mode_icon_color_dual_tone_fill">#ff000000</color>
+    <color name="dark_mode_qs_icon_color_single_tone">#ffe8e8e8</color>
+    <color name="dark_mode_qs_icon_color_dual_tone_background">#33ffffff</color>
+    <color name="dark_mode_qs_icon_color_dual_tone_fill">#ffe8e8e8</color>
+</resources>

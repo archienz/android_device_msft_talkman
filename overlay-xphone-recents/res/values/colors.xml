@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 The LineageOS Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+
+     Names from SystemUI res/values/colors_tv.xml and res/values/colors.xml.
+     LOS 18.1 recents is Trebuchet Quickstep; these are SystemUI leftovers.
+     Literals only. Do not invent recents_task_* names AOSP 11 deleted.
+-->
+<resources>
+    <!-- recents_* leftovers (colors_tv.xml). Phone uses Launcher overview. -->
+    <color name="recents_tv_card_background_color">#000000</color>
+    <color name="recents_tv_card_title_text_color">#E8E8E8</color>
+    <color name="recents_tv_dismiss_text_color">#99E8E8E8</color>
+    <color name="recents_tv_text_shadow_color">#00000000</color>
+
+    <!-- Void scrim for recents-adjacent SystemUI windows (colors.xml). -->
+    <color name="screen_pinning_request_window_bg">#000000</color>
+    <color name="docked_divider_background">#000000</color>
+    <color name="docked_divider_handle">#E8E8E8</color>
+    <drawable name="forced_resizable_background">#000000</drawable>
+    <color name="minimize_dock_shadow_start">#000000</color>
+    <color name="minimize_dock_shadow_end">#00000000</color>
+
+    <!-- Quickstep track leftovers still in SystemUI colors.xml. -->
+    <color name="quick_step_track_background_background_dark">#000000</color>
+    <color name="quick_step_track_background_background_light">#000000</color>
+    <color name="quick_step_track_background_foreground_dark">#E8E8E8</color>
+    <color name="quick_step_track_background_foreground_light">#E8E8E8</color>
+</resources>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 The LineageOS Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+
+     Names from packages/apps/Settings/res/values/colors.xml.
+     Void #000000, primary text #E8E8E8, hairline #33ffffff.
+-->
+<resources>
+    <color name="divider_color">#33ffffff</color>
+    <color name="title_color">#ffe8e8e8</color>
+    <color name="fingerprint_title_color">#ffe8e8e8</color>
+
+    <color name="search_bar_background">#ff000000</color>
+    <color name="contextual_card_background">#ff000000</color>
+    <color name="contextual_card_stroke_color">#33ffffff</color>
+    <color name="contextual_card_dismissal_background">#ff000000</color>
+    <color name="dialog_background">#ff000000</color>
+    <color name="gestures_setting_background_color">#ff000000</color>
+    <color name="shortcut_background">#ff000000</color>
+    <color name="switchbar_background_color">#ff000000</color>
+    <color name="notification_history_background">#ff000000</color>
+    <color name="notification_importance_selection_bg">#ff000000</color>
+    <color name="palette_list_gradient_background">#ff000000</color>
+
+    <!-- Unused by the line-art homepage drawables; keep transparent if stock AdaptiveIcon remains. -->
+    <color name="homepage_network_background">#00000000</color>
+    <color name="homepage_connected_device_background">#00000000</color>
+    <color name="homepage_app_and_notification_background">#00000000</color>
+    <color name="homepage_battery_background">#00000000</color>
+    <color name="homepage_display_background">#00000000</color>
+    <color name="homepage_sound_background">#00000000</color>
+    <color name="homepage_storage_background">#00000000</color>
+    <color name="homepage_security_background">#00000000</color>
+    <color name="homepage_accounts_background">#00000000</color>
+    <color name="homepage_accessibility_background">#00000000</color>
+    <color name="homepage_system_background">#00000000</color>
+    <color name="homepage_support_background">#00000000</color>
+    <color name="homepage_generic_icon_background">#00000000</color>
+    <color name="homepage_location_background">#00000000</color>
+    <color name="homepage_about_background">#00000000</color>
+    <color name="homepage_privacy_background">#00000000</color>
+</resources>
+

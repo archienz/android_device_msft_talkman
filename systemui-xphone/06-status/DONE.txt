@@ -1,0 +1,13 @@
+06-status status bar layouts (void/ink). Full stock copies, then edit.
+
+frameworks/base/packages/SystemUI/res/layout/status_bar.xml
+frameworks/base/packages/SystemUI/res/layout/keyguard_status_bar.xml
+frameworks/base/packages/SystemUI/res/layout/heads_up_status_bar_layout.xml
+frameworks/base/packages/SystemUI/res/values/dimens.xml
+DONE.txt
+
+All stock android:id kept.
+Clock (TextView): sans-serif-thin, #E8E8E8, letterSpacing 0.08, tnum.
+Carrier: real SIM via CarrierText @id/keyguard_carrier_text — visible, no STARLINK.
+Dimens (stock names only): status_bar_clock_size 12sp, status_bar_icon_drawing_size 13dp.
+No colors.xml. No mka/adb. No files outside 06-status.

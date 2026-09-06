@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     talkman SystemUI overlay — void QS slab.
+     16 dp panel radius (brief). Hairline stroke. Not a squircle.
+-->
+<inset xmlns:android="http://schemas.android.com/apk/res/android">
+    <shape android:shape="rectangle">
+        <solid android:color="#ff000000" />
+        <stroke
+            android:width="1px"
+            android:color="#33ffffff" />
+        <corners android:radius="16dp" />
+    </shape>
+</inset>

@@ -1,0 +1,17 @@
+glass/systemui/ files written (notes only; no frameworks/base edit; no mka):
+
+HOOKS.md
+  QS / lock scrim / notification-stack insertion points (paths + view ids + Java binds).
+  Why sideloading SystemUI.apk onto the 2026-09-01 zip fails (Resource ID #0x0 / nav bar).
+
+snippets/qs_panel_quick_settings_background.xml
+  Next-bacon replacement for @id/quick_settings_background (not a view named qs_background).
+
+snippets/super_notification_shade_lock_glass.xml
+  Next-bacon sibling before @id/scrim_behind.
+
+snippets/status_bar_expanded_stack_glass.xml
+  Next-bacon sibling before @id/notification_stack_scroller.
+
+Did not edit overlay/, frameworks/base, system.prop, or device.mk.
+Did not adb push SystemUI.apk.

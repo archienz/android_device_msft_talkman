@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 The LineageOS Project
+     Licensed under the Apache License, Version 2.0 (the "License").
+
+     Names from packages/apps/Settings (and merged SettingsLib search_menu).
+-->
+<resources>
+    <string name="settings_label">SETTINGS</string>
+    <string name="settings_label_launcher">SETTINGS</string>
+    <string name="search_settings">Search</string>
+    <string name="search_menu">Search</string>
+    <string name="search_results_title">SETTINGS</string>
+
+    <string name="network_dashboard_title">NETWORK &amp; INTERNET</string>
+    <string name="connected_devices_dashboard_title">CONNECTED DEVICES</string>
+    <string name="app_and_notification_dashboard_title">APPS &amp; NOTIFICATIONS</string>
+    <string name="power_usage_summary_title">BATTERY</string>
+    <string name="display_settings">DISPLAY</string>
+    <string name="sound_settings">SOUND</string>
+    <string name="storage_settings">STORAGE</string>
+    <string name="privacy_dashboard_title">PRIVACY</string>
+    <string name="location_settings_title">LOCATION</string>
+    <string name="security_settings_title">SECURITY &amp; PRIVACY</string>
+    <string name="account_dashboard_title">ACCOUNTS</string>
+    <string name="accessibility_settings">ACCESSIBILITY</string>
+    <string name="header_category_system">SYSTEM</string>
+    <string name="about_settings">ABOUT PHONE</string>
+    <string name="page_tab_title_support">TIPS &amp; SUPPORT</string>
+</resources>

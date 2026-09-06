@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XDA post preview — LineageOS 18.1 talkman (archienz)</title>
+<style>
+  :root {
+    --bg: #ececec;
+    --page: #ffffff;
+    --ink: #1b1b1b;
+    --muted: #5c5c5c;
+    --line: #d8d8d8;
+    --nav: #1f1f1f;
+    --accent: #f80;
+    --code-bg: #f4f4f4;
+    --sidebar: #f7f7f7;
+    --ok: #1a7f37;
+    --no: #b42318;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  .bar {
+    background: var(--nav);
+    color: #fff;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .bar strong { color: var(--accent); letter-spacing: 0.04em; }
+  .bar .hint { color: #bbb; font-size: 12px; }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  button {
+    background: var(--accent);
+    color: #111;
+    border: 0;
+    padding: 8px 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  button.secondary { background: #333; color: #fff; }
+  button:hover { filter: brightness(1.08); }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
+  .crumb { font-size: 12px; color: var(--muted); margin: 0 0 10px; }
+  .crumb a { color: var(--muted); }
+  h1.thread {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 16px;
+    line-height: 1.25;
+  }
+  .thread-meta { font-size: 12px; color: var(--muted); margin: -10px 0 18px; }
+  .post {
+    background: var(--page);
+    border: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 180px 1fr;
+  }
+  .user {
+    background: var(--sidebar);
+    border-right: 1px solid var(--line);
+    padding: 16px;
+    font-size: 13px;
+  }
+  .user .name { font-weight: 700; color: #c60; font-size: 15px; }
+  .user .rank { color: var(--muted); margin: 2px 0 10px; }
+  .avatar {
+    width: 96px; height: 96px;
+    background: #2a2a2a;
+    color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 28px;
+    margin-bottom: 10px;
+  }
+  .body { padding: 18px 22px 28px; }
+  .body h3 { font-size: 15px; margin: 22px 0 8px; }
+  .body p { margin: 0 0 10px; }
+  .body ul { margin: 0 0 10px; padding-left: 20px; }
+  .body li { margin: 2px 0; }
+  .ok { color: var(--ok); }
+  .no { color: var(--no); }
+  .code {
+    background: var(--code-bg);
+    border: 1px solid var(--line);
+    padding: 12px 14px;
+    font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    margin: 0 0 14px;
+  }
+  a { color: #06c; }
+  .note {
+    background: #fff8e8;
+    border: 1px solid #ead8a0;
+    padding: 10px 12px;
+    font-size: 13px;
+    margin: 0 0 16px;
+  }
+  .bb {
+    margin-top: 28px;
+    background: var(--page);
+    border: 1px solid var(--line);
+    padding: 16px;
+  }
+  .bb h2 { font-size: 16px; margin: 0 0 8px; }
+  textarea {
+    width: 100%;
+    min-height: 280px;
+    font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    border: 1px solid var(--line);
+    padding: 10px;
+    resize: vertical;
+  }
+  footer.page {
+    color: var(--muted);
+    font-size: 12px;
+    margin: 16px 0 32px;
+  }
+  @media (max-width: 720px) {
+    .post { grid-template-columns: 1fr; }
+    .user { border-right: 0; border-bottom: 1px solid var(--line); }
+  }
+</style>
+</head>
+<body>
+  <div class="bar">
+    <div>
+      <strong>XDA</strong> post preview — not posted yet
+      <div class="hint">Looks like the first post. Copy the title and BBCode into a new XDA thread. Change the username if your XDA handle is not archienz.</div>
+    </div>
+    <div class="actions">
+      <button type="button" id="copy-title">Copy title</button>
+      <button type="button" class="secondary" id="copy-bb">Copy BBCode</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <p class="crumb">XDA Forums &gt; Microsoft Lumia 950/950 XL &gt; Lumia 950 ROMs, Kernels, Recoveries, &amp; Other Development</p>
+    <h1 class="thread" id="thread-title">[ROM][UNOFFICIAL] LineageOS 18.1 for Lumia 950 RM-1104 (talkman) — personal CAF 3.10 tree</h1>
+    <p class="thread-meta">Preview · 5 September 2026 · one RM-1104, serial often 9523fa36</p>
+
+    <div class="note">
+      This is a <strong>personal</strong> tree (<a href="https://github.com/archienz/android_device_msft_talkman">archienz/android_device_msft_talkman</a>, branch <code>lineage-18.1-talkman-hw</code>).
+      It is not the Android4Lumia950 community ROM and not official LineageOS.
+      There is no public zip on this page. Build from source, or use a zip you built yourself.
+    </div>
+
+    <article class="post">
+      <aside class="user">
+        <div class="avatar">a</div>
+        <div class="name">archienz</div>
+        <div class="rank">New member</div>
+        <div>Joined Sep 2026</div>
+        <div>Posts 1</div>
+        <div>Lumia 950 RM-1104</div>
+      </aside>
+      <div class="body">
+        <div class="code">/*
+ * Your warranty is now void.
+ *
+ * We are not responsible for bricked devices, dead SD cards,
+ * thermonuclear war, or you getting fired because the alarm app failed. Please
+ * do some research if you have any concerns about features included in this ROM
+ * before flashing it! YOU are choosing to make these modifications, and if
+ * you point the finger at us for messing up your device, we will laugh at you.
+ *
+ * This is not an official LineageOS product. The Lumia 950 did not ship with Android.
+ */</div>
+
+        <h3>Introduction</h3>
+        <p>
+          LineageOS 18.1 (Android 11) on the Microsoft Lumia 950, product <b>talkman</b>.
+          SoC MSM8992, CAF 3.10 kernel. Lunch target <code>lineage_talkman-userdebug</code>.
+        </p>
+        <p>
+          This thread is for the <b>archienz</b> device tree, not the community ROM in
+          <a href="https://xdaforums.com/t/rom-unofficial-lineageos-18-1-for-lumia-950-talkman.4689984/">[ROM][UNOFFICIAL] LineageOS 18.1 for Lumia 950 (talkman)</a>.
+          That work is the start point. This tree changes the camera path, the torch path, the speaker path, and the health path.
+        </p>
+        <p>
+          <b>Product:</b> Lumia 950 <b>RM-1104</b> / board <b>4VM_08r</b> only.
+          Dual-SIM RM-1118 / 4VM_08d is out of scope. Lumia 950 XL (cityman) is a different product.
+        </p>
+        <p>
+          One telephone is in use here. Identity:
+          <code>lineage_talkman-userdebug 11 RQ3A.211001.001 eng.deck.20260901.182829</code>.
+          Unofficial zip dated 2026-09-01, then boot-only kernel flashes. Kernel with rear preview: <b>#29</b>.
+        </p>
+
+        <h3>What works on this telephone</h3>
+        <ul>
+          <li class="ok">Boot to the home screen</li>
+          <li class="ok">Display 1440×2560 at 60 Hz (Duke command-mode panel)</li>
+          <li class="ok">Wi-Fi QCA6174, factory MAC from DPP</li>
+          <li class="ok">Loudspeaker TAS2553 on QUAT_MI2S (PGA 11 dB; quieter than Windows Phone on purpose — 15 dB brownouts an old cell)</li>
+          <li class="ok">USB ADB (<code>g_android</code>, not USB configfs)</li>
+          <li class="ok">Touch (Synaptics RMI4)</li>
+          <li class="ok">GPU Adreno 418 (300 MHz floor on touch, A57 1248 MHz for 1.5 s)</li>
+          <li class="ok">Battery percent and voltage — live, not stuck at 50%</li>
+          <li class="ok">USB cable charge (SDP 5 V / 500 mA, no USB-PD)</li>
+          <li class="ok">Rear camera: Snap live preview and stills (Sony IMX230, HAL1, CCI1 write 0x20, chip 0x0230, CSI lane map 0x0423, mount 90°)</li>
+          <li class="ok">Quick Settings flashlight (GPIO 12 <code>led:flash_torch</code>)</li>
+          <li>Bluetooth: pair / LE connect (QCA6174 Rome)</li>
+        </ul>
+
+        <h3>What does not work</h3>
+        <ul>
+          <li class="no">Cellular / RIL — <code>ril-daemon</code> exits (missing <code>AudioSystem::setErrorCallback</code>). Modem stays OFFLINE</li>
+          <li class="no">GPS — 0 satellites until MPSS is online</li>
+          <li class="no">Front camera — measured (Nokia Ducati module 0x2140, die 0x03BB, 5 MP RAW10), not a CameraId, no HAL</li>
+          <li class="no">Autofocus / OIS — Mitsumi BU24210 at CCI1 0x7c; firmware load is not a lens move. Do not bind lc898212xd</li>
+          <li class="no">Bluetooth media (A2DP) — audio stays on the speaker. Android 11 <code>audio.bluetooth</code> HAL is not packaged</li>
+          <li>Qi wireless charge — not tested</li>
+          <li>Hardware encryption</li>
+          <li>SELinux is permissive</li>
+        </ul>
+
+        <h3>Installation</h3>
+        <p>
+          Full procedure (one RM-1104, from WOA):
+          <a href="https://archienz.github.io/android_device_msft_talkman/INSTALL.html">Install</a>.
+          That install <b>deletes Windows</b> (GPT name Windows) and MMOS. Keep EFS dumps. Keep factory WLAN/BT provision.
+        </p>
+        <ol>
+          <li>Unlock mass storage with WPInternals. Plant LK2ND on EFIESP.</li>
+          <li>LK2ND fastboot is VID:PID <b>18D1:D00D</b> (black screen is normal). Not EDL 9008. Volume-down <b>after</b> the Windows logo, not during it.</li>
+          <li>RAM-boot TWRP, partition, put MBA/MPSS on the modem partition, provision persist from DPP. Do not flash an empty 70 MiB modem image.</li>
+          <li>Install the unofficial zip you built. Do not upload that zip to a public download site from this tree.</li>
+          <li>Later camera/kernel updates: <b>boot.img only</b>. Do not wipe userdata. <code>strings boot.img</code> must include <code>mot_imx230</code> and <code>talkman-cci-scan</code>.</li>
+        </ol>
+        <p>Build on ext4 Linux (this tree is built on SteamOS). Lunch <code>lineage_talkman-userdebug</code>. <code>mka bacon</code>.</p>
+
+        <h3>Sources</h3>
+        <ul>
+          <li>Device: <a href="https://github.com/archienz/android_device_msft_talkman">archienz/android_device_msft_talkman</a> branch <code>lineage-18.1-talkman-hw</code></li>
+          <li>Kernel: <a href="https://github.com/archienz/android_kernel_mmo_msm8994">archienz/android_kernel_mmo_msm8994</a> branch <code>lineage-18.1-talkman</code></li>
+          <li>Vendor: <a href="https://github.com/archienz/android_vendor_msft_talkman">archienz/android_vendor_msft_talkman</a> branch <code>lineage-18.1-julian</code></li>
+          <li>Docs: <a href="https://archienz.github.io/android_device_msft_talkman/">archienz.github.io/android_device_msft_talkman</a></li>
+          <li>Community start point: <a href="https://github.com/Android4Lumia950/android_device_msft_talkman">Android4Lumia950/android_device_msft_talkman</a></li>
+        </ul>
+
+        <h3>Contributors and thanks</h3>
+        <p>
+          Android4Lumia950 (sonic011gamer, ItzzJuliann, NotEclypse, w1zzyl, Empyreal96 and the rest of that group).
+          LineageOS. Nexus 5X / bullhead contributors (this SoC family).
+          Camera lab notes from EpicLPer — ident only; this tree does not ship CSID test-generator as a camera.
+        </p>
+        <p>
+          Bugs: post here with <code>adb logcat</code> / <code>dmesg</code>. Do not ask for a Dual-SIM or 950 XL image in this thread.
+        </p>
+      </div>
+    </article>
+
+    <section class="bb">
+      <h2>BBCode to paste into XDA</h2>
+      <p class="hint" style="color:#5c5c5c;font-size:13px;margin:0 0 8px">XDA uses BBCode in the editor. Paste this as the first post. Replace the username in the forum UI; it is not in this block.</p>
+      <textarea id="bbcode" readonly></textarea>
+    </section>
+    <p class="page-footer page">Local preview file: docs/xda-post-preview.html. Not linked from GitHub Pages unless you add it. Do not publish the Microsoft schematic.</p>
+  </div>
+
+<script>
+const TITLE = "[ROM][UNOFFICIAL] LineageOS 18.1 for Lumia 950 RM-1104 (talkman) — personal CAF 3.10 tree";
+const BB = `[CODE]
+/*
+ * Your warranty is now void.
+ *
+ * We are not responsible for bricked devices, dead SD cards,
+ * thermonuclear war, or you getting fired because the alarm app failed. Please
+ * do some research if you have any concerns about features included in this ROM
+ * before flashing it! YOU are choosing to make these modifications, and if
+ * you point the finger at us for messing up your device, we will laugh at you.
+ *
+ * This is not an official LineageOS product. The Lumia 950 did not ship with Android.
+ */
+[/CODE]
+
+[SIZE=4][B]Introduction[/B][/SIZE]
+
+LineageOS 18.1 (Android 11) on the Microsoft Lumia 950, product [B]talkman[/B]. SoC MSM8992, CAF 3.10 kernel. Lunch target [ICODE]lineage_talkman-userdebug[/ICODE].
+
+This thread is for the [B]archienz[/B] device tree, not the community ROM in [URL='https://xdaforums.com/t/rom-unofficial-lineageos-18-1-for-lumia-950-talkman.4689984/'][ROM][UNOFFICIAL] LineageOS 18.1 for Lumia 950 (talkman)[/URL]. That work is the start point. This tree changes the camera path, the torch path, the speaker path, and the health path.
+
+[B]Product:[/B] Lumia 950 [B]RM-1104[/B] / board [B]4VM_08r[/B] only. Dual-SIM RM-1118 / 4VM_08d is out of scope. Lumia 950 XL (cityman) is a different product.
+
+One telephone is in use here. Identity: [ICODE]lineage_talkman-userdebug 11 RQ3A.211001.001 eng.deck.20260901.182829[/ICODE]. Unofficial zip dated 2026-09-01, then boot-only kernel flashes. Kernel with rear preview: [B]#29[/B].
+
+[SIZE=4][B]What works on this telephone[/B][/SIZE]
+[LIST]
+[*]Boot to the home screen
+[*]Display 1440×2560 at 60 Hz (Duke command-mode panel)
+[*]Wi-Fi QCA6174, factory MAC from DPP
+[*]Loudspeaker TAS2553 on QUAT_MI2S (PGA 11 dB; quieter than Windows Phone on purpose — 15 dB brownouts an old cell)
+[*]USB ADB ([ICODE]g_android[/ICODE], not USB configfs)
+[*]Touch (Synaptics RMI4)
+[*]GPU Adreno 418 (300 MHz floor on touch, A57 1248 MHz for 1.5 s)
+[*]Battery percent and voltage — live, not stuck at 50%
+[*]USB cable charge (SDP 5 V / 500 mA, no USB-PD)
+[*]Rear camera: Snap live preview and stills (Sony IMX230, HAL1, CCI1 write 0x20, chip 0x0230, CSI lane map 0x0423, mount 90°)
+[*]Quick Settings flashlight (GPIO 12 [ICODE]led:flash_torch[/ICODE])
+[*]Bluetooth: pair / LE connect (QCA6174 Rome)
+[/LIST]
+
+[SIZE=4][B]What does not work[/B][/SIZE]
+[LIST]
+[*]Cellular / RIL — [ICODE]ril-daemon[/ICODE] exits (missing [ICODE]AudioSystem::setErrorCallback[/ICODE]). Modem stays OFFLINE
+[*]GPS — 0 satellites until MPSS is online
+[*]Front camera — measured (Nokia Ducati module 0x2140, die 0x03BB, 5 MP RAW10), not a CameraId, no HAL
+[*]Autofocus / OIS — Mitsumi BU24210 at CCI1 0x7c; firmware load is not a lens move. Do not bind lc898212xd
+[*]Bluetooth media (A2DP) — audio stays on the speaker. Android 11 [ICODE]audio.bluetooth[/ICODE] HAL is not packaged
+[*]Qi wireless charge — not tested
+[*]Hardware encryption
+[*]SELinux is permissive
+[/LIST]
+
+[SIZE=4][B]Installation[/B][/SIZE]
+
+Full procedure (one RM-1104, from WOA): [URL='https://archienz.github.io/android_device_msft_talkman/INSTALL.html']Install[/URL]. That install [B]deletes Windows[/B] (GPT name Windows) and MMOS. Keep EFS dumps. Keep factory WLAN/BT provision.
+
+[LIST=1]
+[*]Unlock mass storage with WPInternals. Plant LK2ND on EFIESP.
+[*]LK2ND fastboot is VID:PID [B]18D1:D00D[/B] (black screen is normal). Not EDL 9008. Volume-down [B]after[/B] the Windows logo, not during it.
+[*]RAM-boot TWRP, partition, put MBA/MPSS on the modem partition, provision persist from DPP. Do not flash an empty 70 MiB modem image.
+[*]Install the unofficial zip you built. Do not upload that zip to a public download site from this tree.
+[*]Later camera/kernel updates: [B]boot.img only[/B]. Do not wipe userdata. [ICODE]strings boot.img[/ICODE] must include [ICODE]mot_imx230[/ICODE] and [ICODE]talkman-cci-scan[/ICODE].
+[/LIST]
+
+Build on ext4 Linux. Lunch [ICODE]lineage_talkman-userdebug[/ICODE]. [ICODE]mka bacon[/ICODE].
+
+[SIZE=4][B]Sources[/B][/SIZE]
+[LIST]
+[*]Device: [URL='https://github.com/archienz/android_device_msft_talkman']archienz/android_device_msft_talkman[/URL] branch [ICODE]lineage-18.1-talkman-hw[/ICODE]
+[*]Kernel: [URL='https://github.com/archienz/android_kernel_mmo_msm8994']archienz/android_kernel_mmo_msm8994[/URL] branch [ICODE]lineage-18.1-talkman[/ICODE]
+[*]Vendor: [URL='https://github.com/archienz/android_vendor_msft_talkman']archienz/android_vendor_msft_talkman[/URL] branch [ICODE]lineage-18.1-julian[/ICODE]
+[*]Docs: [URL='https://archienz.github.io/android_device_msft_talkman/']archienz.github.io/android_device_msft_talkman[/URL]
+[*]Community start point: [URL='https://github.com/Android4Lumia950/android_device_msft_talkman']Android4Lumia950/android_device_msft_talkman[/URL]
+[/LIST]
+
+[SIZE=4][B]Contributors and thanks[/B][/SIZE]
+
+Android4Lumia950 (sonic011gamer, ItzzJuliann, NotEclypse, w1zzyl, Empyreal96 and the rest of that group). LineageOS. Nexus 5X / bullhead contributors (this SoC family). Camera lab notes from EpicLPer — ident only; this tree does not ship CSID test-generator as a camera.
+
+Bugs: post here with [ICODE]adb logcat[/ICODE] / [ICODE]dmesg[/ICODE]. Do not ask for a Dual-SIM or 950 XL image in this thread.
+`;
+
+document.getElementById("bbcode").value = BB;
+
+function copyText(text, btn, label) {
+  navigator.clipboard.writeText(text).then(function () {
+    const old = btn.textContent;
+    btn.textContent = label;
+    setTimeout(function () { btn.textContent = old; }, 1500);
+  });
+}
+document.getElementById("copy-title").onclick = function () {
+  copyText(TITLE, this, "Title copied");
+};
+document.getElementById("copy-bb").onclick = function () {
+  copyText(document.getElementById("bbcode").value, this, "BBCode copied");
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+TalkmanXPhoneLauncherOverlay (com.talkman.overlay.xphone.launcher → com.android.launcher3)
+
+Trebuchet package verified: packages/apps/Trebuchet/AndroidManifest.xml
+and quickstep/AndroidManifest.xml both package="com.android.launcher3".
+
+Files:
+  Android.mk
+  AndroidManifest.xml
+  res/values/attrs.xml
+  res/values/styles.xml
+  res/values/dimens.xml
+  res/drawable/round_rect_folder.xml
+  res/drawable-v28/round_rect_folder.xml
+  DONE.txt
+
+Verified Trebuchet names (packages/apps/Trebuchet/res):
+  BaseIcon.Workspace     style   workspace / folder-icon labels (app_icon.xml,
+                                 folder_icon.xml). All-caps, tracked 0.12,
+                                 #ffe8e8e8, no shadow.
+  BaseIcon               style   all-apps / folder children. Same all-caps.
+  LauncherTheme          style   allAppsScrimColor #ff000000 (void). Stock light
+                                 was #FFFFFFFF (ScrimView / ShelfScrimView).
+  LauncherTheme.Dark*    style   aliases of LauncherTheme so DarkText cannot
+                                 restore a light sheet.
+  bg_round_rect_radius   dimen   4dp (stock 8dp). Open-folder plate.
+  default_dialog_corner_radius dimen 4dp (stock 8dp). Themes.java fallback.
+  round_rect_folder      drawable void #ff000000, 4dp corners (not squircle).
+                         v28 stock used dialogCornerRadius; same 4dp here.
+
+Not overlaid:
+  folder_shapes.xml / Squircle — IconShape.pickBestShape; folderIconRadius is a
+  private attr on XML tags. Plate is 4dp via the drawable + dimen above.
+  overlay/packages/apps/Trebuchet — owned, not this dir.
+
+No mka. Not wired in device.mk.

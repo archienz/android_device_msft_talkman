@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 The LineageOS Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+
+     Names from packages/apps/Settings/res/values/themes.xml.
+     Literals only. Public android parents (live RRO, no Settings-private attrs).
+     Theme.Settings is not replaced — it keeps preferenceTheme / wifi_signal.
+-->
+<resources>
+    <style name="Theme.SettingsBase" parent="@android:style/Theme.DeviceDefault.Settings">
+        <item name="android:windowBackground">#ff000000</item>
+        <item name="android:colorBackground">#ff000000</item>
+        <item name="android:colorPrimary">#ff000000</item>
+        <item name="android:colorPrimaryDark">#ff000000</item>
+        <item name="android:colorAccent">#ffe8e8e8</item>
+        <item name="android:statusBarColor">#ff000000</item>
+        <item name="android:navigationBarColor">#ff000000</item>
+        <item name="android:navigationBarDividerColor">#00000000</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:textColorPrimary">#ffe8e8e8</item>
+        <item name="android:textColorSecondary">#99e8e8e8</item>
+        <item name="android:textColorHint">#8ae8e8e8</item>
+        <item name="android:textColorPrimaryInverse">#ffe8e8e8</item>
+        <item name="android:colorControlNormal">#ffD6DEE8</item>
+        <item name="android:colorControlActivated">#ffe8e8e8</item>
+        <item name="android:colorControlHighlight">#33ffffff</item>
+        <item name="android:listDivider">@drawable/xphone_list_divider</item>
+        <item name="android:dividerHorizontal">@drawable/xphone_list_divider</item>
+        <item name="android:dividerVertical">@drawable/xphone_list_divider</item>
+        <!-- Preference titles (homepage + inner lists) use this. -->
+        <item name="android:textAppearanceListItem">@style/TextAppearance.HomepageCardTitle</item>
+    </style>
+
+    <!-- Do not overlay Theme.Settings.Home: stock parent is HomeBase
+         (preferenceTheme, search-bar ActionBar tint). Replacing that parent
+         with a public android theme drops those items and breaks the
+         homepage. Void cards/search/dialogs come from the color overlays;
+         Theme.Settings inherits this SettingsBase. -->
+</resources>

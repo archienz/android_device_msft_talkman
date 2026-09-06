@@ -1,0 +1,7 @@
+frameworks/base/packages/SystemUI/res/values/config.xml
+frameworks/base/packages/SystemUI/res/values/colors.xml
+frameworks/base/packages/SystemUI/res/values-night/colors.xml
+frameworks/base/packages/SystemUI/res/layout/status_bar_notification_row.xml
+frameworks/base/packages/SystemUI/res/layout/status_bar_notification_section_header.xml
+frameworks/base/packages/SystemUI/res/layout/status_bar_notification_footer.xml
+frameworks/base/packages/SystemUI/res/layout/status_bar_no_notifications.xml

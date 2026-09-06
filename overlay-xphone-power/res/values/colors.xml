@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 The LineageOS Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+
+     Names verified in frameworks/base/packages/SystemUI/res/values/colors.xml.
+     Literals only. No GM2 red emergency / alert (no colorful iOS buttons).
+-->
+<resources>
+    <!-- Stock day #F5F5F5 / night GM2_grey_900. Used by GlobalActionsLayout.setBackgrounds. -->
+    <color name="global_actions_separated_background">#ff000000</color>
+    <!-- Stock day #F1F3F4 / night GM2_grey_800. -->
+    <color name="global_actions_grid_background">#ff000000</color>
+    <!-- White type. Stock day GM2_grey_700. -->
+    <color name="global_actions_text">#ffe8e8e8</color>
+    <!-- Stock GM2_red_700 — kill the red power/alert label. -->
+    <color name="global_actions_alert_text">#ffe8e8e8</color>
+    <!-- Stock GM2_red_400 emergency pill. Void, not a colorful iOS button. -->
+    <color name="global_actions_emergency_background">#ff000000</color>
+    <color name="global_actions_emergency_text">#ffe8e8e8</color>
+</resources>

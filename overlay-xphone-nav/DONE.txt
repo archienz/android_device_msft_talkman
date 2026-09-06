@@ -1,0 +1,20 @@
+TalkmanXPhoneNavOverlay (com.talkman.overlay.xphone.nav → com.android.systemui)
+
+Files:
+  Android.mk
+  AndroidManifest.xml
+  res/values/dimens.xml
+  res/values/colors.xml
+  res/drawable/qs_navbar_scrim.xml
+  DONE.txt
+
+Verified SystemUI names (LOS 18.1 / Android 11):
+  dimen/navigation_handle_radius          (NavigationHandle.java; stock 1dp)
+  dimen/navigation_home_handle_width      (home_handle.xml; stock 72dp → 96dp)
+  color/navigation_bar_home_handle_light_color  (styles.xml homeHandleColor; stock #EBffffff → #ffffffff)
+  drawable/qs_navbar_scrim                (status_bar_expanded.xml background; no color of this name)
+
+Not overlaid (would re-enable 3-button):
+  string/config_navBarLayout
+  string/config_navBarLayoutQuickstep
+  string/config_navBarLayoutHandle

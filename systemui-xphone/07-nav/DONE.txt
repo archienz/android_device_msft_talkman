@@ -1,0 +1,25 @@
+07-nav — gesture pill look only (DEVICE_PACKAGE_OVERLAYS).
+
+Files:
+  frameworks/base/packages/SystemUI/res/layout/navigation_bar.xml
+  frameworks/base/packages/SystemUI/res/layout/navigation_bar_window.xml
+  frameworks/base/packages/SystemUI/res/layout/navigation_layout.xml
+  frameworks/base/packages/SystemUI/res/layout/navigation_layout_vertical.xml
+  frameworks/base/packages/SystemUI/res/values/dimens.xml
+  frameworks/base/packages/SystemUI/res/drawable/qs_navbar_scrim.xml
+  DONE.txt
+
+Look:
+  Full stock layouts copied; backgrounds set to @color/system_bar_background_transparent.
+  All stock android:id kept (assist_hint_*, navigation_inflater, navigation_bar_frame,
+  horizontal, vertical, nav_buttons, ends_group, center_group, dpad_group).
+  dimen/navigation_handle_radius = 1dp (hairline; NavigationHandle height = 2dp)
+  dimen/navigation_home_handle_width = 108dp (stock 72dp)
+  drawable/qs_navbar_scrim = transparent
+
+Not overlaid (would re-enable 3-button or drop ids):
+  string/config_navBarLayout
+  string/config_navBarLayoutQuickstep
+  string/config_navBarLayoutHandle
+  layout/home_handle.xml
+  layout/navigation_bar_app_item.xml

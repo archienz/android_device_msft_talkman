@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Messages</string>
+    <string name="compose">New</string>
+    <string name="send">Send</string>
+    <string name="hint_to">Number</string>
+    <string name="hint_body">Message</string>
+    <string name="empty">No messages</string>
+    <string name="need_sms">Allow SMS</string>
+</resources>

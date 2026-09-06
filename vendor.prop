@@ -17,3 +17,7 @@ persist.camera.tnr.video=0
 # HAL3 EIS flag; unused when HAL3.enabled=0. Kept so a future HAL3
 # path does not silently drop EIS. Not a sensor-count or CCI address.
 persist.camera.eis.enable=1
+
+# Vulkan HAL discovery (same as system.prop). ICD is vulkan.msm8992.so.
+# Do not set ro.hwui.use_vulkan=true: ICD enumerates 0 devices (black screen).
+ro.hardware.vulkan=msm8992

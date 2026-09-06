@@ -24,9 +24,16 @@
          lineage-sdk leftover da9e012 keys 96 is SHOT+VOL only. No Dual SIM. -->
     <bool name="config_showNavigationBar">true</bool>
     <bool name="config_hasRecents">true</bool>
-    <!-- 3-button default like bullhead; Settings may offer 2-button swipe-up. -->
-    <integer name="config_navBarInteractionMode">0</integer>
+    <!-- X-phone: gestural default. Thin 20dp hint via navigation_bar_* in dimens.xml.
+         Settings can still switch to 3-button (will be tight at 20dp). -->
+    <integer name="config_navBarInteractionMode">2</integer>
     <bool name="config_swipe_up_gesture_setting_available">true</bool>
+    <bool name="config_showGesturalNavigationHints">true</bool>
+    <!-- Never force an opaque nav blob; no contrast scrim. -->
+    <integer name="config_navBarOpacityMode">2</integer>
+    <bool name="config_navBarNeedsScrim">false</bool>
+    <!-- Keep the thin bar on the bottom in landscape (no side-bar move). -->
+    <bool name="config_navBarCanMove">false</bool>
 
     <!-- Set to true to add links to Cell Broadcast app from Settings and MMS app. -->
     <bool name="config_cellBroadcastAppLinks">true</bool>
@@ -423,8 +430,9 @@
     <integer name="config_cameraLiftTriggerSensorType">-1</integer>
     <string translatable="false" name="config_cameraLiftTriggerSensorStringType"></string>
 
-   <!-- Disable rounded corners on windows to improve graphics performance -->
-   <bool name="config_supportsRoundedCornersOnWindows">false</bool>
+   <!-- X-phone: software rounded windows match the real 16dp panel corners.
+        Adreno 418 cost is accepted; do not invent a punch-hole. -->
+   <bool name="config_supportsRoundedCornersOnWindows">true</bool>
 
    <!-- If this is true, device supports Sustained Performance Mode. -->
    <bool name="config_sustainedPerformanceModeSupported">true</bool>
@@ -451,6 +459,23 @@
 
     <!-- SD card is hot-pluggable on this device -->
     <bool name="config_batterySdCardAccessibility">true</bool>
+
+    <!-- X-phone: RM-1104 panel has no cutout. Empty path, do not fill/mask. -->
+    <string translatable="false" name="config_mainBuiltInDisplayCutout"></string>
+    <string translatable="false" name="config_mainBuiltInDisplayCutoutRectApproximation"></string>
+    <bool name="config_fillMainBuiltInDisplayCutout">false</bool>
+    <bool name="config_maskMainBuiltInDisplayCutout">false</bool>
+
+    <!--
+         License-clean family already registered in frameworks/base/data/fonts/fonts.xml
+         as source-sans-pro (SIL OFL, external/google-fonts/source-sans-pro).
+         Barlow exists in the tree but is not a fonts.xml family. No SF Pro.
+    -->
+    <string name="config_headlineFontFamily" translatable="false">source-sans-pro</string>
+    <string name="config_headlineFontFamilyMedium" translateable="false">source-sans-pro-semi-bold</string>
+    <string name="config_bodyFontFamily" translatable="false">source-sans-pro</string>
+    <string name="config_bodyFontFamilyMedium" translatable="false">source-sans-pro-semi-bold</string>
+    <bool name="config_buttonTextAllCaps">false</bool>
 
     <!-- leftover MATCH b045cc4: no FPC. lineage-sdk / AOSP defaults are
          already false for config_cleanupUnusedFingerprints and

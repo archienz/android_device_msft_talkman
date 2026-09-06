@@ -17,6 +17,11 @@
 # Lunch: lineage_talkman-userdebug (use lunch, not breakfast).
 # Cellular/RIL is P2 — do not treat radio as P0 here.
 
+# m37 lab ramdisk: must be set before vendor/lineage/config/common.mk
+# (via common_full_phone). userdebug otherwise writes ro.adb.secure=1
+# and the 7s MBA window stays authorizing (/data adb_keys not mounted).
+WITH_ADB_INSECURE := true
+
 $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/aosp_base_telephony.mk)
 $(call inherit-product, vendor/lineage/config/common_full_phone.mk)
@@ -36,3 +41,9 @@ PRODUCT_BUILD_PROP_OVERRIDES += \
     PRIVATE_BUILD_DESC="talkman-user 11 RQ3A.211001.001 1 release-keys"
 
 BUILD_FINGERPRINT := Microsoft/talkman/talkman:11/RQ3A.211001.001/1:user/release-keys
+
+# Wallpaper-only, after vendor/lineage/overlay/common. Do not add overlay/ here —
+# DEVICE_PACKAGE_OVERLAYS already has it (dup aapt2 rules).
+PRODUCT_PACKAGE_OVERLAYS += device/msft/talkman/overlay-wallpaper
+# X-phone SystemUI chrome is compile-time overlays in systemui-xphone/ (bacon).
+# Do not adb push SystemUI.apk onto the 2026-09-01 zip.

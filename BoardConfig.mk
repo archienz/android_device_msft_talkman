@@ -61,6 +61,32 @@ BOARD_KERNEL_CMDLINE += androidboot.selinux=permissive
 # Force 0 so LOS init.usb.configfs.rc does not take the gadget.
 BOARD_KERNEL_CMDLINE += androidboot.usbconfigfs=0
 BOARD_KERNEL_CMDLINE += firmware_class.path=/vendor/firmware
+# Other-chat recovery: pre-arm IMEM 0x77665500 so panic/watchdog lands in LK2ND.
+BOARD_KERNEL_CMDLINE += msm_poweroff.panic_bootloader=1
+# Match m14 keep-image cmdline so a panic leaves the ring at 0x300c0000.
+BOARD_KERNEL_CMDLINE += log_buf_len=2M
+BOARD_KERNEL_CMDLINE += log_buf_phys=0x300c0000
+BOARD_KERNEL_CMDLINE += pil_msa.lab_mba_stage=0x0CD00000
+BOARD_KERNEL_CMDLINE += pil_msa.lab_mba_unwrap=1
+BOARD_KERNEL_CMDLINE += pil_msa.lab_mdata_stage=0x06F00000
+BOARD_KERNEL_CMDLINE += pil_msa.lab_hold=1
+BOARD_KERNEL_CMDLINE += pil_msa.lab_identity=0
+# m36: META before the ~44MiB hive preload. m35 died at seg 6 (0x075c0000).
+# Sit next to hold/identity — cmdline truncates at lab_share_size=.
+BOARD_KERNEL_CMDLINE += pil_msa.lab_load_before_auth=0
+BOARD_KERNEL_CMDLINE += pil_msa.lab_share_size=0x5E00000
+BOARD_KERNEL_CMDLINE += pil_msa.lab_share_flags=9
+# Windows SHARE 0x02000202 3-arg; 4-arg 0x0200020B was -22 on #26.
+BOARD_KERNEL_CMDLINE += pil_msa.lab_share_fnid=1
+BOARD_KERNEL_CMDLINE += pil_msa.lab_unlock=1
+BOARD_KERNEL_CMDLINE += pil_msa.lab_init_image=1
+BOARD_KERNEL_CMDLINE += pil_msa.lab_mirror_size=0x400000
+BOARD_KERNEL_CMDLINE += pil_msa.lab_tz_pas_id=9
+BOARD_KERNEL_CMDLINE += pil_msa.lab_code_start=0
+BOARD_KERNEL_CMDLINE += pil_msa.lab_reloc_headers=1
+BOARD_KERNEL_CMDLINE += pil_msa.lab_place_hash=1
+BOARD_KERNEL_CMDLINE += pil_msa.lab_win_hash=1
+BOARD_KERNEL_CMDLINE += pil_msa.lab_code_span=1
 # No CONFIG_USB_CONFIGFS. Recovery/vold trees honor this name.
 # Leftover bullhead / LOS default TARGET_USES_USB_CONFIGFS := true would
 # take the gadget from g_android. Keep false.
@@ -160,6 +186,7 @@ TARGET_NO_RPC := true
 PRODUCT_ENFORCE_VINTF_MANIFEST_OVERRIDE := true
 DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/manifest.xml
 DEVICE_MANIFEST_FILE += $(DEVICE_PATH)/vintf/android.hardware.camera.provider@2.4.xml
+DEVICE_MANIFEST_FILE += $(DEVICE_PATH)/vintf/vulkan.xml
 DEVICE_MATRIX_FILE := $(DEVICE_PATH)/compatibility_matrix.xml
 TARGET_FS_CONFIG_GEN += $(DEVICE_PATH)/config.fs
 

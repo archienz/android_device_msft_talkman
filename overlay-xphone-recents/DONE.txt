@@ -1,0 +1,40 @@
+TalkmanXPhoneRecentsOverlay (com.talkman.overlay.xphone.recents)
+target: com.android.systemui
+
+Files
+- Android.mk
+- AndroidManifest.xml
+- res/values/colors.xml
+- res/values/dimens.xml
+- res/values/config.xml
+- res/drawable/recents_onboarding_toast_rounded_background.xml
+
+SystemUI recents_* / leftover names overlaid
+- recents_tv_card_background_color          #000000
+- recents_tv_card_title_text_color          #E8E8E8
+- recents_tv_dismiss_text_color             #99E8E8E8
+- recents_tv_text_shadow_color              #00000000
+- recents_onboarding_toast_arrow_corner_radius   4dp
+- recents_onboarding_toast_rounded_background    void + hairline, 4dp
+- screen_pinning_request_window_bg          #000000  (void scrim)
+- docked_divider_background                 #000000
+- docked_divider_handle                     #E8E8E8
+- forced_resizable_background               #000000
+- minimize_dock_shadow_start                #000000
+- minimize_dock_shadow_end                  #00000000
+- quick_step_track_background_background_dark    #000000
+- quick_step_track_background_background_light   #000000
+- quick_step_track_background_foreground_dark    #E8E8E8
+- quick_step_track_background_foreground_light   #E8E8E8
+- config_recentsComponent                   OverviewProxyRecentsImpl
+- recents_grow_in_multiwindow               true
+
+Not in SystemUI (Trebuchet Quickstep owns these; do not invent here)
+- task_corner_radius_small
+- task_card_vert_space / portrait_task_card_horz_space*
+- overview_actions_* / overview_button / overview_peek_distance
+- recents_page_spacing / recents_empty_message*
+- chip_scrim_start_color
+
+Gesture only: no config_navBarLayout (3-button). Pill is overlay-xphone-nav.
+No mka. Not wired in device.mk.

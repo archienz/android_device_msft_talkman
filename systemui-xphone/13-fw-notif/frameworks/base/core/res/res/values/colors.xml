@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Invert stock light template (dark text on #ffffffff) to void plates + ink. -->
+    <color name="notification_material_background_color">#ff111111</color>
+    <color name="notification_action_list">#ff1a1a1a</color>
+    <color name="notification_primary_text_color_light">#ffe8e8e8</color>
+    <color name="notification_secondary_text_color_light">#99e8e8e8</color>
+    <color name="notification_progress_background_color">#33ffffff</color>
+    <color name="notification_default_color_light">#ffe8e8e8</color>
+</resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     talkman Settings overlay — small radii, flush lists, hairline rules.
+-->
+<resources>
+    <dimen name="rect_button_radius">2dp</dimen>
+    <dimen name="search_bar_margin">0dp</dimen>
+    <dimen name="search_bar_corner_radius">2dp</dimen>
+    <dimen name="search_bar_card_elevation">0dp</dimen>
+    <dimen name="contextual_card_corner_radius">2dp</dimen>
+    <dimen name="contextual_card_side_margin">0dp</dimen>
+    <dimen name="contextual_card_vertical_margin">0dp</dimen>
+    <dimen name="horizontal_divider_height">1px</dimen>
+    <dimen name="output_switcher_panel_icon_corner_radius">2dp</dimen>
+</resources>

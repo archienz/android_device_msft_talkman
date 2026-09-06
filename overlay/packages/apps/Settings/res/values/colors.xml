@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     talkman Settings overlay — X / xAI / SpaceX telemetry chrome.
+     True black lists, hairline separators. Not iOS inset grouped cards.
+     Does not replace bools.xml / config.xml talkman hardware flags.
+-->
+<resources>
+    <color name="xphone_black">#ff000000</color>
+    <color name="xphone_surface">#ff000000</color>
+    <color name="xphone_well">#ff1a1a1a</color>
+    <color name="xphone_hairline">#33ffffff</color>
+    <color name="xphone_text_primary">#ffffffff</color>
+    <color name="xphone_text_secondary">#99ffffff</color>
+    <color name="xphone_header">#8a8a8a</color>
+    <color name="xphone_accent">#ffffffff</color>
+    <color name="xphone_ripple">#33ffffff</color>
+
+    <color name="divider_color">@color/xphone_hairline</color>
+    <color name="search_bar_background">@color/xphone_black</color>
+    <color name="contextual_card_background">@color/xphone_black</color>
+    <color name="contextual_card_stroke_color">@color/xphone_hairline</color>
+    <color name="contextual_card_dismissal_background">@color/xphone_well</color>
+    <color name="dialog_background">@color/xphone_black</color>
+    <color name="gestures_setting_background_color">@color/xphone_black</color>
+    <color name="shortcut_background">@color/xphone_well</color>
+    <color name="switchbar_background_color">@color/xphone_well</color>
+    <color name="switchbar_switch_track_tint">#66ffffff</color>
+    <color name="switchbar_switch_thumb_tint">@android:color/white</color>
+    <color name="notification_history_background">@color/xphone_black</color>
+    <color name="notification_importance_selection_bg">@color/xphone_black</color>
+    <color name="palette_list_gradient_background">@color/xphone_black</color>
+    <color name="icon_accent">@color/xphone_accent</color>
+    <color name="icon_launcher_setting_color">@color/xphone_accent</color>
+
+    <!-- Homepage AdaptiveIcon wells: graphite, not Material rainbow. -->
+    <color name="homepage_network_background">@color/xphone_well</color>
+    <color name="homepage_connected_device_background">@color/xphone_well</color>
+    <color name="homepage_app_and_notification_background">@color/xphone_well</color>
+    <color name="homepage_battery_background">@color/xphone_well</color>
+    <color name="homepage_display_background">@color/xphone_well</color>
+    <color name="homepage_sound_background">@color/xphone_well</color>
+    <color name="homepage_storage_background">@color/xphone_well</color>
+    <color name="homepage_security_background">@color/xphone_well</color>
+    <color name="homepage_accounts_background">@color/xphone_well</color>
+    <color name="homepage_accessibility_background">@color/xphone_well</color>
+    <color name="homepage_system_background">@color/xphone_well</color>
+    <color name="homepage_support_background">@color/xphone_well</color>
+    <color name="homepage_generic_icon_background">@color/xphone_well</color>
+    <color name="homepage_location_background">@color/xphone_well</color>
+    <color name="homepage_about_background">@color/xphone_well</color>
+    <color name="homepage_privacy_background">@color/xphone_well</color>
+</resources>

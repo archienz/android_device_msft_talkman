@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     talkman Settings overlay — X-phone hairline list divider.
+     1px, not iOS grouped-card chrome. No Apple assets.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+       android:shape="rectangle">
+    <size android:height="1px" android:width="1px" />
+    <solid android:color="@color/xphone_hairline" />
+</shape>

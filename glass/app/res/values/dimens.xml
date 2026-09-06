@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- QS-sized panel: 2 tile rows (96dp) + brightness + padding. Radius 4–6 dp. -->
+    <dimen name="qs_glass_height">288dp</dimen>
+    <dimen name="qs_glass_margin_h">16dp</dimen>
+    <dimen name="qs_glass_margin_top">72dp</dimen>
+    <dimen name="qs_glass_radius">5dp</dimen>
+    <dimen name="qs_label_size">13sp</dimen>
+    <dimen name="gesture_pill_width">128dp</dimen>
+    <dimen name="gesture_pill_height">4dp</dimen>
+    <dimen name="gesture_pill_margin_bottom">10dp</dimen>
+</resources>

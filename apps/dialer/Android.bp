@@ -1,0 +1,13 @@
+android_app {
+    name: "TalkmanDialer",
+    srcs: ["src/**/*.java"],
+    resource_dirs: ["res"],
+    manifest: "AndroidManifest.xml",
+    sdk_version: "current",
+    min_sdk_version: "30",
+    product_specific: true,
+    certificate: "platform",
+    static_libs: ["talkman-xphone-ui-lib"],
+    optimize: { enabled: false },
+    dex_preopt: { enabled: false },
+}

@@ -1,0 +1,8 @@
+// Shared X-phone UI widgets (starfield). Used by TalkmanClock / Dialer / Messages.
+java_library {
+    name: "talkman-xphone-ui-lib",
+    srcs: ["src/**/*.java"],
+    sdk_version: "current",
+    min_sdk_version: "30",
+    installable: false,
+}

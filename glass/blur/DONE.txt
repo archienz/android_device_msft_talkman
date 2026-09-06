@@ -1,0 +1,11 @@
+TalkmanGlassCache (com.talkman.glass.blur)
+
+360x640 RGBA cache, dual-Kawase 3 passes (180x320 down, 90x160 down, 360x640 up),
+one FBO ping-pong, GLES 3.1 mediump. Not 1440x2560.
+
+Files:
+  Android.bp
+  DONE.txt
+  src/com/talkman/glass/blur/TalkmanGlassCache.java
+  src/com/talkman/glass/blur/KawaseShaders.java
+  src/com/talkman/glass/blur/GlUtil.java

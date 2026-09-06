@@ -1,0 +1,80 @@
+TalkmanXPhoneSettingsOverlay
+package com.talkman.overlay.xphone.settings
+targetPackage com.android.settings
+non-static product RRO (pm install + cmd overlay enable)
+
+Files:
+  Android.mk
+  AndroidManifest.xml
+  res/values/colors.xml
+  res/values/dimens.xml
+  res/values/styles.xml
+  res/values/themes.xml
+  res/values-night/colors.xml
+  res/values-night/styles.xml
+  res/values-night/themes.xml
+  res/drawable/xphone_list_divider.xml
+  res/drawable/search_bar_selected_background.xml
+  res/drawable/preference_background.xml
+  DONE.txt
+
+Verified in packages/apps/Settings/res (overlaid names):
+
+colors (values/colors.xml):
+  divider_color
+  title_color
+  fingerprint_title_color
+  search_bar_background
+  contextual_card_background
+  contextual_card_stroke_color
+  contextual_card_dismissal_background
+  dialog_background
+  gestures_setting_background_color
+  shortcut_background
+  switchbar_background_color
+  notification_history_background
+  notification_importance_selection_bg
+  palette_list_gradient_background
+
+colors (values-night/colors.xml):
+  switchbar_switch_track_tint
+  switchbar_switch_thumb_tint
+  homepage_accessibility_background
+  homepage_support_background
+  homepage_card_dismissal_background
+  contextual_card_background
+  search_bar_background
+  dialog_background
+  notification_importance_selection_bg
+  notification_history_background
+  palette_list_gradient_background
+  gestures_setting_background_color
+
+dimens (values/dimens.xml):
+  rect_button_radius
+  search_bar_corner_radius
+  contextual_card_corner_radius
+  output_switcher_panel_icon_corner_radius
+  divider_height
+  horizontal_divider_height
+  vertical_divider_width
+  wifi_divider_height
+
+styles / themes:
+  Theme.SettingsBase
+  Theme.Settings.Home
+  ThemeOverlay.Settings.SearchBar
+  Widget.ActionBar.Base
+  TextAppearance.CategoryTitle
+  TextAppearance.Small.SwitchBar
+  FingerprintHeaderStyle
+  FaceHeaderStyle
+  LockPatternSizeHeaderStyle
+
+drawables:
+  search_bar_selected_background
+  preference_background
+  xphone_list_divider (new; referenced only by Theme.SettingsBase / Theme.Settings.Home)
+
+Look: void #000000, primary text #E8E8E8, hairline #33ffffff, corners 4dp.
+Literals only in styles (no ?attr/). Did not edit overlay/packages/apps/Settings.

@@ -1,0 +1,21 @@
+--- a/src/com/android/systemui/statusbar/phone/ScrimState.java
++++ b/src/com/android/systemui/statusbar/phone/ScrimState.java
+@@ -81,7 +81,8 @@
+             mBubbleTint = Color.TRANSPARENT;
+ 
+             mFrontAlpha = 0;
+-            mBehindAlpha = mScrimBehindAlphaKeyguard;
++            // Stock field tracks KEYGUARD_SCRIM_ALPHA; pin lock dim so glass reads.
++            mBehindAlpha = ScrimController.KEYGUARD_SCRIM_ALPHA;
+             mBubbleAlpha = 0;
+         }
+     },
+@@ -254,7 +255,7 @@
+     float mBehindAlpha;
+     float mBubbleAlpha;
+ 
+-    float mScrimBehindAlphaKeyguard;
++    float mScrimBehindAlphaKeyguard = ScrimController.KEYGUARD_SCRIM_ALPHA;
+     float mDefaultScrimAlpha;
+     ScrimView mScrimInFront;
+     ScrimView mScrimBehind;

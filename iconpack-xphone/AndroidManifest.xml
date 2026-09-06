@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.talkman.iconpack.xphone"
+    android:versionCode="6"
+    android:versionName="1.4">
+    <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="30" />
+    <application
+        android:label="X-phone icons"
+        android:icon="@drawable/ic_settings"
+        android:allowBackup="false"
+        android:hasCode="false">
+        <activity
+            android:name="android.app.Activity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:label="X-phone icons">
+            <intent-filter>
+                <action android:name="com.novalauncher.THEME" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="org.adw.launcher.icons.ACTION_PICK_ICON" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.anddoes.launcher.THEME" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

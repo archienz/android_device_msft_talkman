@@ -1,0 +1,26 @@
+// Talkman Vulkan memory-type dump (system binary).
+// Not in PRODUCT_PACKAGES. Build: mka talkman-vk-mem
+// Do not add this to talkman-vulkan.mk (other agent).
+
+cc_binary {
+    name: "talkman-vk-mem",
+    srcs: ["vk_mem.c"],
+    vendor: false,
+    proprietary: false,
+    compile_multilib: "64",
+
+    shared_libs: [
+        "liblog",
+        "libvulkan",
+    ],
+
+    header_libs: [
+        "vulkan_headers",
+    ],
+
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-DLOG_TAG=\"TalkmanVkMem\"",
+    ],
+}

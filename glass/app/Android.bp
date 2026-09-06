@@ -1,0 +1,23 @@
+// Talkman glass demo APK (void + QS-sized TalkmanGlassView).
+// Build later: mka talkman-glass-demo
+// Sideload: adb install -r $OUT/product/app/talkman-glass-demo/talkman-glass-demo.apk
+// Do not add PRODUCT_PACKAGES from this file. No Vulkan. HWUI stays GLES.
+
+android_app {
+    name: "talkman-glass-demo",
+    srcs: ["src/**/*.java"],
+    resource_dirs: ["res"],
+    manifest: "AndroidManifest.xml",
+    platform_apis: true,
+    product_specific: true,
+    static_libs: [
+        "talkman-glass-blur",
+        "libtalkman-glass",
+    ],
+    optimize: {
+        enabled: false,
+    },
+    dex_preopt: {
+        enabled: false,
+    },
+}

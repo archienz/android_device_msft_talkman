@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     talkman Settings overlay — technical headers, flush cards, 2dp corners.
+     Named styles replace the Settings.git definition of the same name.
+-->
+<resources>
+    <style name="Widget.ActionBar.Base"
+           parent="@android:style/Widget.DeviceDefault.ActionBar.Solid">
+        <item name="android:background">@color/xphone_black</item>
+    </style>
+
+    <style name="TextAppearance.CategoryTitle"
+           parent="@*android:style/TextAppearance.DeviceDefault.Body2">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:letterSpacing">0.14</item>
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textColor">@color/xphone_header</item>
+    </style>
+
+    <style name="ContextualCardStyle">
+        <item name="android:layout_marginBottom">@dimen/contextual_card_vertical_margin</item>
+        <item name="android:layout_marginStart">@dimen/contextual_card_side_margin</item>
+        <item name="android:layout_marginEnd">@dimen/contextual_card_side_margin</item>
+        <item name="cardBackgroundColor">@color/contextual_card_background</item>
+        <item name="cardCornerRadius">@dimen/contextual_card_corner_radius</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeColor">@color/contextual_card_stroke_color</item>
+        <item name="strokeWidth">1px</item>
+        <item name="rippleColor">@color/xphone_ripple</item>
+    </style>
+
+    <style name="SearchBarStyle">
+        <item name="android:layout_margin">@dimen/search_bar_margin</item>
+        <item name="cardCornerRadius">@dimen/search_bar_corner_radius</item>
+        <item name="enforceMaterialTheme">true</item>
+        <item name="cardElevation">0dp</item>
+        <item name="shapeAppearance">@null</item>
+        <item name="cardBackgroundColor">@color/search_bar_background</item>
+        <item name="strokeColor">@color/xphone_hairline</item>
+        <item name="strokeWidth">1px</item>
+    </style>
+
+    <style name="FingerprintHeaderStyle" parent="@*android:style/TextAppearance.DeviceDefault.Subhead">
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:textColor">@color/xphone_text_secondary</item>
+        <item name="android:lineSpacingMultiplier">1.2</item>
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.08</item>
+    </style>
+
+    <style name="FaceHeaderStyle" parent="@*android:style/TextAppearance.DeviceDefault.Subhead">
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:textColor">@color/xphone_text_secondary</item>
+        <item name="android:lineSpacingMultiplier">1.2</item>
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.08</item>
+    </style>
+</resources>

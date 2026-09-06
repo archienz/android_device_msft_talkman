@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 The LineageOS Project
+     Licensed under the Apache License, Version 2.0 (the "License").
+-->
+<resources>
+    <bool name="config_night_light_suggestion_enabled">false</bool>
+    <bool name="config_show_avatar_in_homepage">false</bool>
+</resources>

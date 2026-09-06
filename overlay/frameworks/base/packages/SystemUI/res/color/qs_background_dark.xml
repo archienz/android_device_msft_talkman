@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     talkman SystemUI overlay. Stock follows colorBackgroundFloating
+     (white in day QuickSettings). Void slab is always black.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="#ff000000" />
+</selector>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">App Library</string>
+    <string name="search_hint">App Library</string>
+    <string name="search_hint_active">Search</string>
+    <string name="folder_suggestions">Suggestions</string>
+    <string name="folder_recent">Recently Added</string>
+    <string name="folder_social">Social</string>
+    <string name="folder_utilities">Utilities</string>
+    <string name="folder_productivity">Productivity</string>
+    <string name="folder_creativity">Creativity</string>
+    <string name="folder_other">Other</string>
+</resources>

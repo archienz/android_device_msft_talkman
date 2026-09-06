@@ -1,0 +1,18 @@
+11-scrim files written (overlay + unapplied patches; no frameworks/base edit; no mka):
+
+frameworks/base/packages/SystemUI/res/values/dimens.xml
+  Overlay existing scrim_behind_alpha 0.62 → 0.08.
+  No lock-scrim bool exists in SystemUI res/values/bools.xml.
+  Did not overlay shutdown_scrim_behind_alpha (09-power).
+  Did not replace ScrimView / super_notification_shade.xml (12-shade-window).
+
+patches/ScrimController.java.patch
+  KEYGUARD_SCRIM_ALPHA 0.2f → 0.08f.
+  attachViews(ScrimView, ScrimView, ScrimView) unchanged.
+  setScrimBehindDrawable stays Drawable-only.
+
+patches/ScrimState.java.patch
+  KEYGUARD.prepare pins mBehindAlpha to ScrimController.KEYGUARD_SCRIM_ALPHA.
+  Default mScrimBehindAlphaKeyguard to that constant.
+
+DONE.txt

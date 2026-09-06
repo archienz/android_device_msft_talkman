@@ -1,0 +1,4 @@
+frameworks/base/packages/SystemUI/res/values/colors.xml
+frameworks/base/packages/SystemUI/res/values/styles.xml
+frameworks/base/packages/SystemUI/res/values-night/colors.xml
+frameworks/base/packages/SystemUI/res/values-night/styles.xml

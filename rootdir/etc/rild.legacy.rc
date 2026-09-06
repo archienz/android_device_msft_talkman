@@ -1,0 +1,8 @@
+service ril-daemon /vendor/bin/hw/rild
+    class main
+    user radio
+    group radio cache inet misc audio log readproc wakelock
+    capabilities BLOCK_SUSPEND NET_ADMIN NET_RAW
+    # Installed linker64 may not yet contain TARGET_LD_SHIM_LIBS.
+    # libril-qc-qmi-1.so imports AudioSystem::setErrorCallback (removed in fw/av).
+    setenv LD_PRELOAD /vendor/lib64/libaudioclient_shim.so

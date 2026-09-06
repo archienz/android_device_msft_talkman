@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     talkman SystemUI overlay — launch-console status bar, hairline handle,
+     small-radius chrome. Names from SystemUI res/values/dimens.xml.
+     Tile *path* is framework config_icon_mask (not owned here).
+-->
+<resources>
+    <!-- 2 dp hairline (radius*2). Framework nav strip is 20 dp. -->
+    <dimen name="navigation_handle_radius">1dp</dimen>
+    <dimen name="navigation_handle_bottom">4dp</dimen>
+    <dimen name="navigation_home_handle_width">96dp</dimen>
+    <dimen name="navigation_handle_horizontal_margin">24dp</dimen>
+
+    <!-- Launch-console status bar. Height stays framework 24 dp. No island. -->
+    <dimen name="status_bar_clock_size">12sp</dimen>
+    <dimen name="status_bar_clock_starting_padding">4dp</dimen>
+    <dimen name="status_bar_left_clock_end_padding">4dp</dimen>
+    <dimen name="status_bar_horizontal_padding">2dp</dimen>
+    <dimen name="status_bar_padding_start">6dp</dimen>
+    <dimen name="status_bar_padding_end">6dp</dimen>
+    <dimen name="status_bar_padding_top">0dp</dimen>
+    <dimen name="status_bar_icon_drawing_size">13dp</dimen>
+    <item type="dimen" name="status_bar_icon_drawing_alpha">100%</item>
+    <dimen name="status_bar_system_icon_spacing">1dp</dimen>
+
+    <dimen name="qs_time_expanded_size">13sp</dimen>
+    <dimen name="qs_tile_text_size">11sp</dimen>
+    <dimen name="qs_tile_divider_height">1px</dimen>
+    <dimen name="qs_tile_icon_background_stroke_width">1dp</dimen>
+    <dimen name="qs_tile_spacing">4dp</dimen>
+    <dimen name="qs_footer_margin">2dp</dimen>
+
+    <!-- Tight chrome, not iOS squircles / 20–28 dp pills. -->
+    <dimen name="rect_button_radius">4dp</dimen>
+    <dimen name="borderless_button_radius">2dp</dimen>
+    <dimen name="biometric_dialog_corner_size">4dp</dimen>
+    <dimen name="screenshot_button_corner_radius">4dp</dimen>
+    <dimen name="screenshot_action_container_corner_radius">6dp</dimen>
+    <dimen name="ongoing_appops_chip_bg_corner_radius">6dp</dimen>
+    <dimen name="control_corner_radius">6dp</dimen>
+    <dimen name="seek_bar_corner_radius">2dp</dimen>
+
+    <!-- High-contrast shade / power scrims (GAR floor is 0.54). -->
+    <item name="scrim_behind_alpha" format="float" type="dimen">0.85</item>
+    <item name="shutdown_scrim_behind_alpha" format="float" type="dimen">0.98</item>
+</resources>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     talkman Settings overlay — Theme.Settings / Home forced to black
+     telemetry chrome. Compile-time overlay replaces the named style;
+     every stock item is kept. SetupWizard light themes are not touched.
+-->
+<resources>
+    <style name="Theme.Settings" parent="Theme.SettingsBase">
+        <item name="preferenceTheme">@style/PreferenceTheme</item>
+        <item name="android:clipToPadding">false</item>
+        <item name="android:clipChildren">false</item>
+        <item name="android:listPreferredItemHeight">56dip</item>
+        <item name="android:homeAsUpIndicator">@drawable/ic_arrow_back</item>
+        <item name="android:navigationBarColor">@color/xphone_black</item>
+        <item name="android:datePickerDialogTheme">@style/PickerDialogTheme.Settings</item>
+
+        <item name="fingerprint_layout_theme">@style/FingerprintLayoutTheme</item>
+        <item name="face_layout_theme">@style/FaceLayoutTheme</item>
+        <item name="ic_menu_moreoverflow">@*android:drawable/ic_menu_moreoverflow_holo_dark</item>
+
+        <item name="wifi_signal">@drawable/wifi_signal</item>
+        <item name="wifi_signal_color">@color/xphone_accent</item>
+        <item name="wifi_friction">@drawable/wifi_friction</item>
+
+        <item name="side_margin">0dp</item>
+        <item name="sudListItemIconColor">@color/xphone_accent</item>
+
+        <item name="android:actionBarStyle">@style/Widget.ActionBar</item>
+        <item name="android:actionBarTheme">@android:style/ThemeOverlay.Material.Dark.ActionBar</item>
+        <item name="switchBarTheme">@style/ThemeOverlay.SwitchBar.Settings</item>
+        <item name="preferenceBackgroundColor">@drawable/preference_background</item>
+        <item name="alertDialogTheme">@style/Theme.AlertDialog</item>
+        <item name="*android:lockPatternStyle">@style/LockPatternStyle.Setup</item>
+
+        <item name="colorPrimary">@color/xphone_black</item>
+        <item name="colorPrimaryVariant">@color/xphone_black</item>
+        <item name="colorPrimaryDark">@color/xphone_black</item>
+        <item name="colorAccent">@color/xphone_accent</item>
+        <item name="sliceViewStyle">@style/Widget.SliceView.Settings</item>
+
+        <item name="android:windowBackground">@color/xphone_black</item>
+        <item name="android:colorBackground">@color/xphone_black</item>
+        <item name="android:colorPrimary">@color/xphone_black</item>
+        <item name="android:colorPrimaryDark">@color/xphone_black</item>
+        <item name="android:colorAccent">@color/xphone_accent</item>
+        <item name="android:statusBarColor">@color/xphone_black</item>
+        <item name="android:navigationBarDividerColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:textColorPrimary">@color/xphone_text_primary</item>
+        <item name="android:textColorSecondary">@color/xphone_text_secondary</item>
+        <item name="android:textColorHint">@color/xphone_header</item>
+        <item name="android:colorControlNormal">@color/xphone_text_secondary</item>
+        <item name="android:colorControlActivated">@color/xphone_accent</item>
+        <item name="android:colorControlHighlight">@color/xphone_ripple</item>
+        <item name="android:listDivider">@drawable/xphone_list_divider</item>
+        <item name="android:dividerHorizontal">@drawable/xphone_list_divider</item>
+    </style>
+
+    <style name="Theme.Settings.HomeBase" parent="Theme.Settings.NoActionBar">
+        <item name="colorPrimary">@color/xphone_black</item>
+        <item name="colorAccent">@color/xphone_accent</item>
+        <item name="preferenceTheme">@style/PreferenceTheme</item>
+        <item name="android:actionBarTheme">@android:style/ThemeOverlay.Material.Dark.ActionBar</item>
+        <item name="colorPrimaryVariant">@color/xphone_black</item>
+    </style>
+
+    <style name="Theme.Settings.Home" parent="Theme.Settings.HomeBase">
+        <item name="colorPrimaryDark">@color/xphone_black</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarDividerColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/xphone_black</item>
+        <item name="android:windowBackground">@color/xphone_black</item>
+        <item name="android:colorBackground">@color/xphone_black</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:statusBarColor">@color/xphone_black</item>
+    </style>
+
+    <style name="ThemeOverlay.SwitchBar.Settings.Base" parent="@*android:style/ThemeOverlay.DeviceDefault.ActionBar">
+        <item name="android:elevation">0dp</item>
+        <item name="switchBarMarginStart">@dimen/switchbar_subsettings_margin_start</item>
+        <item name="switchBarMarginEnd">@dimen/switchbar_subsettings_margin_end</item>
+        <item name="switchBarBackgroundColor">@color/switchbar_background_color</item>
+        <item name="switchBarBackgroundActivatedColor">@color/xphone_well</item>
+        <item name="switchBarRestrictionIcon">@*android:drawable/ic_info</item>
+    </style>
+
+    <style name="Theme.AlertDialog" parent="Theme.AlertDialog.Base">
+        <item name="android:windowSoftInputMode">adjustResize</item>
+        <item name="android:clipToPadding">true</item>
+        <item name="android:clipChildren">true</item>
+        <item name="android:actionBarStyle">@style/Widget.ActionBar</item>
+        <item name="dialogCornerRadius">2dp</item>
+        <item name="android:windowTitleStyle">@*android:style/DialogWindowTitle.DeviceDefault</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance.DialogMessage</item>
+        <item name="buttonBarButtonStyle">@*android:style/Widget.DeviceDefault.Button.ButtonBar.AlertDialog</item>
+    </style>
+
+    <style name="Theme.Panel" parent="@*android:style/Theme.DeviceDefault.Settings.Dialog">
+        <item name="android:windowBackground">@color/xphone_black</item>
+        <item name="android:dividerHorizontal">@drawable/xphone_list_divider</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:listDivider">@drawable/xphone_list_divider</item>
+        <item name="android:fontFamily">sans-serif-condensed</item>
+    </style>
+</resources>

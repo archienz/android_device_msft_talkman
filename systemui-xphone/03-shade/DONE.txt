@@ -1,0 +1,3 @@
+03-shade/frameworks/base/packages/SystemUI/res/layout/status_bar_expanded.xml
+03-shade/frameworks/base/packages/SystemUI/res/values/config.xml
+03-shade/DONE.txt

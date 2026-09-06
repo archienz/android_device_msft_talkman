@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Talkman widgets</string>
+    <string name="widget_dock">Dock</string>
+    <string name="widget_date">Date</string>
+    <string name="phone">Phone</string>
+    <string name="messages">Messages</string>
+    <string name="browser">Browser</string>
+    <string name="camera">Camera</string>
+</resources>

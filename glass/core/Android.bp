@@ -1,0 +1,11 @@
+// Talkman liquid-glass GLES 3.1 helper (Adreno 418).
+// Other talkman modules: static_libs: ["libtalkman-glass"]
+// Do not add PRODUCT_PACKAGES from this file. Do not replace SystemUI.apk.
+
+java_library {
+    name: "libtalkman-glass",
+    srcs: ["src/**/*.java"],
+    java_resource_dirs: ["shaders"],
+    // Platform: SystemUI-core static_libs this. Demo uses platform_apis.
+    installable: false,
+}

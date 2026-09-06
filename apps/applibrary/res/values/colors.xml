@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="void_bg">#ff000000</color>
+    <color name="ink">#ffe8e8e8</color>
+    <color name="hairline">#33ffffff</color>
+    <color name="ink_dim">#99e8e8e8</color>
+</resources>

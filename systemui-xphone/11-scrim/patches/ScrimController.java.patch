@@ -1,0 +1,15 @@
+--- a/src/com/android/systemui/statusbar/phone/ScrimController.java
++++ b/src/com/android/systemui/statusbar/phone/ScrimController.java
+@@ -106,9 +106,10 @@
+     }
+ 
+     /**
+-     * Default alpha value for most scrims.
++     * Lock-screen behind-scrim alpha. Stock 0.2f hides TalkmanGlassView
++     * under scrim_behind; 0.08f leaves the bevel readable.
+      */
+-    protected static final float KEYGUARD_SCRIM_ALPHA = 0.2f;
++    protected static final float KEYGUARD_SCRIM_ALPHA = 0.08f;
+     /**
+      * Scrim opacity when the phone is about to wake-up.
+      */

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- NOTE ONLY. Next bacon: replace the View at
+     frameworks/base/packages/SystemUI/res/layout/qs_panel.xml
+     android:id="@+id/quick_settings_background" (today lines 25–30).
+
+     Keep the same id. QSContainerImpl.mBackground findViewById + setTop/setBottom
+     depend on it. Do not ship by replacing SystemUI.apk on the 2026-09-01 zip.
+
+     Requires com.talkman.glass.TalkmanGlassView on SystemUI's classpath.
+-->
+<com.talkman.glass.TalkmanGlassView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/quick_settings_background"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:elevation="4dp"
+    android:background="@android:color/transparent" />
+
+<!-- Also next bacon, in the same qs_panel.xml:
+     - @id/quick_settings_status_bar_background: android:background="#00000000"
+       (today #ff000000) so the void + glass read through the status strip.
+     - @id/quick_settings_gradient_view: android:visibility="gone"
+       (today @drawable/qs_bg_gradient).
+     Do not keep @drawable/qs_background_primary on this view. -->

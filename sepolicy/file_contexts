@@ -243,6 +243,17 @@
 /sys/devices/soc\.0/qpnp-rtc-[0-9]+/rtc/rtc0(/.*)?                        u:object_r:sysfs_rtc:s0
 /(system/vendor|vendor)/bin/timekeep                                      u:object_r:timekeep_exec:s0
 
+# Vulkan ICD + QGL deps. AOSP only labels /vendor/lib(64)?/egl as
+# same_process_hal_file (that is why GLES works). gpuservice and
+# untrusted_app cannot execute vendor_file, so vulkan.msm8992.so
+# must be same_process_hal_file or cmd gpu vkjson reports 0 devices.
+# Do not label a stub HAL — these are the real Adreno 418 blobs.
+/(vendor|system/vendor)/lib(64)?/hw/vulkan\.msm8992\.so	u:object_r:same_process_hal_file:s0
+/(vendor|system/vendor)/lib(64)?/vulkan\.msm8992\.so	u:object_r:same_process_hal_file:s0
+/(vendor|system/vendor)/lib(64)?/libadreno_utils\.so	u:object_r:same_process_hal_file:s0
+/(vendor|system/vendor)/lib(64)?/libgsl\.so		u:object_r:same_process_hal_file:s0
+/(vendor|system/vendor)/lib(64)?/libllvm-qgl\.so		u:object_r:same_process_hal_file:s0
+
 # files in firmware
 /firmware(/.*)?                    u:object_r:firmware_file:s0
 

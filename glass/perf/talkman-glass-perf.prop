@@ -1,0 +1,67 @@
+#
+# talkman glass / compositor perf fragment
+# Adreno 418, 60 Hz TE. LOS 18.1 / Android 11 (AOSP R).
+#
+# Fragment only. Not live. Do not copy into system.prop or vendor.prop
+# from this directory. A later bacon owner may PRODUCT_PROPERTY_OVERRIDES
+# these keys; that wiring is not this file.
+#
+# Panel is 60 Hz. Do not invent 90/120 Hz keys.
+#
+
+# ---------------------------------------------------------------------------
+# SurfaceFlinger window blur — disable (AOSP R debug / capability flags)
+# ---------------------------------------------------------------------------
+# SF background blur is a full-framebuffer RenderEngine pass
+# (1440×2560). Contract budget: never Gaussian-blur the panel per frame.
+# Glass frost lives in com.talkman.glass on a 360×640 Dual-Kawase cache.
+#
+# persist.sys.sf.disable_blurs is the AOSP user/debug kill switch
+# (SurfaceFlinger::readPersistentProperties, SystemUI BlurUtils).
+# When 1, SF ignores eBackgroundBlurRadiusChanged and SystemUI
+# supportsBlursOnWindows() is false. Safe: composition stays HWC/MDP;
+# only the blur radius update is skipped.
+#
+# ro.surface_flinger.supports_background_blur is the capability bit
+# (SF ctor default "0"). Keep 0 so RenderEngine does not allocate the
+# blur path. AOSP GLESRenderEngine fatals if this is 1 and GL < 3.0;
+# A418 is GLES 3.1 so that fatal does not apply — the cost is still
+# a full-res blur shader we cannot afford at 60 Hz.
+persist.sys.sf.disable_blurs=1
+ro.surface_flinger.supports_background_blur=0
+
+# ro.sf.blurs_are_expensive is NOT a disable. SF only uses it to call
+# setExpensiveRenderingExpected() (GPU boost) when a layer still
+# requests blur. Leave unset. Do not treat it as a blur off switch.
+
+# ---------------------------------------------------------------------------
+# HWUI stays Skia GLES
+# ---------------------------------------------------------------------------
+# Android 11 HWUI: ro.hwui.use_vulkan unset → debug.hwui.renderer
+# defaults to skiagl (Properties.cpp). A418 ICD is Vulkan 1.0 / no
+# AHardwareBuffer import. Skia Vulkan on R requires instance 1.1 and
+# fatals below that. Contract forbids assigning ro.hwui.use_vulkan
+# (not even false). Pin the renderer debug flag so a later vulkan=true
+# cannot flip HWUI to skiavk.
+#
+# Do not write:
+#   ro.hwui.use_vulkan
+debug.hwui.renderer=skiagl
+
+# ---------------------------------------------------------------------------
+# Already live — comment only, do not duplicate
+# ---------------------------------------------------------------------------
+# Touch / GPU floors (powerhint.xml + init.talkman.power.sh, measured
+# out/qa-gpu-touch-20260902-1749/): GPU wake/floor 300 MHz (pwrlevel 4),
+# A57 input boost 1248 MHz for 1.5 s, sched_boost_on_input.
+# system.prop: debug.sf.{late,early,earlyGl}.{sf,app}.duration =
+#   5.5 ms / 15.5 ms (60 Hz TE). persist.hwc.mdpcomp.enable=true.
+# device.mk PRODUCT_DEFAULT_PROPERTY_OVERRIDES:
+#   debug.sf.disable_backpressure=1
+#   debug.sf.enable_gl_backpressure=1
+#   debug.sf.latch_unsignaled=1
+# system.prop also has ro.hwui.* cache sizes and ro.opengles.version=196610.
+# ro.hardware.vulkan=msm8992 is HAL discovery only, not HWUI.
+#
+# Do not restate those keys here. Do not add min_gpuclk / min_freq /
+# debug.sf.*duration overrides.

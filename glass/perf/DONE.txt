@@ -1,0 +1,21 @@
+glass/perf DONE  2026-09-05
+
+Owned only: device/msft/talkman/glass/perf/
+Did not edit system.prop, vendor.prop, device.mk, overlay/.
+No mka. No adb. Fragment is not live.
+
+Wrote:
+  talkman-glass-perf.prop
+  README.txt
+  DONE.txt
+
+Assigned (3):
+  persist.sys.sf.disable_blurs=1
+  ro.surface_flinger.supports_background_blur=0
+  debug.hwui.renderer=skiagl
+
+Unset on purpose:
+  ro.hwui.use_vulkan          (must stay unassigned)
+  ro.sf.blurs_are_expensive   (GPU-boost hint, not a blur off switch)
+
+Did not duplicate live floors (300 MHz GPU, A57 1248, SF 5.5/15.5 ms).

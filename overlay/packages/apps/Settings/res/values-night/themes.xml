@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     talkman Settings overlay — night Home / search / dialog stay true black.
+-->
+<resources>
+    <style name="Theme.Settings.Home" parent="Theme.Settings.HomeBase">
+        <item name="colorPrimary">@color/xphone_black</item>
+        <item name="colorPrimaryDark">@color/xphone_black</item>
+        <item name="android:colorBackground">@color/xphone_black</item>
+        <item name="android:windowBackground">@color/xphone_black</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:statusBarColor">@color/xphone_black</item>
+        <item name="android:navigationBarColor">@color/xphone_black</item>
+        <item name="android:navigationBarDividerColor">@android:color/transparent</item>
+    </style>
+
+    <style name="ThemeOverlay.Settings.SearchBar" parent="Theme.Settings">
+        <item name="android:colorBackground">@color/xphone_black</item>
+        <item name="cardBackgroundColor">@color/xphone_black</item>
+        <item name="android:colorControlNormal">@color/xphone_accent</item>
+    </style>
+
+    <style name="Theme.AlertDialog.Base" parent="@style/Theme.AppCompat.DayNight.Dialog.Alert">
+        <item name="colorAccent">@color/xphone_accent</item>
+        <item name="android:colorBackground">@color/dialog_background</item>
+    </style>
+</resources>

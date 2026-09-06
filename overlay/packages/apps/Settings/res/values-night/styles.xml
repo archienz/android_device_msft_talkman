@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     talkman Settings overlay — night action bar matches black lists.
+-->
+<resources>
+    <style name="Widget.ActionBar.Base" parent="@android:style/Widget.DeviceDefault.ActionBar.Solid">
+        <item name="android:background">@color/xphone_black</item>
+    </style>
+</resources>

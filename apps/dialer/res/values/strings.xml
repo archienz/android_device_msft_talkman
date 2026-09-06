@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Phone</string>
+    <string name="tab_recents">Recents</string>
+    <string name="tab_contacts">Contacts</string>
+    <string name="call">Call</string>
+    <string name="end_call">End</string>
+    <string name="need_permission">Allow Phone, Contacts, and Call log</string>
+    <string name="empty_recents">No calls</string>
+    <string name="empty_contacts">No contacts</string>
+    <string name="mute">Mute</string>
+    <string name="speaker">Speaker</string>
+    <string name="set_default">Set as default phone app to take calls</string>
+</resources>

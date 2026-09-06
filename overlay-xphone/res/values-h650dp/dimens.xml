@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 The LineageOS Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+
+     Talkman 1440x2560 @ 564 dpi is ~726 dp tall, so this config wins.
+     Stock res-keyguard/values-h650dp sets widget_big_font_size back to 54dp.
+     Do not also define 76dp under values/: aapt2 drops the duplicate and
+     stock 54dp wins again.
+-->
+<resources>
+    <dimen name="widget_big_font_size">96dp</dimen>
+</resources>

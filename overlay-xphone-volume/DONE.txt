@@ -1,0 +1,39 @@
+TalkmanXPhoneVolumeOverlay (com.talkman.overlay.xphone.volume → com.android.systemui)
+
+Files:
+  Android.mk
+  AndroidManifest.xml
+  res/values/dimens.xml
+  res/values/styles.xml
+  DONE.txt
+
+Verified SystemUI names (frameworks/base/packages/SystemUI/res):
+  dimen/volume_dialog_panel_transparent_padding_horizontal  8dp
+  dimen/volume_dialog_panel_transparent_padding             12dp
+  dimen/volume_dialog_stream_padding                        4dp
+  dimen/volume_dialog_panel_width                           56dp
+  dimen/volume_dialog_slider_height                         200dp
+  dimen/volume_dialog_ringer_size                           56dp
+  dimen/volume_dialog_ringer_icon_padding                   14dp
+  dimen/volume_dialog_caption_size                          56dp
+  dimen/volume_dialog_spacer                                4dp
+  dimen/volume_dialog_slider_margin_top                     8dp
+  dimen/volume_dialog_slider_margin_bottom                  0dp
+  dimen/volume_dialog_row_margin_bottom                     4dp
+  dimen/volume_dialog_elevation                             0dp (flat slab)
+  dimen/volume_tool_tip_arrow_corner_radius                 4dp (tight 4–6 dp)
+  style/TextAppearance.Volume                               #ffe8e8e8, 10sp, tracked, all-caps
+  style/TextAppearance.Volume.Header                        same
+  style/TextAppearance.Volume.Header.Secondary              same
+  style/VolumeButtons                                       literal #ffe8e8e8, tracked
+
+Absent: no volume_* color in res/values/colors.xml or res/color/.
+Not overlaid (shared, not volume_*):
+  drawable/rounded_bg_full  (volume_dialog.xml panel; also QS)
+  color/accent_tint_color_selector
+Unused leftover dimens (lint unused, not in volume_dialog.xml):
+  volume_slider_interspacing, volume_offset_top, volume_button_size,
+  volume_dialog_margin_bottom, volume_dialog_padding_top,
+  volume_dialog_padding_end, volume_row_*, volume_expander_*
+
+No mka. No files outside overlay-xphone-volume/.

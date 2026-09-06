@@ -1,0 +1,11 @@
+TalkmanXPhoneNotifOverlay v5 — target android (framework).
+
+v1: void notification template colors.
+v2: accent + QS stroke dimens (tree only; v2 APK on the telephone lacked dimens).
+v5 (2026-09-06): line-art QS glyphs that SystemUI loads from
+com.android.internal.R.drawable (flashlight, bluetooth, airplane, rotate,
+night, dnd, wifi signal 0–4, battery saver). Hairline tile stroke dimens
+ship in this APK (QSTileBaseView reads framework dimens, not SystemUI).
+Active icon tint: primary_device_default_settings_light = #E8E8E8.
+
+Do not overlay config_icon_mask (that clips every adaptive icon).

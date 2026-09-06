@@ -1,0 +1,32 @@
+talkman-glass-demo  2026-09-05
+
+Owned only: device/msft/talkman/glass/app/
+Package: com.talkman.glass.demo
+Module: talkman-glass-demo
+minSdk 30. No Vulkan. No mka. Did not edit outside glass/app/.
+
+Void #000000 + stars (or system wallpaper) and a QS-sized (288dp) panel.
+Calls com.talkman.glass.blur.TalkmanGlassCache (talkman-glass-blur).
+Calls com.talkman.glass.core.TalkmanGlassView when that class is present;
+does not implement it. Hairline stub panel until core lands.
+
+Wrote:
+  Android.bp
+  Android.mk
+  AndroidManifest.xml
+  DONE.txt
+  res/drawable/gesture_pill.xml
+  res/drawable/qs_panel_stub.xml
+  res/layout/activity_glass_demo.xml
+  res/values/colors.xml
+  res/values/dimens.xml
+  res/values/strings.xml
+  res/values/themes.xml
+  src/com/talkman/glass/demo/GlassDemoActivity.java
+  src/com/talkman/glass/demo/GlassViews.java
+  src/com/talkman/glass/demo/VoidStarView.java
+
+Sideload later (owner runs mka):
+  mka talkman-glass-demo
+  adb install -r out/target/product/talkman/product/app/talkman-glass-demo/talkman-glass-demo.apk
+  adb shell am start -n com.talkman.glass.demo/.GlassDemoActivity

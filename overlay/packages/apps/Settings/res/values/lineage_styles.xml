@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     talkman Settings overlay — Lineage lock-pattern header, telemetry type.
+-->
+<resources>
+    <style name="LockPatternSizeHeaderStyle" parent="android:style/TextAppearance.Material.Subhead">
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:textColor">@color/xphone_text_secondary</item>
+        <item name="android:lineSpacingMultiplier">1.2</item>
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.08</item>
+    </style>
+</resources>

@@ -1,0 +1,27 @@
+// Talkman Vulkan 1.0 color + depth attachment (system binary).
+// Build with: m talkman-vk-depth
+// Not in PRODUCT_PACKAGES. Do not add this to talkman-vulkan.mk.
+// Do not set ro.hwui.use_vulkan.
+
+cc_binary {
+    name: "talkman-vk-depth",
+    srcs: ["main.c"],
+    vendor: false,
+    proprietary: false,
+    compile_multilib: "64",
+
+    shared_libs: [
+        "liblog",
+        "libvulkan",
+    ],
+
+    header_libs: [
+        "vulkan_headers",
+    ],
+
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-DLOG_TAG=\"TalkmanVkDepth\"",
+    ],
+}

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 The LineageOS Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<resources>
+    <!--
+         X-phone chrome (framework overlay only).
+
+         Lumia 950 RM-1104 AMOLED is 1440×2560 at ro.sf.lcd_density=564.
+         Physical active-area corners are tight (~3 mm):
+           16dp × 564/160 ≈ 56 px ≈ 2.9 mm.
+         That is the real panel, not an iOS-sized squircle and not a
+         punch-hole / fake cutout. Top and bottom inherit this radius.
+    -->
+    <dimen name="rounded_corner_radius">16dp</dimen>
+    <dimen name="rounded_corner_radius_top">0dp</dimen>
+    <dimen name="rounded_corner_radius_bottom">0dp</dimen>
+
+    <!-- No notch / punch-hole: keep the AOSP 24dp status bar. -->
+    <dimen name="status_bar_height_portrait">24dp</dimen>
+    <dimen name="status_bar_height_landscape">24dp</dimen>
+    <dimen name="status_bar_height">24dp</dimen>
+    <dimen name="display_cutout_touchable_region_size">0dp</dimen>
+
+    <!--
+         Technical nav hint: 20dp reserved strip (not a 48dp capsule well).
+         Default interaction mode is gestural. 3-button remains in Settings
+         but will be tight at this height. Handle *shape* is SystemUI
+         (not owned here). Width stays 48dp if a side bar is ever re-enabled.
+    -->
+    <dimen name="navigation_bar_height">20dp</dimen>
+    <dimen name="navigation_bar_height_landscape">20dp</dimen>
+    <dimen name="navigation_bar_width">48dp</dimen>
+    <dimen name="navigation_bar_frame_height">20dp</dimen>
+    <dimen name="navigation_bar_frame_height_landscape">20dp</dimen>
+    <dimen name="navigation_bar_gesture_height">20dp</dimen>
+
+    <!-- Tighter than iOS (~28dp) dialogs. Technical, not pill. -->
+    <dimen name="config_dialogCornerRadius">6dp</dimen>
+    <dimen name="config_buttonCornerRadius">4dp</dimen>
+    <dimen name="config_bottomDialogCornerRadius">6dp</dimen>
+    <dimen name="config_progressBarCornerRadius">1dp</dimen>
+    <dimen name="dialog_corner_radius">6dp</dimen>
+</resources>

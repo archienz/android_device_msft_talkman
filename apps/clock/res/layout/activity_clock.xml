@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ff000000">
+
+    <view
+        class="com.talkman.ui.StarfieldView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingTop="88dp">
+
+        <TextView
+            android:id="@+id/clock_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-thin"
+            android:letterSpacing="0.06"
+            android:textColor="#ffe8e8e8"
+            android:textSize="76dp"
+            android:fontFeatureSettings="tnum" />
+
+        <TextView
+            android:id="@+id/clock_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:letterSpacing="0.22"
+            android:paddingTop="8dp"
+            android:textAllCaps="true"
+            android:textColor="#ffe8e8e8"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <view
+        class="com.talkman.ui.HorizonView"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="72dp" />
+</FrameLayout>

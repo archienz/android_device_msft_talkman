@@ -101,26 +101,36 @@ Qi GPIOs match 4VM_08r: `wc-en` GPIO **2**, `wc-det` GPIO **14**.
 
 ---
 
-## Progress (2026-09-05)
+## Progress (2026-09-06)
 
 Source in Git is not a pass. A pass is a physical talkman log in `out/qa-*`.
 
-Unofficial zip `lineage-18.1-20260901-UNOFFICIAL-talkman` is installed on one RM-1104. The telephone boots to the home screen. Procedure: [`docs/INSTALL.md`](docs/INSTALL.md) and https://archienz.github.io/android_device_msft_talkman/INSTALL.html.
+Product is Lumia 950 **RM-1104** / board **4VM_08r** / SoC **MSM8992**. Lunch is `lineage_talkman-userdebug`. Flash is **boot only** on a black LK2ND screen (`18D1:D00D`, volume-down after the Windows logo). Do not EDL. Do not wipe userdata.
+
+Unofficial zip `lineage-18.1-20260901-UNOFFICIAL-talkman` is installed on one RM-1104 (serial often `9523fa36`). The telephone boots to the home screen. Procedure: [`docs/INSTALL.md`](docs/INSTALL.md) and https://archienz.github.io/android_device_msft_talkman/INSTALL.html.
 
 Host: Steam Deck SteamOS, ext4 `/home/deck/android/los-18.1`. Do not `repo sync` onto NTFS. Do not Ubuntu Distrobox.
 
-P0.1 Battery UI and P0.2 USB cable charge are **Working on this telephone**. P0.4 rear camera **live preview and stills** are on this telephone (kernel `#29`). Quick Settings flashlight is **Working on this telephone**. Bluetooth A2DP media is **Working on this telephone** (2026-09-05, after the vendor A2DP policy file; in Git, not yet in the installed zip). GPS is not. Front camera is measured and is **not** in the HAL. AF / OIS firmware load is **not** a lens move. Dual SIM RM-1118 is not this product. There is no `CONFIG_MSM_OIS`. The Microsoft service schematic is for implementation only. It is not published.
+P0.1 Battery UI and P0.2 USB cable charge are **Working on this telephone**. P0.4 rear camera **live preview and stills** are on this telephone (kernel `#29`). Companion AF is Mitsumi **BU24210** at CCI1 write **0x7c**. Do not bind `lc898212xd`. The lens does not move. Quick Settings flashlight is **Working on this telephone**. Bluetooth A2DP media is **Working on this telephone** (2026-09-05, after the vendor A2DP policy file; in Git, not yet in the installed zip). GPS is not. Front camera is measured and is **not** in the HAL. Dual SIM RM-1118 is not this product. There is no `CONFIG_MSM_OIS`. The Microsoft service schematic is for implementation only. It is not published.
+
+**Modem / MPSS is not ONLINE.** Do not claim a network. Measured stay-up on kernel `#26` (`3.10.108-perf`, 2026-09-05 20:03:48 AEST, `boot_completed=1`, ~20 min, `out/qa-m26-live-20260906.txt`): MBA **DEBUG 7** (`MBA_META_DATA_AUTH_TLB_FAILURE`), hash paddr **0x0CC00334** (unaligned), `RMB_MBA_STATUS` **-3**, `SHARE_MEMORY` rc **-22**, `subsys3` modem **OFFLINE**. Venus was OFFLINE on that dump; AR6320 and ADSP were ONLINE. `ril-daemon` stayed up after `libaudioclient_shim` (`AudioSystem::setErrorCallback`). `gsm.sim.state` was empty.
+
+Lab ram-boot **m35** (kernel `#67`, 2026-09-06 15:31 AEST, `out/qa-m19-mba.txt`): hash paddr **0x0CA00000**, `align_ok=1`, `lab_identity=0`, reloc **070→074**, MBA **STATUS=1 DEBUG=0** (pre-META). Preload stopped at segment 6 (`0x075c0000`). The kernel dies at about 7 s. MPSS stayed OFFLINE. After-META was not on that dump.
+
+Lab **m36** sent `pil_msa.lab_load_before_auth=0`. After-META STATUS/DEBUG was **not** captured (`adb` / `logd`). Lab **m38** (kernel `#70`) reached the 4ee7 gadget at about 8 s; `adb` stayed authorizing and the after-META lines were not captured. Do not mark META=3 or AUTH_COMPLETE.
+
+A real LK2ND `fastboot boot` of Android is about **8 s** Booting. A **0.5 s** OKAY on `18D1:D00D` is lk1st and does not start the kernel. Use volume-down **after** the Windows logo. Do not treat `adb reboot bootloader` as LK2ND.
 
 | ID | Subsystem | Status | What is on the telephone | What is still missing |
 |---|---|---|---|---|
 | P0.0 | Rebuild LOS 18.1 | Built and flashed | `lineage_talkman-userdebug` zip 2026-09-01. Later **boot-only** flashes. Kernel `#29` 2026-09-02 17:33 AEST (camera preview). Later AF lab images are local only | Next bacon for vendor/system (flashlight HAL, photo strobe, RIL shim, Bluetooth audio HAL) |
 | P0.1 | Battery UI | Working on this telephone | `dumpsys battery` live percent and voltage. Not 50 percent | — |
 | P0.2 | Charge | Working on this telephone (USB cable), with one kernel fix pending flash | USB `online`, SDP 5 V / 500 mA, `charging_enabled`. No PD | Measured 2026-09-05: after days on a 500 mA SDP the PMI8994 **safety timer** (768 min) fired and latched the charger off (MISC `RT_STS` bit 2, battery a flat −16 mA, status Discharging at 3.70 V). Only VBUS removal clears it. Kernel `7339221a798` sets `charging-timeout-mins = 0`. Qi pad not tested. `bms/charge_full` is still a bad health value |
-| P0.3 | GPS | Not Working | GPSTest empty. `loc_eng_start`. 0 satellites. Modem OFFLINE | `numSvs` more than 0. MPSS online. `rild` must load first |
-| P0.4 | Camera | Working on this telephone (rear preview and stills) | HAL **1** CameraId 0. Probe `mot_imx230`. CCI1 write **0x20** chip **0x0230**. CSI lane map **0x0423**. Mount-angle **90**. Snap live view and DCIM stills. QS torch on GPIO 12 | Front not listed (Ducati `0x2140` / die `0x03BB` measured; no XML). AF fixed until BU24210 moves. Photo strobe is in Git, not in the 2026-09-01 zip |
+| P0.3 | GPS | Not Working | GPSTest empty. `loc_eng_start`. 0 satellites. MPSS OFFLINE | `numSvs` more than 0. `subsys3` modem ONLINE |
+| P0.4 | Camera | Working on this telephone (rear preview and stills) | HAL **1** CameraId 0. Probe `mot_imx230`. CCI1 write **0x20** chip **0x0230**. CSI lane map **0x0423**. Mount-angle **90**. Snap live view and DCIM stills. QS torch on GPIO 12 | Front not listed (Ducati `0x2140` / die `0x03BB` measured; no XML). AF is BU24210 at write **0x7c**; no `lc898212xd`. Photo strobe is in Git, not in the 2026-09-01 zip |
 | — | Display / Wi-Fi / speaker / flashlight | Working on this telephone (QS torch) | 1440×2560 at 60 Hz. QCA6174. Loudspeaker at TAS PGA **11 dB**. QS flashlight → `set_torch_mode` → `led:flash_torch` (`out/qa-torch-20260902/`). Touch input boost: A57 1248 MHz + GPU 300 MHz for 1.5 s | Speaker is quieter than Windows on purpose (brownout); TAS2553 battery guard work is in progress to restore 15 dB |
 | — | Bluetooth audio | Working on this telephone (A2DP media, 2026-09-05) | Pair / LE connect on QCA6174. `AudioFlinger: Loaded a2dp audio interface` with `BT A2DP Out` ports after `a2dp_audio_policy_configuration.xml` was put in `/vendor/etc` | The 2026-09-01 zip has the file only in `/system/etc`; the vendor `audio_policy_configuration.xml` includes it from `/vendor/etc`, so the A2DP module never loaded. `device.mk` now copies it to vendor (next bacon). Owner confirmed media plays on the Bluetooth device (2026-09-05) |
-| P2 | RIL | Deferred | `ril-daemon` exit 1 every 5 s: `libril-qc-qmi-1.so` missing `AudioSystem::setErrorCallback` | `libaudioclient_shim` in system image. Then MPSS vote |
+| P2 | RIL / MPSS | Not Working (no network) | `libaudioclient_shim` keeps `ril-daemon` up (`init.svc.ril-daemon=running` on `#26`). QCRIL votes PIL. MBA still fails. `#26` DEBUG **7** hash **0x0CC00334**. m35 `#67` hash **0x0CA** `align_ok=1` STATUS=1 DEBUG=0 pre-META, then ~7 s die. m36/m38 after-META not captured | `subsys3` modem ONLINE. MBA STATUS **3** then **4**. Do not claim bars or a SIM |
 
 Keep QCamera2 MSMB `mot_imx230`. Do not ship CSID test-generator as camera. Rear CSI data lanes on RM-1104 are CSI0 LN2/LN1/LN3/LN0 (`qcom,csi-lane-assign = <0x0423>`), not Clark `0x4320`. Do not bind `libactuator_lc898212xd`. Do not add CameraId 1 until a front HAL exists for die `0x03BB`.
 

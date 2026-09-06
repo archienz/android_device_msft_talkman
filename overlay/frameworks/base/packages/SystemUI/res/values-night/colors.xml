@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     talkman SystemUI overlay — same void chrome at night.
+     Stock night is GM2 grey_900 / teal accents.
+-->
+<resources>
+    <color name="notification_shade_background_color">#ff000000</color>
+    <color name="notification_divider_color">#33ffffff</color>
+    <color name="notification_channel_dialog_separator">#33ffffff</color>
+    <color name="notification_section_header_label_color">#deffffff</color>
+    <color name="notification_section_clear_all_btn_color">#99ffffff</color>
+    <color name="notification_material_background_dimmed_color">#aa000000</color>
+
+    <color name="qs_customize_background">#ff000000</color>
+    <color name="qs_customize_decoration">#ff111111</color>
+    <color name="qs_user_switcher_avatar_background">#ff1a1a1a</color>
+    <color name="qs_user_switcher_avatar_icon_color">#ffffffff</color>
+    <color name="qs_user_switcher_selected_avatar_icon_color">#ff000000</color>
+
+    <color name="global_actions_separated_background">#ff000000</color>
+    <color name="global_actions_grid_background">#ff111111</color>
+
+    <color name="biometric_dialog_accent">#ffffffff</color>
+</resources>

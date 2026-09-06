@@ -1,0 +1,28 @@
+10-recents SystemUI recents/onboarding overlay (void + hairline)
+
+frameworks/base/packages/SystemUI/res/layout/recents_onboarding.xml
+frameworks/base/packages/SystemUI/res/drawable/recents_onboarding_toast_rounded_background.xml
+frameworks/base/packages/SystemUI/res/values/colors.xml
+frameworks/base/packages/SystemUI/res/values/dimens.xml
+frameworks/base/packages/SystemUI/res/values/config.xml
+
+Stock names only
+- recents_onboarding.xml ids: onboarding_text, dismiss, arrow
+- recents_onboarding_toast_rounded_background  void #000000 + hairline #33ffffff, 4dp
+- recents_tv_card_background_color             #ff000000  (colors_tv.xml)
+- recents_tv_card_title_text_color             #ffe8e8e8
+- recents_tv_dismiss_text_color                #99e8e8e8
+- recents_tv_text_shadow_color                 #00000000
+- recents_onboarding_toast_arrow_corner_radius 4dp
+- recents_quick_scrub_onboarding_margin_start  8dp (stock)
+- recents_grow_in_multiwindow                  true (stock)
+
+Not overlaid (not SystemUI recents_* / would invent Trebuchet Overview)
+- task_corner_radius* / overview_* / recents_page_spacing
+- config_recentsComponent (not recents_*)
+- screen_pinning / docked_divider / quick_step_track (not recents_*)
+- strings (no STARLINK)
+
+TalkmanGlassView not used: it is GLSurfaceView and cannot parent toast children.
+Arrow triangle is still colorAccent from RecentsOnboarding.java (no Java patch).
+No mka / adb. No files outside 10-recents.

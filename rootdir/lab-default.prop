@@ -1,0 +1,6 @@
+# m37 lab first-stage ramdisk. Copied to /debug_ramdisk/adb_debug.prop
+# when /force_debuggable is present; loaded last and overrides system
+# ro.adb.secure so the 7s MBA window is adb device (no Allow).
+ro.adb.secure=0
+ro.secure=0
+persist.sys.usb.config=adb

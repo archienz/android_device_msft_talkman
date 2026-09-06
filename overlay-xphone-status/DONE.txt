@@ -1,0 +1,18 @@
+TalkmanXPhoneStatusOverlay (com.talkman.overlay.xphone.status → com.android.systemui)
+
+Files:
+  Android.mk
+  AndroidManifest.xml
+  res/values/colors.xml
+  res/values/dimens.xml
+  res/values/styles.xml
+
+Verified SystemUI names (frameworks/base/packages/SystemUI/res):
+  status_bar_clock_size                 dimen   12sp
+  status_bar_icon_drawing_size          dimen   13dp
+  system_bar_background_opaque          color   #ff000000
+  status_bar_clock_color                color   #ffffffff
+  TextAppearance.StatusBar.Clock        style   parent @android:style/TextAppearance
+                                        letterSpacing 0.08, sans-serif-thin, #ffffffff
+
+No mka. No files outside overlay-xphone-status/.

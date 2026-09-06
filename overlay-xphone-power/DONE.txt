@@ -1,0 +1,23 @@
+TalkmanXPhonePowerOverlay (com.talkman.overlay.xphone.power → com.android.systemui)
+
+Files:
+  Android.mk
+  AndroidManifest.xml
+  res/values/colors.xml
+  res/values-night/colors.xml
+  res/values/dimens.xml
+  res/values/styles.xml
+  res/values-night/styles.xml
+
+Verified SystemUI names (frameworks/base/packages/SystemUI/res):
+  global_actions_separated_background   color   #ff000000  (void; stock day #F5F5F5)
+  global_actions_grid_background        color   #ff000000  (void; stock day #F1F3F4)
+  global_actions_text                   color   #ffe8e8e8  (white type)
+  global_actions_alert_text             color   #ffe8e8e8  (not GM2_red_700)
+  global_actions_emergency_background   color   #ff000000  (not GM2_red_400 iOS pill)
+  global_actions_emergency_text         color   #ffe8e8e8
+  shutdown_scrim_behind_alpha           float dimen 1.0    (stock 0.95)
+  Theme.SystemUI.Dialog.GlobalActions   (dark parent, literal void / #ffe8e8e8)
+
+values-night copies the six colors and the GlobalActions theme so stock GM2 greys / red alert do not win.
+No mka. No files outside overlay-xphone-power/.

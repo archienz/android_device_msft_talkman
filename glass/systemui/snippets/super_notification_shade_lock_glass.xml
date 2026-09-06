@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- NOTE ONLY. Next bacon: insert as a sibling in
+     frameworks/base/packages/SystemUI/res/layout/super_notification_shade.xml
+     immediately AFTER @id/backdrop and BEFORE @id/scrim_behind.
+
+     Do not replace ScrimView. ScrimController.attachViews() requires
+     @id/scrim_behind and @id/scrim_in_front to stay ScrimView.
+     Do not ship by replacing SystemUI.apk on the 2026-09-01 zip.
+-->
+<com.talkman.glass.TalkmanGlassView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:sysui="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/talkman_glass_lock_scrim"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:importantForAccessibility="no"
+    sysui:ignoreRightInset="true" />
+
+<!-- Keep existing:
+     <com.android.systemui.statusbar.ScrimView android:id="@+id/scrim_behind" … />
+     Optional next bacon: lower ScrimController.KEYGUARD_SCRIM_ALPHA so the
+     0.2 black dim does not hide the bevel. -->

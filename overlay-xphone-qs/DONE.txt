@@ -1,0 +1,10 @@
+TalkmanXPhoneQsOverlay v5 — target com.android.systemui.
+
+v4: void plate, 11sp labels, 8 collapsed columns.
+v5 (2026-09-06): line-art QS glyphs for SystemUI-local tiles
+(ic_qs_wifi_*, ic_hotspot, ic_swap_vert, ic_qs_sync, ic_qs_no_sim).
+Framework glyphs (flashlight / bt / airplane / rotate / night) live in
+overlay-xphone-notif (target android).
+
+config_qsTileStrokeWidth* in this overlay does not change the wells —
+QSTileBaseView reads com.android.internal.R.dimen.

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 The LineageOS Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+
+     Names from SystemUI res/values/dimens.xml and res-keyguard/values/dimens.xml.
+-->
+<resources>
+    <!-- Default 54dp. Thin face needs more size to read like the mockup. -->
+    <dimen name="widget_big_font_size">76dp</dimen>
+    <dimen name="widget_label_font_size">13sp</dimen>
+    <dimen name="bottom_text_spacing_digital">8dp</dimen>
+    <dimen name="title_clock_padding">8dp</dimen>
+
+    <!-- Upper-third clock, not flush to the status bar. -->
+    <dimen name="keyguard_clock_top_margin">88dp</dimen>
+
+    <!-- Sit SWIPE UP above the 20 dp gestural handle. -->
+    <dimen name="keyguard_indication_margin_bottom">56dp</dimen>
+
+    <!-- No padlock: talkman has no FPC. Zero the lock glyph. -->
+    <dimen name="keyguard_lock_width">0dp</dimen>
+    <dimen name="keyguard_lock_height">0dp</dimen>
+    <dimen name="keyguard_lock_padding">0dp</dimen>
+    <dimen name="keyguard_clock_lock_margin">0dp</dimen>
+
+    <dimen name="keyguard_shadow_radius">0</dimen>
+</resources>

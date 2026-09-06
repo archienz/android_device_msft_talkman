@@ -1,0 +1,10 @@
+// Talkman glass frost cache (Adreno 418). Static jar for later SystemUI /
+// com.talkman.glass hooks. Do not add PRODUCT_PACKAGES from this file.
+
+java_library {
+    name: "talkman-glass-blur",
+    srcs: ["src/**/*.java"],
+    sdk_version: "current",
+    product_specific: true,
+    installable: false,
+}

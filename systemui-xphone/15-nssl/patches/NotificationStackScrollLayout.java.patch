@@ -1,0 +1,120 @@
+--- a/src/com/android/systemui/statusbar/notification/stack/NotificationStackScrollLayout.java	2026-09-06 00:07:47.708302546 +1000
++++ b/src/com/android/systemui/statusbar/notification/stack/NotificationStackScrollLayout.java	2026-09-06 00:07:47.740989529 +1000
+@@ -930,6 +930,12 @@
+ 
+     @ShadeViewRefactor(RefactorComponent.DECORATOR)
+     private void drawBackground(Canvas canvas) {
++        if (canvas == null || mSections == null || mSections.length == 0
++                || mSections[0] == null
++                || mSections[mSections.length - 1] == null) {
++            updateClipping();
++            return;
++        }
+         int lockScreenLeft = mSidePaddings;
+         int lockScreenRight = getWidth() - mSidePaddings;
+         int lockScreenTop = mSections[0].getCurrentBounds().top;
+@@ -938,35 +944,45 @@
+         int hiddenTop = mTopPadding;
+ 
+         float yProgress = 1 - mInterpolatedHideAmount;
+-        float xProgress = mHideXInterpolator.getInterpolation(
+-                (1 - mLinearHideAmount) * mBackgroundXFactor);
++        float xProgress = 1f;
++        if (mHideXInterpolator != null) {
++            xProgress = mHideXInterpolator.getInterpolation(
++                    (1 - mLinearHideAmount) * mBackgroundXFactor);
++        }
+ 
+         int left = (int) MathUtils.lerp(hiddenLeft, lockScreenLeft, xProgress);
+         int right = (int) MathUtils.lerp(hiddenLeft, lockScreenRight, xProgress);
+         int top = (int) MathUtils.lerp(hiddenTop, lockScreenTop, yProgress);
+         int bottom = (int) MathUtils.lerp(hiddenTop, lockScreenBottom, yProgress);
+-        mBackgroundAnimationRect.set(
+-                left,
+-                top,
+-                right,
+-                bottom);
++        if (mBackgroundAnimationRect != null) {
++            mBackgroundAnimationRect.set(
++                    left,
++                    top,
++                    right,
++                    bottom);
++        }
+ 
+         int backgroundTopAnimationOffset = top - lockScreenTop;
+         // TODO(kprevas): this may not be necessary any more since we don't display the shelf in AOD
+         boolean anySectionHasVisibleChild = false;
+         for (NotificationSection section : mSections) {
+-            if (section.needsBackground()) {
++            if (section != null && section.needsBackground()) {
+                 anySectionHasVisibleChild = true;
+                 break;
+             }
+         }
+         boolean shouldDrawBackground;
+-        if (mKeyguardBypassController.getBypassEnabled() && onKeyguard()) {
++        if (mKeyguardBypassController != null
++                && mKeyguardBypassController.getBypassEnabled() && onKeyguard()) {
+             shouldDrawBackground = isPulseExpanding();
+         } else {
+-            shouldDrawBackground = !mAmbientState.isDozing() || anySectionHasVisibleChild;
++            shouldDrawBackground = mAmbientState == null
++                    || !mAmbientState.isDozing() || anySectionHasVisibleChild;
+         }
+-        if (shouldDrawBackground) {
++        // X-phone: do not paint the solid stack plate over TalkmanGlassView.
++        // Stock gate is config_drawNotificationBackground; skip the fill either way.
++        // ExpandableView children still layout and draw.
++        if (shouldDrawBackground && mShouldDrawNotificationBackground) {
+             drawBackgroundRects(canvas, left, right, top, backgroundTopAnimationOffset);
+         }
+ 
+@@ -991,42 +1007,11 @@
+      */
+     private void drawBackgroundRects(Canvas canvas, int left, int right, int top,
+             int animationYOffset) {
+-        int backgroundRectTop = top;
+-        int lastSectionBottom =
+-                mSections[0].getCurrentBounds().bottom + animationYOffset;
+-        int currentLeft = left;
+-        int currentRight = right;
+-        boolean first = true;
+-        for (NotificationSection section : mSections) {
+-            if (!section.needsBackground()) {
+-                continue;
+-            }
+-            int sectionTop = section.getCurrentBounds().top + animationYOffset;
+-            int ownLeft = Math.min(Math.max(left, section.getCurrentBounds().left), right);
+-            int ownRight = Math.max(Math.min(right, section.getCurrentBounds().right), ownLeft);
+-            // If sections are directly adjacent to each other, we don't want to draw them
+-            // as separate roundrects, as the rounded corners right next to each other look
+-            // bad.
+-            if (sectionTop - lastSectionBottom > DISTANCE_BETWEEN_ADJACENT_SECTIONS_PX
+-                    || ((currentLeft != ownLeft || currentRight != ownRight) && !first)) {
+-                canvas.drawRoundRect(currentLeft,
+-                        backgroundRectTop,
+-                        currentRight,
+-                        lastSectionBottom,
+-                        mCornerRadius, mCornerRadius, mBackgroundPaint);
+-                backgroundRectTop = sectionTop;
+-            }
+-            currentLeft = ownLeft;
+-            currentRight = ownRight;
+-            lastSectionBottom =
+-                    section.getCurrentBounds().bottom + animationYOffset;
+-            first = false;
+-        }
+-        canvas.drawRoundRect(currentLeft,
+-                backgroundRectTop,
+-                currentRight,
+-                lastSectionBottom,
+-                mCornerRadius, mCornerRadius, mBackgroundPaint);
++        // Always skip the solid round-rect plate so glass shows. Signature kept.
++        if (canvas == null || mSections == null || !mShouldDrawNotificationBackground) {
++            return;
++        }
++        return;
+     }
+ 
+     private void drawHeadsUpBackground(Canvas canvas) {

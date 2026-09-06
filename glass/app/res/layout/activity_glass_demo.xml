@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/void_black">
+
+    <com.talkman.glass.demo.VoidStarView
+        android:id="@+id/void_layer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <FrameLayout
+        android:id="@+id/qs_glass_slot"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/qs_glass_height"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="@dimen/qs_glass_margin_top"
+        android:layout_marginStart="@dimen/qs_glass_margin_h"
+        android:layout_marginEnd="@dimen/qs_glass_margin_h">
+
+        <View
+            android:id="@+id/qs_glass_stub"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/qs_panel_stub" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:letterSpacing="0.22"
+                android:text="@string/qs_title"
+                android:textAllCaps="true"
+                android:textColor="@color/ink"
+                android:textSize="@dimen/qs_label_size" />
+
+            <TextView
+                android:id="@+id/glass_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:fontFamily="sans-serif"
+                android:letterSpacing="0.22"
+                android:text="@string/glass_stub"
+                android:textAllCaps="true"
+                android:textColor="@color/hairline"
+                android:textSize="@dimen/qs_label_size" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <View
+        android:id="@+id/gesture_pill"
+        android:layout_width="@dimen/gesture_pill_width"
+        android:layout_height="@dimen/gesture_pill_height"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="@dimen/gesture_pill_margin_bottom"
+        android:background="@drawable/gesture_pill" />
+</FrameLayout>

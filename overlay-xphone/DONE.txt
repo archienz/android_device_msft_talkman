@@ -1,0 +1,34 @@
+TalkmanXPhoneLockOverlay refinements (com.talkman.overlay.xphone.lock → com.android.systemui)
+
+Kept: Roboto Thin clock (widget_big / sans-serif-thin), SAT date (EEEddMMM + all-caps),
+SWIPE UP (keyguard_unlock / keyguard_retry), zero padlock (0dp lock dimens),
+no camera/phone affordances, no STARLINK, no wallpaperTextColor.
+
+Changed under overlay-xphone/res/ only:
+  values/styles.xml
+    TextAppearance.Keyguard added, parent @android:style/TextAppearance
+    Secondary / BottomArea stay on that public parent
+    date = sans-serif-light + literal #ffe8e8e8
+    SWIPE UP / charging hint = #ffe8e8e8 (was #ffffffff)
+    widget_title_bold uses overlay dimens
+  values/dimens.xml
+    widget_title_font_size 24dp, widget_small_font_size 48dp,
+    widget_vertical_padding_clock 4dp
+    widget_big_font_size removed from default (see h650dp)
+  values/colors.xml
+    keyguard_overflow_content_color #ffe8e8e8
+  values/donottranslate.xml
+    SAT skeleton comment only
+  values-h650dp/dimens.xml   NEW  widget_big_font_size 76dp
+  values-h800dp/dimens.xml   NEW  keyguard_clock_top_margin 88dp
+
+Why h650dp only for the clock: stock res-keyguard values-h650dp is 54dp.
+Talkman is ~726 dp tall so that config wins. Putting the same size in
+values/ as well makes aapt2 drop the h650 entry; stock 54dp would win.
+
+v2 (2026-09-06): widget_big 96dp; date skeleton EEE dd MMM (ICU still
+pretty-prints a comma in en-US). versionCode 2 on this telephone.
+
+aapt2 compile+link vs prebuilts/sdk/30/public/android.jar: OK
+  widget_big_font_size = (h650dp-v13) 76dp
+No mka. Android.mk / AndroidManifest.xml / frameworks/ not edited.
