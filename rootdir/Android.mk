@@ -51,7 +51,23 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE_CLASS := ETC
 LOCAL_SRC_FILES := etc/init.talkman.rc
 LOCAL_MODULE_PATH  := $(TARGET_OUT_VENDOR_ETC)/init/hw
-LOCAL_REQUIRED_MODULES := init.talkman.charger.sh
+LOCAL_REQUIRED_MODULES := init.talkman.charger.sh init.talkman.qcril-recover.sh
+include $(BUILD_PREBUILT)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := init.talkman.qcril-recover.sh
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE_CLASS := EXECUTABLES
+LOCAL_SRC_FILES := etc/init.talkman.qcril-recover.sh
+LOCAL_MODULE_PATH := $(TARGET_OUT_VENDOR_EXECUTABLES)
+include $(BUILD_PREBUILT)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := talkman-rild-wait.sh
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE_CLASS := EXECUTABLES
+LOCAL_SRC_FILES := etc/talkman-rild-wait.sh
+LOCAL_MODULE_PATH := $(TARGET_OUT_VENDOR_EXECUTABLES)
 include $(BUILD_PREBUILT)
 
 include $(CLEAR_VARS)
@@ -93,6 +109,14 @@ LOCAL_MODULE_CLASS := ETC
 LOCAL_SRC_FILES := etc/init.talkman.usb.rc
 LOCAL_MODULE_PATH  := $(TARGET_OUT_VENDOR_ETC)/init/hw
 LOCAL_REQUIRED_MODULES := init.talkman.usb.sh
+include $(BUILD_PREBUILT)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := init.talkman.logd.rc
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE_CLASS := ETC
+LOCAL_SRC_FILES := etc/init.talkman.logd.rc
+LOCAL_MODULE_PATH  := $(TARGET_OUT_VENDOR_ETC)/init
 include $(BUILD_PREBUILT)
 
 include $(CLEAR_VARS)

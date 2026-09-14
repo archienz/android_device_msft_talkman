@@ -69,6 +69,8 @@ on property:sys.usb.config=none && property:sys.usb.configfs=0
     setprop sys.usb.state ${sys.usb.config}
 
 on property:sys.usb.config=adb && property:sys.usb.configfs=0
+    start logd
+    start adbd
     write /sys/class/android_usb/android0/enable 0
     write /sys/class/android_usb/android0/idVendor 18D1
     write /sys/class/android_usb/android0/idProduct 4EE7
@@ -77,7 +79,6 @@ on property:sys.usb.config=adb && property:sys.usb.configfs=0
     write /sys/class/android_usb/android0/bDeviceProtocol 0
     write /sys/class/android_usb/android0/functions adb
     write /sys/class/android_usb/android0/enable 1
-    start adbd
     setprop sys.usb.state ${sys.usb.config}
 
 on property:sys.usb.config=mtp && property:sys.usb.configfs=0

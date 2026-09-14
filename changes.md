@@ -4,6 +4,15 @@ This file is a description of the tree. It is not a procedure.
 
 Purpose, Progress, and differences compared to the community repository stay in [`README.md`](README.md).
 
+### Modem / radio after ONLINE (2026-09-15, measured, no camp)
+
+- Two-step LK2ND: leftover=n stock `18D1:D00D`. First ram is the warm image (`oem talkman-warm`) with PT_LOAD **18** / AUTH **0x058DAE67**. Then a stay-class `boot.img`. Never leftover re-ram. Never flash reserved-memory. Boot-only. Not EDL.
+- Proven on this telephone: MPSS S3 **ONLINE**. `SET_UICC` after `CARDSTATE_PRESENT`. persist `dsds` then `ss` plus `ril-daemon` restart. Helper `setRadioPower` can get DMS GET mode **0** / SET ONLINE. SIM **LOADED** and `gsm.sim.operator.numeric=50502`. SST can leave `POWER_OFF` for `OUT_OF_SERVICE`.
+- Vendor HIDL (`hardware/ril/libril/ril_service.cpp`): remap unlocked PERSO→READY so `GET_IMSI` can run; cookie-matched IRadio client death so helper `setResponseFunctions(null)` cannot clear a later Phone bind.
+- Userspace in this tree: `talkman-rild-wait.sh` waits for HLOS ONLINE, runs two-phase `dsds`→`ss`, starts Phone first after the `ss` rild, and scores NAS **0x67** / `is_online` / `FORCE_NW_SEARCH` into kmsg. `rild.legacy.rc` keeps `ril-daemon` disabled until that wait. qcril.db is a oneshot recover (not copy-every-boot). `persist.radio.force_nw_search=1`.
+- Not proven: `mVoiceRegState=0` (`IN_SERVICE`). Do not mark a network Working. RSSI **99** is an empty QMI cache.
+- Open hole: after the `ss` rild restart, Phone often does not call `setResponseFunctions`. `ITelephony.setRadioPower` (transaction 18) can return true anyway.
+
 ### Modem / MBA (2026-09-06, measured, MPSS not ONLINE)
 
 - Product is RM-1104 / 4VM_08r / MSM8992. Flash is boot-only on LK2ND `18D1:D00D`. Do not publish the Microsoft service schematic.

@@ -166,6 +166,8 @@
 /vendor/bin/init\.talkman\.usb\.sh             u:object_r:init-usb-sh_exec:s0
 /vendor/bin/init\.talkman\.charger\.sh         u:object_r:vendor_shell_exec:s0
 /vendor/bin/init\.talkman\.sh                  u:object_r:talkman-sh_exec:s0
+/vendor/bin/init\.talkman\.qcril-recover\.sh   u:object_r:talkman-sh_exec:s0
+/vendor/bin/talkman-rild-wait\.sh              u:object_r:vendor_shell_exec:s0
 /vendor/bin/init\.talkman\.bt\.sh              u:object_r:vendor_shell_exec:s0
 /(vendor|system/vendor)/bin/init\.msm8992\.sensor\.sh    u:object_r:talkman-sh_exec:s0
 /vendor/bin/init\.talkman\.qseecomd\.sh        u:object_r:init-talkman-qseecomd-sh_exec:s0

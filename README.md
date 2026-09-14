@@ -101,7 +101,7 @@ Qi GPIOs match 4VM_08r: `wc-en` GPIO **2**, `wc-det` GPIO **14**.
 
 ---
 
-## Progress (2026-09-06)
+## Progress (2026-09-15)
 
 Source in Git is not a pass. A pass is a physical talkman log in `out/qa-*`.
 
@@ -113,11 +113,15 @@ Host: Steam Deck SteamOS, ext4 `/home/deck/android/los-18.1`. Do not `repo sync`
 
 P0.1 Battery UI and P0.2 USB cable charge are **Working on this telephone**. P0.4 rear camera **live preview and stills** are on this telephone (kernel `#29`). Companion AF is Mitsumi **BU24210** at CCI1 write **0x7c**. Do not bind `lc898212xd`. The lens does not move. Quick Settings flashlight is **Working on this telephone**. Bluetooth A2DP media is **Working on this telephone** (2026-09-05, after the vendor A2DP policy file; in Git, not yet in the installed zip). GPS is not. Front camera is measured and is **not** in the HAL. Dual SIM RM-1118 is not this product. There is no `CONFIG_MSM_OIS`. The Microsoft service schematic is for implementation only. It is not published.
 
-**Modem / MPSS is not ONLINE.** Do not claim a network. Measured stay-up on kernel `#26` (`3.10.108-perf`, 2026-09-05 20:03:48 AEST, `boot_completed=1`, ~20 min, `out/qa-m26-live-20260906.txt`): MBA **DEBUG 7** (`MBA_META_DATA_AUTH_TLB_FAILURE`), hash paddr **0x0CC00334** (unaligned), `RMB_MBA_STATUS` **-3**, `SHARE_MEMORY` rc **-22**, `subsys3` modem **OFFLINE**. Venus was OFFLINE on that dump; AR6320 and ADSP were ONLINE. `ril-daemon` stayed up after `libaudioclient_shim` (`AudioSystem::setErrorCallback`). `gsm.sim.state` was empty.
+**Modem / MPSS is P2. Do not claim a network.** Two-step LK2ND on leftover=n stock `18D1:D00D`: first ram is the warm image (`oem talkman-warm`) and measures PT_LOAD **18** / AUTH **0x058DAE67**. Then ram a stay-class `boot.img`. Never leftover re-ram. Never flash reserved-memory. Boot-only. Not EDL.
 
-Lab ram-boot **m35** (kernel `#67`, 2026-09-06 15:31 AEST, `out/qa-m19-mba.txt`): hash paddr **0x0CA00000**, `align_ok=1`, `lab_identity=0`, reloc **070→074**, MBA **STATUS=1 DEBUG=0** (pre-META). Preload stopped at segment 6 (`0x075c0000`). The kernel dies at about 7 s. MPSS stayed OFFLINE. After-META was not on that dump.
+Proven on this telephone: MPSS S3 **ONLINE**; `SET_UICC` after `CARDSTATE_PRESENT`; persist `dsds` then `ss` plus `ril-daemon` restart; helper `setRadioPower` can get DMS GET mode **0** / SET ONLINE; SIM **LOADED** and `gsm.sim.operator.numeric=50502`; SST can leave `POWER_OFF` for `OUT_OF_SERVICE`. Vendor HIDL libril remaps unlocked PERSO→READY and uses a cookie-matched IRadio death recipient so a helper `setResponseFunctions(null)` cannot wipe a later Phone bind.
 
-Lab **m36** sent `pil_msa.lab_load_before_auth=0`. After-META STATUS/DEBUG was **not** captured (`adb` / `logd`). Lab **m38** (kernel `#70`) reached the 4ee7 gadget at about 8 s; `adb` stayed authorizing and the after-META lines were not captured. Do not mark META=3 or AUTH_COMPLETE.
+Not proven: `mVoiceRegState=0` (`IN_SERVICE`). Do **not** mark networks Working. RSSI **99** is an empty QMI cache. `FORCE_NW_SEARCH=1` does not call NAS **0x67** while `is_online=0`.
+
+Open hole: after the `ss` rild restart, Phone often does not call `setResponseFunctions` (IRadio). `ITelephony.setRadioPower` (transaction 18) can still return true. `talkman-rild-wait.sh` starts Phone first after phase-2 `ss`, then scores NAS **0x67** / `is_online` / `FORCE_NW_SEARCH` into kmsg.
+
+The 2026-09-01 zip and stay-up `#26` (`out/qa-m26-live-20260906.txt`) are still MBA **DEBUG 7** / `subsys3` OFFLINE.
 
 A real LK2ND `fastboot boot` of Android is about **8 s** Booting. A **0.5 s** OKAY on `18D1:D00D` is lk1st and does not start the kernel. Use volume-down **after** the Windows logo. Do not treat `adb reboot bootloader` as LK2ND.
 
@@ -126,11 +130,11 @@ A real LK2ND `fastboot boot` of Android is about **8 s** Booting. A **0.5 s** OK
 | P0.0 | Rebuild LOS 18.1 | Built and flashed | `lineage_talkman-userdebug` zip 2026-09-01. Later **boot-only** flashes. Kernel `#29` 2026-09-02 17:33 AEST (camera preview). Later AF lab images are local only | Next bacon for vendor/system (flashlight HAL, photo strobe, RIL shim, Bluetooth audio HAL) |
 | P0.1 | Battery UI | Working on this telephone | `dumpsys battery` live percent and voltage. Not 50 percent | — |
 | P0.2 | Charge | Working on this telephone (USB cable), with one kernel fix pending flash | USB `online`, SDP 5 V / 500 mA, `charging_enabled`. No PD | Measured 2026-09-05: after days on a 500 mA SDP the PMI8994 **safety timer** (768 min) fired and latched the charger off (MISC `RT_STS` bit 2, battery a flat −16 mA, status Discharging at 3.70 V). Only VBUS removal clears it. Kernel `7339221a798` sets `charging-timeout-mins = 0`. Qi pad not tested. `bms/charge_full` is still a bad health value |
-| P0.3 | GPS | Not Working | GPSTest empty. `loc_eng_start`. 0 satellites. MPSS OFFLINE | `numSvs` more than 0. `subsys3` modem ONLINE |
+| P0.3 | GPS | Not Working | GPSTest empty. `loc_eng_start`. 0 satellites. Installed zip MPSS OFFLINE | `numSvs` more than 0. Lab ONLINE is not a GPS pass |
 | P0.4 | Camera | Working on this telephone (rear preview and stills) | HAL **1** CameraId 0. Probe `mot_imx230`. CCI1 write **0x20** chip **0x0230**. CSI lane map **0x0423**. Mount-angle **90**. Snap live view and DCIM stills. QS torch on GPIO 12 | Front not listed (Ducati `0x2140` / die `0x03BB` measured; no XML). AF is BU24210 at write **0x7c**; no `lc898212xd`. Photo strobe is in Git, not in the 2026-09-01 zip |
 | — | Display / Wi-Fi / speaker / flashlight | Working on this telephone (QS torch) | 1440×2560 at 60 Hz. QCA6174. Loudspeaker at TAS PGA **11 dB**. QS flashlight → `set_torch_mode` → `led:flash_torch` (`out/qa-torch-20260902/`). Touch input boost: A57 1248 MHz + GPU 300 MHz for 1.5 s | Speaker is quieter than Windows on purpose (brownout); TAS2553 battery guard work is in progress to restore 15 dB |
 | — | Bluetooth audio | Working on this telephone (A2DP media, 2026-09-05) | Pair / LE connect on QCA6174. `AudioFlinger: Loaded a2dp audio interface` with `BT A2DP Out` ports after `a2dp_audio_policy_configuration.xml` was put in `/vendor/etc` | The 2026-09-01 zip has the file only in `/system/etc`; the vendor `audio_policy_configuration.xml` includes it from `/vendor/etc`, so the A2DP module never loaded. `device.mk` now copies it to vendor (next bacon). Owner confirmed media plays on the Bluetooth device (2026-09-05) |
-| P2 | RIL / MPSS | Not Working (no network) | `libaudioclient_shim` keeps `ril-daemon` up (`init.svc.ril-daemon=running` on `#26`). QCRIL votes PIL. MBA still fails. `#26` DEBUG **7** hash **0x0CC00334**. m35 `#67` hash **0x0CA** `align_ok=1` STATUS=1 DEBUG=0 pre-META, then ~7 s die. m36/m38 after-META not captured | `subsys3` modem ONLINE. MBA STATUS **3** then **4**. Do not claim bars or a SIM |
+| P2 | RIL / MPSS | Not Working (no camp) | Lab leftover=n two-step: S3 ONLINE; `SET_UICC` after `CARDSTATE_PRESENT`; persist `dsds` then `ss` plus rild restart; helper `setRadioPower` can DMS GET **0** / SET ONLINE; `LOADED` / `gsm.sim.operator.numeric=50502`; SST can leave `POWER_OFF` to `OUT_OF_SERVICE` | camp. `gsm.operator.numeric`. `mVoiceRegState=0` IN_SERVICE. Phone `setResponseFunctions` after `ss` rild. Do not leftover re-ram. Do not flash reserved-memory |
 
 Keep QCamera2 MSMB `mot_imx230`. Do not ship CSID test-generator as camera. Rear CSI data lanes on RM-1104 are CSI0 LN2/LN1/LN3/LN0 (`qcom,csi-lane-assign = <0x0423>`), not Clark `0x4320`. Do not bind `libactuator_lc898212xd`. Do not add CameraId 1 until a front HAL exists for die `0x03BB`.
 
@@ -158,8 +162,8 @@ A function is **Working on this telephone** only with `out/qa-*` logs. The commu
 | Charge (USB) | Cable charge through smbcharger | USB SDP 5 V / 500 mA. **Working on this telephone**. Qi pad not tested. UI strings are 5 V 1.8 A and Qi 900 mA. No PD |
 | `power_profile.xml` | Bullhead **2700** mAh | BV-T5E **3000** mAh (BatteryStats only) |
 | Fuel-gauge kernel | Phandle on the **charger** node. Cutoff 2800 mV. vbatt-low 4200 mV | Phandle also on **FG**. Cutoff 3200 mV. vbatt-low 3500 mV (WOA). This change is in `kernel/mmo/msm8994`. It is not on the community kernel GitHub |
-| GPS | `loc_eng_start`. 0 satellites when MPSS is OFFLINE | Same. Modem stays OFFLINE until `rild` loads |
-| RIL | `ril-daemon` does not stay up | Measured miss: `AudioSystem::setErrorCallback` in `libril-qc-qmi-1.so`. Shim is not in the installed zip |
+| GPS | `loc_eng_start`. 0 satellites when MPSS is OFFLINE | Same GPS path. Lab leftover=n two-step can ONLINE MPSS. GPSTest still 0 satellites |
+| RIL | `ril-daemon` does not stay up | Lab leftover=n: S3 ONLINE, `LOADED` / `gsm.sim.operator.numeric=50502`. No camp. Phone often misses IRadio `setResponseFunctions` after `ss` rild. Not Working |
 | Display / touch | 1440×2560 at 60 Hz | Same panel. GPU floor **300 MHz** and A57 **1248 MHz** for 1.5 s after touch |
 | USB | CAF `g_android` | `g_android`. No USB_CONFIGFS. No PD |
 | LifeTimer | Bullhead APK. PackageManager crash loop | Not in the package list |
@@ -213,6 +217,7 @@ The Changes list is [`changes.md`](changes.md).
 - Do not Magisk-bind a random `imx230` HAL.
 - Do not use Dual SIM RM-1118 / board 4VM_08d as talkman.
 - Do not publish the Microsoft service schematic (PDF or page renders). Permission is use, not publish.
+- Do not leftover re-ram. Do not flash reserved-memory. Flash is **boot only** on LK2ND `18D1:D00D`. Not EDL.
 
 ---
 

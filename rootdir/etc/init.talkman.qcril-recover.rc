@@ -1,0 +1,19 @@
+# Talkman m306: qcril.db recover from the boot ramdisk (/odm overlay).
+# No odm partition; second-stage parses /odm/etc/init (same as m39 logd).
+# /system/etc/init is not in the stay-class hivegaps boot.img.
+# Reuses rootdir/etc/init.talkman.qcril-recover.sh (m305). Do not start
+# ril-daemon. rild.legacy.rc class main unchanged.
+# Service suffix -rd so vendor init.talkman.rc talkman-qcril-recover
+# (/vendor/bin, m305) can coexist after a later vendor apply.
+
+on post-fs-data
+    mkdir /data/misc/radio 0770 radio radio
+    exec_start talkman-qcril-recover-rd
+
+# disabled: do not class_start this again. Do not start ril-daemon here.
+service talkman-qcril-recover-rd /odm/bin/init.talkman.qcril-recover.sh
+    class core
+    user radio
+    group radio
+    oneshot
+    disabled

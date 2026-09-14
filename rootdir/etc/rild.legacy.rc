@@ -1,3 +1,20 @@
+# m338/m415: delay ril-daemon until HLOS MPSS ONLINE.
+# Auto hold-release + quiet PRESENT + setuicc + phase2 ss + keyevent 224
+# live in talkman-rild-wait.sh. Vendor path (not /odm/etc/init; m308 ENOENT).
+# Do not bind over dumpstate_board.sh — that file stays the battery dump.
+# Do not RADIO_POWER from init. Stock telephony-common.jar. Author archienz.
+# m415: wait.sh quiet PRESENT (sleep 5 + one logcat). Same two-phase as pack
+# 4a4b322f. Not a QMI client. Never fake IN_SERVICE.
+# m452: wait.sh longer PRESENT — sleep 5 then 4 spaced greps over ~20s.
+# SET_UICC once on PRESENT. Phase2 ss on timeout. Not a 1s logcat loop.
+
+on post-fs-data
+    setprop persist.radio.adb_log_on 1
+    setprop persist.radio.ril_payload_on 1
+    setprop persist.radio.no_wait_for_card 1
+    mkdir /data/misc/radio 0770 radio radio
+    start talkman-rild-wait
+
 service ril-daemon /vendor/bin/hw/rild
     class main
     user radio
@@ -6,3 +23,13 @@ service ril-daemon /vendor/bin/hw/rild
     # Installed linker64 may not yet contain TARGET_LD_SHIM_LIBS.
     # libril-qc-qmi-1.so imports AudioSystem::setErrorCallback (removed in fw/av).
     setenv LD_PRELOAD /vendor/lib64/libaudioclient_shim.so
+    disabled
+
+# disabled + start from post-fs-data. Invoke via /system/bin/sh so the
+# domain is shell (not talkman-sh). Never /debug_ramdisk (MS_NOEXEC + ENOENT).
+service talkman-rild-wait /system/bin/sh /vendor/bin/talkman-rild-wait.sh
+    class core
+    user root
+    group root
+    oneshot
+    disabled

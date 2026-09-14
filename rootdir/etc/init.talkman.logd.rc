@@ -1,0 +1,28 @@
+# Talkman m39: logd + adbd before USB gadget so the ~6s 4ee7 window has shell.
+# First-stage ramdisk overlay lives at /odm/etc/init (no odm partition; root
+# stays the ramdisk so this survives first_stage /system+/vendor mounts).
+# Also installed as /vendor/etc/init/init.talkman.logd.rc on vendor rebuilds.
+# No m37 insecure-adb props. Do not add a debug-ramdisk override file.
+# Do not set persist.sys.usb.config to none (that stops adbd).
+
+on init
+    start logd
+
+on post-fs
+    start logd
+
+on late-fs
+    start logd
+    start adbd
+    setprop sys.talkman.logd.ready 1
+
+on early-boot
+    start logd
+    start adbd
+    setprop sys.talkman.logd.ready 1
+
+# Stock init.usb.rc applies persist.sys.usb.config at `on boot` (gadget up).
+# adbd has been running since late-fs by then. Start again if it died.
+on property:sys.usb.config=adb
+    start logd
+    start adbd

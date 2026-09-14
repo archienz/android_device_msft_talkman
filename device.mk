@@ -282,7 +282,11 @@ PRODUCT_PACKAGES += \
     init.recovery.talkman.rc \
     init.talkman.ramdump.rc \
     init.talkman.diag.rc \
-    init.talkman.misc.rc
+    init.talkman.misc.rc \
+    init.talkman.logd.rc \
+    init.talkman.qcril-recover.sh \
+    talkman-rild-wait.sh \
+    talkman-iradio-on
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/rootdir/etc/rild.legacy.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/rild.legacy.rc \
@@ -300,13 +304,23 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/rootdir/etc/fstab.talkman:$(TARGET_COPY_OUT_ROOT)/fstab.talkman \
     $(LOCAL_PATH)/rootdir/etc/fstab.talkman:$(TARGET_COPY_OUT_RAMDISK)/fstab.talkman
 endif
-# m37 lab first-stage ramdisk (boot.img only). /force_debuggable makes
-# first-stage copy /adb_debug.prop → /debug_ramdisk/adb_debug.prop;
-# second-stage loads that last and overrides system ro.adb.secure=1.
+# m39: first-stage ramdisk overlay. /odm is not a partition; second-stage
+# parses /odm/etc/init. Start logd/adbd before the USB gadget. Do not copy
+# /force_debuggable or ro.adb.secure=0 (m37 gadget-before-shell).
+# m306: same overlay for qcril.db recover so a boot-only stay-class ram
+# runs the m305 script without a vendor apply. Not /system/etc/init
+# (that path is not in the hivegaps ramdisk). Do not put this .rc on
+# vendor/etc/init — duplicate service if odm also imports it.
+# m415/m425: talkman-rild-wait.sh + rild.legacy.rc at ramdisk root (same
+# names as the sit pack). Not /odm/etc/init (m308 ENOENT). Vendor install
+# is PRODUCT_PACKAGES talkman-rild-wait.sh; dumpstate_board.sh stays the
+# battery dump.
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/rootdir/lab-default.prop:$(TARGET_COPY_OUT_RAMDISK)/adb_debug.prop \
-    $(LOCAL_PATH)/rootdir/lab-default.prop:$(TARGET_COPY_OUT_RAMDISK)/default.prop \
-    $(LOCAL_PATH)/rootdir/force_debuggable:$(TARGET_COPY_OUT_RAMDISK)/force_debuggable
+    $(LOCAL_PATH)/rootdir/etc/init.talkman.logd.rc:$(TARGET_COPY_OUT_RAMDISK)/odm/etc/init/init.talkman.logd.rc \
+    $(LOCAL_PATH)/rootdir/etc/init.talkman.qcril-recover.rc:$(TARGET_COPY_OUT_RAMDISK)/odm/etc/init/init.talkman.qcril-recover.rc \
+    $(LOCAL_PATH)/rootdir/etc/init.talkman.qcril-recover.sh:$(TARGET_COPY_OUT_RAMDISK)/odm/bin/init.talkman.qcril-recover.sh \
+    $(LOCAL_PATH)/rootdir/etc/talkman-rild-wait.sh:$(TARGET_COPY_OUT_RAMDISK)/talkman-rild-wait.sh \
+    $(LOCAL_PATH)/rootdir/etc/rild.legacy.rc:$(TARGET_COPY_OUT_RAMDISK)/rild.legacy.rc
 #    $(LOCAL_PATH)/rootdir/etc/init.msm8992.sensor.sh:$(TARGET_COPY_OUT_VENDOR)/bin/init.msm8992.sensor.sh
 
 # Keylayout / keychars

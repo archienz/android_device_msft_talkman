@@ -156,6 +156,10 @@ persist.radio.mode_pref_nv10=1
 ril.nosim.ecc_list_count=1
 ril.nosim.ecc_list_1=111,113,117,122,125
 persist.radio.redir_party_num=0
+# m405 / pack 4a4b322f first-stage vendor/build.prop: nas_init
+# property_get persist.radio.force_nw_search @ 0x283444 (strtoul 0/1).
+# wait.sh leftover-clears + setprop 1 before rild. Not a new QMI client.
+persist.radio.force_nw_search=1
 
 #disable FUSE storage on Android 11
 persist.sys.fflag.override.settings_fuse=false

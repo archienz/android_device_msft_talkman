@@ -2,7 +2,8 @@
 # build/make/target/product/telephony_vendor.mk (/vendor/bin/hw/rild,
 # rild.legacy.rc) and loads /vendor/lib64/libril-qc-qmi-1.so. Single SIM.
 # Do not flip enforcing. init.te unchanged.
-# radio_data_file allows commented: they pull radio neverallow.
+# radio_data_file is core_data_file_type; vendor rild is not coredomain.
+# full_treble_only neverallow is exempted the same way as location.te.
 
 binder_call(rild, audioserver)
 binder_call(rild, mediaserver)
@@ -30,13 +31,23 @@ allow rild per_mgr_service:service_manager find;
 
 allow rild time_daemon:unix_stream_socket connectto;
 
-# leftover: rild reads qcril.db linked to /system/etc/qcril.db
-# neverallow pull radio — unused without PRODUCT_PACKAGES rild
-#allow rild radio_data_file:lnk_file read;
-
-# leftover: allow rild to access radio data file
-#allow rild radio_data_file:dir rw_dir_perms;
-#allow rild radio_data_file:file create_file_perms;
+# m292 kmsg audit :292–:304 @ err_ready (permissive=1, not a blanket):
+#   avc: denied { getattr } for comm="rild" path="/data/misc/radio"
+#     scontext=u:r:rild:s0 tcontext=u:object_r:radio_data_file:s0 tclass=dir
+#   avc: denied { getattr } for comm="rild" path="/data/misc/radio/qcril.db"
+#     scontext=u:r:rild:s0 tcontext=u:object_r:radio_data_file:s0 tclass=file
+#   avc: denied { read write } for comm="rild" name="qcril.db" ... tclass=file
+#   avc: denied { open } for comm="rild" path="/data/misc/radio/qcril.db" ...
+#   avc: denied { ioctl } for comm="rild" path=".../qcril.db" ioctlcmd=f50c
+#   avc: denied { lock } for comm="rild" path=".../qcril.db" ... tclass=file
+#   avc: denied { write add_name read open remove_name } ... tclass=dir
+#   avc: denied { create unlink } name="qcril.db-journal" ... tclass=file
+# libril-qc-qmi-1.so sourced /data/misc/radio/qcril.db. search is the
+# path-walk bit (not in the AVC set). Not permissive=1.
+typeattribute rild data_between_core_and_vendor_violators;
+allow rild radio_data_file:dir { getattr write add_name read open remove_name search };
+allow rild radio_data_file:file { getattr read write open ioctl lock create unlink };
+allow rild radio_data_file:lnk_file read;
 
 userdebug_or_eng(`
   allow rild ssr_device:chr_file { open read };

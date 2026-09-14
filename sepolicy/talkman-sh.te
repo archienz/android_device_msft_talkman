@@ -16,6 +16,11 @@ allow talkman-sh firmware_file:file r_file_perms;
 allow talkman-sh firmware_file:dir r_dir_perms;
 
 allow talkman-sh shell_exec:file r_file_perms;
+allow talkman-sh vendor_shell_exec:file rx_file_perms;
 
 # execute toybox/toolbox
 allow talkman-sh toolbox_exec:file rx_file_perms;
+allow talkman-sh vendor_toolbox_exec:file rx_file_perms;
+
+# /system/etc/qcril.db seed + /system/bin/sqlite3 integrity_check.
+allow talkman-sh system_file:file { getattr open read execute execute_no_trans };

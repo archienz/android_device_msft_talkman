@@ -1,0 +1,27 @@
+// m383/m389/m396/m462: HIDL IRadio helper (setRadioPower / setUiccSubscription /
+// getIccCardStatus peek). Refuse SET_UICC on card=0. m389 setuicc
+// keeps Phone setResponseFunctions when bound. m396 unbound uses
+// own callbacks (m387 path). m462 argv "power" = setRadioPower(true)
+// only while Phone is down. m467: after Complete, destroy
+// callbacks + drop service + exit. Not a QMI client.
+// m400: argv "bandpref" = IOemHook QCRIL_EVT_HOOK_SET_PREFERRED_NETWORK_BAND_PREF
+// map=1 (full persist.radio.lte_full_band). Does not steal IRadio.
+// Packed into ramdisk; first-stage binds onto
+// /vendor/bin/qmakernote-xtract. Author archienz.
+cc_binary {
+    name: "talkman-iradio-on",
+    srcs: ["talkman-iradio-on.cpp"],
+    shared_libs: [
+        "liblog",
+        "libutils",
+        "libhidlbase",
+        "libcutils",
+        "libbase",
+        "android.hardware.radio@1.0",
+        "android.hardware.radio.deprecated@1.0",
+    ],
+    cflags: [
+        "-Wall",
+        "-Wno-unused-parameter",
+    ],
+}
