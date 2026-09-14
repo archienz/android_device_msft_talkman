@@ -423,6 +423,15 @@
 # waits), start ss rild (registerAsService unblocks
 # setResponseFunctions). No pid-empty wait. No helper
 # IRadio after Phone is up. No jar overlay. Author archienz.
+# m511: after Phone bind + GET 0, one KEYCODE_WAKEUP so
+# Phone sendDeviceState → HIDL SCREEN_STATE → blob
+# consider @ 0x39d7f8 with is_online=1 enable=1 (sole
+# bl 0x409724 / NAS 0x67). persist force_nw_search=1
+# already. Do not send 0x67. Do not steal IRadio.
+# Phase2 keyevent stays before RADIO_POWER. This third
+# keyevent is after txn 18 + scored GET 0 + new m474
+# non-null ss. Not a loop. Not a fake PLMN. Author
+# archienz.
 # m474: Phone IRadio client. libril linkToDeath cookie so
 # helper setResponseFunctions(null)+exit cannot wipe a
 # later Phone bind (m466). wait.sh: after ss rild, force-stop
@@ -680,6 +689,7 @@ klog "m469 force-stop then helper setRadioPower then helper release then Phone b
 klog "m509 PRESENT+SET_UICC+helper release then setprop ss then stop phase1 ril-daemon then force-stop then start Phone then start ss ril-daemon then leftover air then sleep 2 then txn=18 i32 1 bound /vendor/bin/dumpstate_board.sh (Phone-first wait: IRadio down so getService(slot1,true) waits; bind only new m474 non-null ss; no helper if Phone up; no pid-empty wait; no 1s loop)"
 klog "m489 PRESENT+SET_UICC+helper release then setprop ss then force-stop then start Phone then stop/start ril-daemon then leftover air then sleep 2 then txn=18 i32 1 bound /vendor/bin/dumpstate_board.sh (Phone-first; IRadio appears while Phone polling; helper only if unbound after 2s and Phone not down; no steal if bind already; prefer no helper IRadio if Phone up; no bind logcat; no pid-empty wait; no 1s loop)"
 klog "m494 one-shot greps NAS 0x67 / is_online / FORCE_NW_SEARCH into kmsg bound /vendor/bin/dumpstate_board.sh (not a loop; do not send 0x67; Phone-first m489)"
+klog "m511 after Phone bind + GET 0 keyevent 224 SCREEN_STATE re-queue consider bound /vendor/bin/dumpstate_board.sh (not a loop; do not send 0x67; Phone-owned IRadio)"
 klog "m489 diag m484/m481: leftover=n Phone never setResponseFunctions after ss rild; GET 0 via helper m484; SST OOS+50502 without helper m481"
 klog "m485 PRESENT+SET_UICC+ss rild then force-stop then sleep 1 then helper setRadioPower then helper setResponseFunctions(null)+exit then stop/start ril-daemon then start Phone then leftover air then sleep 3 then txn=18 i32 1 bound /vendor/bin/dumpstate_board.sh (fresh IRadio; GET 0 may drop; Phone txn 18 re-ONLINE; bind only setResponseFunctions/RadioResponse registered; no bind logcat; no radio files; no 1s loop)"
 klog "m485 diag m484: leftover=n pack 325f6b94 sit1/2 helper SET ONLINE + operating mode 0 get0=y txn18=y Parcel true; Phone never setResponseFunctions; cookie stayed; 50502=n gsm.sim=READY op empty; sit3 USB died +20s"
@@ -1600,6 +1610,11 @@ klog "m483 txn18=y txn=$TXN reply=$SC1 sst=$SST sim=$(getprop gsm.sim.state) op=
 klog "m482 txn18=y txn=$TXN reply=$SC1 sst=$SST sim=$(getprop gsm.sim.state) op=$(getprop gsm.sim.operator.numeric) helper_rp=$HELPER_RP bind=$BIND_SEEN phone_bound=$PHONE_BOUND"
 klog "m474 txn18=y txn=$TXN reply=$SC1 sst=$SST sim=$(getprop gsm.sim.state) op=$(getprop gsm.sim.operator.numeric) helper_rp=n bind=$BIND_SEEN phone_bound=$PHONE_BOUND"
 klog "m473 txn18=y txn=$TXN reply=$SC1 sst=$SST sim=$(getprop gsm.sim.state) op=$(getprop gsm.sim.operator.numeric) helper_rp=n"
+# m511: one second for DMS GET 0 to land in radio before the
+# one-shot score gates the post-GET0 SCREEN_STATE keyevent.
+# Not a loop. Not a logcat wait. Do not send 0x67.
+klog "m511 sleep 1 after txn 18 for DMS GET 0 before SCREEN_STATE (not a loop; do not send 0x67)"
+sleep 1
 
 # one-shot kmsg scores: one logcat -t 80 piped to awk (one-line
 # flags only; not full logcat-in-var; no radio files).
@@ -1793,9 +1808,26 @@ setprop sys.talkman.post_get0 $POST_GET0
 setprop sys.talkman.nas67 $NAS67
 setprop sys.talkman.is_online $ISO
 setprop sys.talkman.force_nw_search $FNWS
+# m511: Phone-owned SCREEN_STATE after bind + GET 0 so
+# consider can run is_online=1 enable=1. Do not send 0x67.
+# Do not helper IRadio. Skip if bind or GET 0 missing.
+if [ "$BIND_SEEN" = y ] || [ "$PHONE_BOUND" = y ]; then
+    if [ "$g0" = y ] || [ "$POST_GET0" = y ]; then
+        input keyevent 224
+        klog "m511 input keyevent 224 after Phone bind + GET 0 (SCREEN_STATE re-queue consider; is_online=1 enable=1; do not send 0x67)"
+        setprop sys.talkman.nas67_wakeup y
+    else
+        klog "m511 skip post-GET0 keyevent — GET 0 not scored (bind=$BIND_SEEN g0=$g0)"
+        setprop sys.talkman.nas67_wakeup n
+    fi
+else
+    klog "m511 skip post-GET0 keyevent — no Phone bind (SCREEN_STATE would not reach QCRIL)"
+    setprop sys.talkman.nas67_wakeup n
+fi
 # m494: one-shot greps NAS 0x67 / is_online / FORCE_NW_SEARCH
 # into kmsg (not a loop; do not send 0x67). Host dmesg dump
 # can see them if radio logcat is gone. Not a radio file.
+klog "m511 post-GET0 SCREEN_STATE done — one-shot greps NAS 0x67 / is_online / FORCE_NW_SEARCH into kmsg (not a loop; do not send 0x67)"
 klog "m494 one-shot greps NAS 0x67 / is_online / FORCE_NW_SEARCH into kmsg (not a loop; do not send 0x67)"
 logcat -b radio -d -t 80 2>/dev/null | grep -E '0x67|is_online|FORCE_NW_SEARCH' | tail -n 8 > /dev/kmsg
 # Quiet: getprop gsm.* only. No dumpsys. No extra radio files.
