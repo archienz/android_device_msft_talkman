@@ -408,6 +408,21 @@
 # is_online / FORCE_NW_SEARCH into kmsg (not a loop;
 # do not send 0x67). Host dmesg dump can score nas67
 # if USB/radio logcat is gone. Author archienz.
+# m509: Phone-first wait, not Phone-first on a live phase1
+# IRadio. AOSP RILJ (stock jar) getRadioProxy() calls
+# IRadio.getService("slot1", true) once; there is no
+# IServiceNotification. retry=true waits only while
+# IRadio is down (VINTF radio 1.1). If phase1 rild is
+# still registered after persist=ss, Phone binds that
+# dying client (klog "non-null ss" is a false bind) or
+# races its death into mDisabledRadioServices and never
+# calls setResponseFunctions on the ss process. txn 18
+# can still Parcel true (SST "Do nothing" unless
+# RADIO_POWER_OFF). Order: persist ss, stop phase1
+# rild, force-stop Phone, start Phone (getService
+# waits), start ss rild (registerAsService unblocks
+# setResponseFunctions). No pid-empty wait. No helper
+# IRadio after Phone is up. No jar overlay. Author archienz.
 # m474: Phone IRadio client. libril linkToDeath cookie so
 # helper setResponseFunctions(null)+exit cannot wipe a
 # later Phone bind (m466). wait.sh: after ss rild, force-stop
@@ -662,6 +677,7 @@ klog "m466 helper death settle then Phone then IRadio/RILJ bind then ITelephony.
 klog "m467 Phone IRadio client on ss rild then ITelephony.setRadioPower txn=18 i32 1 bound /vendor/bin/dumpstate_board.sh (no helper power; no force-stop; no IRadio steal; no 1s logcat loop)"
 klog "m468 slim wait getprop leftover air + two bind greps then txn=18 always then immediate kmsg scores bound /vendor/bin/dumpstate_board.sh (no settings stall; no skip txn 18; no helper power; no force-stop; no 1s loop)"
 klog "m469 force-stop then helper setRadioPower then helper release then Phone bind then txn=18 i32 1 bound /vendor/bin/dumpstate_board.sh (GET 0 + Phone IRadio client; no steal after bind; no 1s loop)"
+klog "m509 PRESENT+SET_UICC+helper release then setprop ss then stop phase1 ril-daemon then force-stop then start Phone then start ss ril-daemon then leftover air then sleep 2 then txn=18 i32 1 bound /vendor/bin/dumpstate_board.sh (Phone-first wait: IRadio down so getService(slot1,true) waits; bind only new m474 non-null ss; no helper if Phone up; no pid-empty wait; no 1s loop)"
 klog "m489 PRESENT+SET_UICC+helper release then setprop ss then force-stop then start Phone then stop/start ril-daemon then leftover air then sleep 2 then txn=18 i32 1 bound /vendor/bin/dumpstate_board.sh (Phone-first; IRadio appears while Phone polling; helper only if unbound after 2s and Phone not down; no steal if bind already; prefer no helper IRadio if Phone up; no bind logcat; no pid-empty wait; no 1s loop)"
 klog "m494 one-shot greps NAS 0x67 / is_online / FORCE_NW_SEARCH into kmsg bound /vendor/bin/dumpstate_board.sh (not a loop; do not send 0x67; Phone-first m489)"
 klog "m489 diag m484/m481: leftover=n Phone never setResponseFunctions after ss rild; GET 0 via helper m484; SST OOS+50502 without helper m481"
@@ -1269,9 +1285,10 @@ klog "m395 do not wipe provision — MPSS keep GW"
 klog "m396 do not wipe provision — MPSS keep GW"
 setprop sys.talkman.phase 2
 setprop sys.talkman.phase2_persist ss
-# m489 Phone-first: persist props before the ss rild so the new
-# process re-reads them. Start Phone before stop/start so RILJ
-# getService is already polling when IRadio appears.
+# m509 Phone-first wait: persist props for the new ss process,
+# then drop phase1 IRadio before Phone starts. RILJ
+# getService("slot1", true) waits; it does not poll a live
+# phase1 client.
 setprop persist.radio.lte_full_band 0xa0080908df
 setprop persist.radio.oem_socket 0
 setprop persist.radio.force_nw_search 1
@@ -1290,6 +1307,8 @@ AIR_RETRY=n
 PHONE_API=n
 PHONE_BOUND=n
 BIND_SEEN=n
+PRE_SRF=0
+POST_SRF=0
 SST=unknown
 RADIO_STATE=none
 TXN=18
@@ -1305,11 +1324,29 @@ setprop sys.talkman.helper_rp n
 setprop sys.talkman.helper_rp_comp n
 setprop sys.talkman.helper_rp_err none
 setprop sys.talkman.helper_rp_rc n
-# force-stop then start Phone BEFORE ss rild. Do not wait
-# pid empty (m482 sit1/3 dumped in that wait; sit2 helper
-# then second pid-wait; txn18 never).
+# m509: stop phase1 rild BEFORE Phone so persist=ss cannot
+# bind the dying IRadio (false m474 non-null ss) and so
+# getService(slot1, true) waits for the ss process.
+klog "m509 phase2 stop ril-daemon before Phone (IRadio down; getService will wait)"
+stop ril-daemon
+st=0
+while [ "$st" -lt 20 ]; do
+    ril=`getprop init.svc.ril-daemon`
+    if [ "$ril" != running ]; then
+        klog "m509 phase2 ril-daemon stopped svc=$ril before Phone"
+        klog "m396 phase2 ril-daemon stopped svc=$ril"
+        klog "m395 phase2 ril-daemon stopped svc=$ril"
+        break
+    fi
+    sleep 0.25
+    st=`expr $st + 1`
+done
+sleep 1
+# force-stop then start Phone while IRadio is down. Do not
+# wait pid empty (m482 sit1/3 dumped in that wait).
 am force-stop com.android.phone
 PHONE_REBIND=y
+klog "m509 phone_rebind force-stop then start Phone while IRadio down (getService waits; no pid-empty wait)"
 klog "m489 phone_rebind force-stop then start Phone then ss rild (Phone-first; RILJ getService will retry; no pid-empty wait)"
 klog "m485 phone_rebind force-stop com.android.phone (sleep 1 then helper setRadioPower; do not wait pid empty)"
 klog "m484 phone_rebind force-stop com.android.phone (sleep 1 then helper setRadioPower; do not wait pid empty)"
@@ -1332,6 +1369,7 @@ setprop sys.talkman.phone_disabled 0
 am start -n com.android.phone/.PhoneApp >/dev/null 2>&1
 setprop ctl.start com.android.phone
 setprop sys.talkman.phone_rebind y
+klog "m509 Phone-first start com.android.phone while IRadio down (getService slot1 true waits)"
 klog "m489 Phone-first start com.android.phone before ss rild (RILJ getService will retry)"
 # m485 post-helper stop ril-daemon (fresh IRadio; GET 0 may drop)
 # m485 post-helper start ril-daemon (never-helper-touched IRadio; Phone txn 18 must re-ONLINE)
@@ -1368,28 +1406,19 @@ setprop sys.talkman.prl_deq skip
 setprop sys.talkman.prl_cap skip
 setprop sys.talkman.rild_wait 3
 phpid=`pidof com.android.phone 2>/dev/null`
+klog "m509 Phone pid=$phpid after start — start ss ril-daemon next (getService wait; no pid-empty wait)"
 klog "m489 Phone pid=$phpid after start — stop/start ril-daemon next (IRadio appears while Phone polling; no pid-empty wait)"
 klog "m485 Phone pid=$phpid after start — leftover air getprop once then sleep 3 (fresh IRadio; no pid-empty wait; no bind logcat greps; no IRadio steal)"
 klog "m483 Phone pid=$phpid after start — leftover air getprop once then sleep 2 (no pid-empty wait; no bind logcat greps; no IRadio steal)"
 klog "m482 Phone pid=$phpid after start waited=$pw — sleep 3 (no bind logcat greps; no IRadio steal)"
 klog "m474 Phone pid=$phpid after start waited=$pw — sleep 3 (no bind logcat greps; no IRadio steal)"
 klog "m473 Phone pid=$phpid after start — sleep 3 (no bind logcat greps; no IRadio steal)"
-klog "m489 phase2 stop ril-daemon after Phone start (IRadio appears while Phone polling)"
-stop ril-daemon
-st=0
-while [ "$st" -lt 20 ]; do
-    ril=`getprop init.svc.ril-daemon`
-    if [ "$ril" != running ]; then
-        klog "m396 phase2 ril-daemon stopped svc=$ril"
-        klog "m395 phase2 ril-daemon stopped svc=$ril"
-        klog "m489 phase2 ril-daemon stopped svc=$ril after Phone start"
-        break
-    fi
-    sleep 0.25
-    st=`expr $st + 1`
-done
-sleep 1
+# bind=y only a NEW m474 non-null ss after this start (not a
+# persist=ss klog on the dying phase1 process).
+PRE_SRF=`dmesg 2>/dev/null | grep -c 'm474 setResponseFunctions non-null ss'`
+[ -z "$PRE_SRF" ] && PRE_SRF=0
 start ril-daemon
+klog "m509 phase2 start ril-daemon after Phone-first wait (ss; getService unblocks; pre_srf=$PRE_SRF)"
 klog "m489 phase2 start ril-daemon after Phone start (ss; Phone already polling)"
 klog "m396 phase2 start ril-daemon ss num_rilds=1 first property_get"
 klog "m395 phase2 start ril-daemon ss num_rilds=1 first property_get"
@@ -1407,6 +1436,7 @@ while [ "$pr" -lt 8 ]; do
     rildpid=`pidof hw/rild 2>/dev/null`
     [ -z "$rildpid" ] && rildpid=`pidof rild 2>/dev/null`
     if [ -n "$rildpid" ]; then
+        klog "m509 phase2 rild pid=$rildpid after Phone-first wait — leftover air then sleep 2 then txn 18 (no helper if Phone up; no bind logcat)"
         klog "m489 phase2 rild pid=$rildpid after Phone-first — leftover air then sleep 2 then txn 18 (helper only if unbound; no bind logcat)"
         klog "m485 phase2 rild pid=$rildpid after ss — force-stop then sleep 1 then helper power then release then stop/start ril-daemon then start Phone then leftover air then sleep 3 then txn 18 (fresh IRadio; GET 0 may drop; Phone txn 18 re-ONLINE; no bind logcat)"
         klog "m484 phase2 rild pid=$rildpid after ss — force-stop then sleep 1 then helper power then release then start Phone then leftover air then sleep 2 then txn 18 (no pid-empty wait; keep death cookie; GET 0 from helper SET ONLINE operating mode 0; no bind logcat)"
@@ -1481,13 +1511,11 @@ else
     setprop sys.talkman.air_leftover n
 fi
 # sleep 2 for Phone to bind the new IRadio. Do NOT logcat
-# bind greps (m469/m470 USB/PS_HOLD suspect). bind=y
-# only setResponseFunctions or RadioResponse registered
-# — not "missing". Helper only if still unbound and Phone
-# is not down. Prefer no helper IRadio if Phone is up.
+# bind greps (m469/m470 USB/PS_HOLD suspect). bind=y only
+# a NEW m474 setResponseFunctions non-null ss after ss
+# rild start. Do not take IRadio after Phone is up.
 sleep 2
 # cheap IRadio: one dmesg awk (full lshal is not cheap).
-# bind=y only srf/rr registered. Evidence tokens logged.
 bindflags=`dmesg 2>/dev/null | awk '
 BEGIN { srf="n"; rr="n"; rilj="n"; rsvc="n"; rimpl="n"; ir="n" }
 index($0, "setResponseFunctions non-null") { srf="y" }
@@ -1502,115 +1530,40 @@ index($0, "RadioImpl") { rimpl="y" }
 index($0, "android.hardware.radio@") { ir="y" }
 END { printf "srf=%s rr=%s rilj=%s rsvc=%s rimpl=%s ir=%s\n", srf, rr, rilj, rsvc, rimpl, ir }
 '`
+POST_SRF=`dmesg 2>/dev/null | grep -c 'm474 setResponseFunctions non-null ss'`
+[ -z "$POST_SRF" ] && POST_SRF=0
+klog "m509 one-shot dmesg pre_srf=$PRE_SRF post_srf=$POST_SRF $bindflags (bind only new non-null ss)"
 klog "m489 one-shot dmesg $bindflags (lshal skip not cheap; bind only srf/rr registered — not missing)"
 klog "m485 one-shot dmesg $bindflags (lshal skip not cheap; bind only srf/rr registered — not missing)"
-case "$bindflags" in
-    *srf=y*|*rr=y*)
-        PHONE_BOUND=y
-        BIND_SEEN=y
-        klog "m489 Phone setResponseFunctions or RadioResponse registered (bind=y; skip helper)"
-        klog "m485 Phone setResponseFunctions or RadioResponse registered (bind=y)"
-        klog "m484 Phone setResponseFunctions non-null ss in kmsg (libril cookie live)"
-        klog "m483 Phone setResponseFunctions non-null ss in kmsg (libril cookie live)"
-        klog "m482 Phone setResponseFunctions non-null ss in kmsg (libril cookie live)"
-        klog "m474 Phone setResponseFunctions non-null ss in kmsg (libril cookie live)"
-        ;;
-    *)
-        klog "m489 Phone setResponseFunctions/RadioResponse not registered after 2s"
-        klog "m485 Phone setResponseFunctions/RadioResponse not registered — still txn 18"
-        klog "m484 Phone setResponseFunctions non-null ss not in kmsg — still txn 18"
-        klog "m483 Phone setResponseFunctions non-null ss missing in kmsg — still txn 18"
-        klog "m482 Phone setResponseFunctions non-null ss missing in kmsg — still leftover air then txn 18"
-        klog "m474 Phone setResponseFunctions non-null ss missing in kmsg — still txn 18"
-        ;;
-esac
+if [ "$POST_SRF" -gt "$PRE_SRF" ]; then
+    PHONE_BOUND=y
+    BIND_SEEN=y
+    klog "m509 Phone setResponseFunctions non-null ss after ss rild (bind=y; skip helper)"
+    klog "m489 Phone setResponseFunctions or RadioResponse registered (bind=y; skip helper)"
+    klog "m485 Phone setResponseFunctions or RadioResponse registered (bind=y)"
+    klog "m474 Phone setResponseFunctions non-null ss in kmsg (libril cookie live)"
+else
+    klog "m509 Phone setResponseFunctions non-null ss not new after ss rild (pre=$PRE_SRF post=$POST_SRF) — still txn 18; no helper"
+    klog "m489 Phone setResponseFunctions/RadioResponse not registered after 2s"
+    klog "m474 Phone setResponseFunctions non-null ss missing in kmsg — still txn 18"
+fi
 phpid=`pidof com.android.phone 2>/dev/null`
 if [ "$PHONE_BOUND" = y ] || [ "$BIND_SEEN" = y ]; then
     klog "m489 skip helper — Phone already bound (do not steal IRadio)"
     klog "m489 prefer no helper IRadio if Phone is up"
 elif [ -z "$phpid" ]; then
     klog "m489 skip helper — Phone down"
-elif [ -n "$HELPER" ]; then
-    klog "m489 IRadio setRadioPower last-resort (Phone up, not bound after 2s)"
-    klog "m483 IRadio setRadioPower run $HELPER power (Phone down; helper setResponseFunctions(null)+exit after Complete; no pid-empty wait)"
-    klog "m482 IRadio setRadioPower run $HELPER power (Phone down; helper setResponseFunctions(null)+exit after Complete)"
-    klog "m471 IRadio setRadioPower run $HELPER power (Phone down; helper setResponseFunctions(null)+exit after Complete)"
-    klog "m469 IRadio setRadioPower run $HELPER power (Phone down; helper must release before Phone bind)"
-    klog "m462 IRadio setRadioPower run $HELPER power (Phone down; SET_UICC pattern; not steal)"
-    "$HELPER" power
-    HELPER_RP_RC=$?
-    HELPER_RP=`getprop sys.talkman.helper_rp`
-    HELPER_RP_COMP=`getprop sys.talkman.helper_rp_comp`
-    klog "m489 IRadio setRadioPower helper rc=$HELPER_RP_RC rp=$HELPER_RP comp=$HELPER_RP_COMP path=$HELPER"
-    klog "m483 IRadio setRadioPower helper rc=$HELPER_RP_RC rp=$HELPER_RP comp=$HELPER_RP_COMP path=$HELPER"
-    klog "m482 IRadio setRadioPower helper rc=$HELPER_RP_RC rp=$HELPER_RP comp=$HELPER_RP_COMP path=$HELPER"
-    klog "m471 IRadio setRadioPower helper rc=$HELPER_RP_RC rp=$HELPER_RP comp=$HELPER_RP_COMP path=$HELPER"
-    klog "m469 IRadio setRadioPower helper rc=$HELPER_RP_RC rp=$HELPER_RP comp=$HELPER_RP_COMP path=$HELPER"
-    klog "m462 IRadio setRadioPower helper rc=$HELPER_RP_RC rp=$HELPER_RP comp=$HELPER_RP_COMP path=$HELPER"
-    case "$HELPER_RP_RC" in
-        0)
-            HELPER_RP=y
-            case "$HELPER_RP_COMP" in
-                n) ;;
-                *) HELPER_RP_COMP=y ;;
-            esac
-            ;;
-        5)
-            HELPER_RP=y
-            ;;
-    esac
-    if [ "$HELPER_RP" = y ]; then
-        klog "m489 IRadio setRadioPower issued (Phone up, not bound after 2s)"
-        klog "m485 IRadio setRadioPower issued (Phone down)"
-        klog "m484 IRadio setRadioPower issued (Phone down)"
-        klog "m483 IRadio setRadioPower issued (Phone down)"
-        klog "m482 IRadio setRadioPower issued (Phone down)"
-        klog "m471 IRadio setRadioPower issued (Phone down)"
-        klog "m469 IRadio setRadioPower issued (Phone down)"
-        klog "m462 IRadio setRadioPower issued (Phone down)"
-        if [ "$HELPER_RP_COMP" = y ]; then
-            klog "m489 helper SET ONLINE completed -- operating mode 0"
-            klog "m485 helper SET ONLINE completed -- operating mode 0 (GET 0 may drop after fresh rild)"
-            klog "m484 helper SET ONLINE completed -- operating mode 0"
-            POST_GET0=y
-            POST_OPRT=y
-        fi
-    else
-        klog "m489 IRadio setRadioPower not issued rc=$HELPER_RP_RC rp=$HELPER_RP"
-        klog "m483 IRadio setRadioPower not issued rc=$HELPER_RP_RC rp=$HELPER_RP"
-        klog "m482 IRadio setRadioPower not issued rc=$HELPER_RP_RC rp=$HELPER_RP"
-        klog "m471 IRadio setRadioPower not issued rc=$HELPER_RP_RC rp=$HELPER_RP"
-        klog "m469 IRadio setRadioPower not issued rc=$HELPER_RP_RC rp=$HELPER_RP"
-        klog "m462 IRadio setRadioPower not issued rc=$HELPER_RP_RC rp=$HELPER_RP"
-    fi
-    HELPER_ALIVE=`pidof qmakernote-xtract 2>/dev/null`
-    klog "m489 helper setResponseFunctions(null)+exit after setRadioPower pid=$HELPER_ALIVE (empty=released IRadio; death cookie keeps later Phone bind)"
-    klog "m483 helper setResponseFunctions(null)+exit after setRadioPower pid=$HELPER_ALIVE (empty=released IRadio; death cookie keeps later Phone bind)"
-    klog "m482 helper setResponseFunctions(null)+exit after setRadioPower pid=$HELPER_ALIVE (empty=released IRadio; death cookie keeps later Phone bind)"
-    klog "m471 helper setResponseFunctions(null)+exit after setRadioPower pid=$HELPER_ALIVE (empty=released IRadio; fix NULL client)"
-    klog "m469 helper power exit pid=$HELPER_ALIVE (empty=released IRadio; Phone bind next)"
-    if [ -n "$HELPER_ALIVE" ]; then
-        sleep 1
-        HELPER_ALIVE=`pidof qmakernote-xtract 2>/dev/null`
-        klog "m489 helper power settle pid=$HELPER_ALIVE (empty=dead; txn 18 next; no pid-empty wait)"
-        klog "m483 helper power settle pid=$HELPER_ALIVE (empty=dead; start Phone next; no pid-empty wait)"
-        klog "m482 helper power settle pid=$HELPER_ALIVE (empty=dead; wait Phone pid gone next)"
-        klog "m471 helper power settle pid=$HELPER_ALIVE (empty=dead; Phone next)"
-        klog "m469 helper power settle pid=$HELPER_ALIVE (empty=dead; Phone next)"
-        klog "m466 helper death settle sleep 1 done pid=$HELPER_ALIVE (empty=dead; Phone next; not IRadio steal)"
-    fi
 else
-    klog "m489 IRadio setRadioPower helper missing — skip"
-    klog "m483 IRadio setRadioPower helper missing — skip"
-    klog "m482 IRadio setRadioPower helper missing — skip"
-    klog "m471 IRadio setRadioPower helper missing — skip"
-    klog "m469 IRadio setRadioPower helper missing — skip"
-    klog "m462 IRadio setRadioPower helper missing — skip"
-    setprop sys.talkman.helper_rp n
+    klog "m509 skip helper — Phone up unbound; getService wait should bind; helper would steal IRadio"
+    klog "m489 prefer no helper IRadio if Phone is up"
+    HELPER_RP=n
+    HELPER_RP_COMP=n
+    HELPER_RP_RC=n
 fi
 setprop sys.talkman.helper_rp $HELPER_RP
 setprop sys.talkman.helper_rp_comp $HELPER_RP_COMP
 setprop sys.talkman.helper_rp_rc $HELPER_RP_RC
+klog "m509 sleep 2 done — ITelephony.setRadioPower txn=18 i32 1; Phone-first wait; no helper if Phone up"
 klog "m489 sleep 2 done — ITelephony.setRadioPower txn=18 i32 1; Phone-first; helper only if unbound"
 klog "m485 sleep 3 done — ITelephony.setRadioPower txn=18 i32 1; helper dead; fresh rild; Phone had 3s to bind"
 klog "m484 sleep 2 done — ITelephony.setRadioPower txn=18 i32 1; helper dead; Phone had 2s to bind"

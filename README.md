@@ -119,7 +119,7 @@ Proven on this telephone: MPSS S3 **ONLINE**; `SET_UICC` after `CARDSTATE_PRESEN
 
 Not proven: `mVoiceRegState=0` (`IN_SERVICE`). Do **not** mark networks Working. RSSI **99** is an empty QMI cache. `FORCE_NW_SEARCH=1` does not call NAS **0x67** while `is_online=0`.
 
-Open hole: after the `ss` rild restart, Phone often does not call `setResponseFunctions` (IRadio). `ITelephony.setRadioPower` (transaction 18) can still return true. `talkman-rild-wait.sh` starts Phone first after phase-2 `ss`, then scores NAS **0x67** / `is_online` / `FORCE_NW_SEARCH` into kmsg.
+Open hole: after the `ss` rild restart, Phone often does not call `setResponseFunctions` (IRadio). `ITelephony.setRadioPower` (transaction 18) can still return true. `talkman-rild-wait.sh` now stops the phase-1 rild before starting Phone so RILJ `getService("slot1", true)` waits for the ss IRadio, then scores NAS **0x67** / `is_online` / `FORCE_NW_SEARCH` into kmsg. Not proven on the telephone.
 
 The 2026-09-01 zip and stay-up `#26` (`out/qa-m26-live-20260906.txt`) are still MBA **DEBUG 7** / `subsys3` OFFLINE.
 
